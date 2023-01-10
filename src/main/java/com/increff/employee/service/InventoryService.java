@@ -1,10 +1,12 @@
 package com.increff.employee.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.transaction.Transactional;
 
 import com.increff.employee.dao.InventoryDao;
+import com.increff.employee.model.OrderItemForm;
 import com.increff.employee.pojo.InventoryPojo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,7 +34,21 @@ public class InventoryService {
         dao.delete(barcode);
     }
 
-
+    public List<InventoryPojo> getInventoryPojo(List<String> barcode) throws ApiException {
+        List<InventoryPojo> inventoryPojoList = new ArrayList<>();
+        for (String temp : barcode) {
+            InventoryPojo inventoryPojo = get(temp);
+            inventoryPojoList.add(inventoryPojo);
+//            if (temp.getQuantity() > inventoryPojo.getQuantity()) {
+//                throw new ApiException("Maximum available quantity for the barcode" + temp.getBarcode() + " is " + inventoryPojo.getQuantity());
+//            }
+//            else{
+//                inventoryPojo.setQuantity(inventoryPojo.getQuantity()-temp.getQuantity());
+//                update(temp.getBarcode(),inventoryPojo);
+//            }
+        }
+        return inventoryPojoList;
+    }
     @Transactional(rollbackOn = ApiException.class)
     public InventoryPojo get(String barcode) throws ApiException {
         InventoryPojo p = dao.select(barcode);
@@ -48,9 +64,9 @@ public class InventoryService {
     }
 
     @Transactional(rollbackOn  = ApiException.class)
-    public void update(String barcode, InventoryPojo p) throws ApiException {
+    public void update(InventoryPojo p) throws ApiException {
         normalize(p);
-        InventoryPojo ex = dao.select(barcode);
+        InventoryPojo ex = dao.select(p.getBarcode());
 
             ex.setQuantity((p.getQuantity()));
             ex.setBarcode(p.getBarcode());

@@ -18,7 +18,8 @@ function getProductUrl(){
 //BUTTON ACTIONS
 function addProduct(event){
 	//Set the values to update
-	var $form = $("#product-form");
+
+	var $form = $("#product-add-form");
 	var json = toJson($form);
 	var url = getProductUrl();
     console.log(url,json)
@@ -30,7 +31,9 @@ function addProduct(event){
        	'Content-Type': 'application/json'
        },
 	   success: function(response) {
+	   	$('#add-product-modal').modal('toggle');
 	   		getProductList();
+
 	   },
 	   error: handleAjaxError,
 	});
@@ -155,10 +158,9 @@ console.log('ankur jinfo')
 	for(var i in data){
 		var e = data[i];
 		console.log(e);
-		var buttonHtml = '<button onclick="deleteProduct(' + e.barcode + ')">delete</button>'
-		buttonHtml += ' <button onclick="displayEditProduct(' + e.barcode + ')">edit</button>'
+//		var buttonHtml = '<button onclick="deleteProduct(' + "'" + e.barcode + "'" +')">delete</button>'
+		var buttonHtml = ' <button onclick="displayEditProduct(' + "'" + e.barcode + "'" +')">edit</button>'
 		var row = '<tr>'
-		+ '<td>' + e.id + '</td>'
 		+ '<td>' + e.name + '</td>'
 		+ '<td>'  + e.brandName + '</td>'
 		+ '<td>' + e.brandCategory + '</td>'
@@ -218,7 +220,7 @@ function displayUploadData(){
 
 function displayProduct(data){
     console.log(data)
-    console.log('displayProductssssssssssssssssss')
+
 	$("#product-edit-form input[name=name]").val(data.name);
 	$("#product-edit-form input[name=brandCategory]").val(data.brandCategory);
 	$("#product-edit-form input[name=brandName]").val(data.brandName);
@@ -229,6 +231,11 @@ function displayProduct(data){
 
 }
 
+function openAddModel(){
+
+	$('#add-product-modal').modal('toggle');
+
+}
 
 //INITIALIZATION CODE
 function init(){
@@ -238,9 +245,11 @@ function init(){
 	$('#upload-data').click(displayUploadData);
 	$('#process-data').click(processData);
 	$('#download-errors').click(downloadErrors);
-    $('#productFile').on('change', updateFileName)
-        var element = document.getElementById("product-icon");
-        element.classList.add("thick");
+    $('#productFile').on('change', updateFileName);
+    $('#create-new-product').click(openAddModel);
+
+    var element = document.getElementById("product-icon");
+    element.classList.add("thick");
 }
 
 $(document).ready(init);

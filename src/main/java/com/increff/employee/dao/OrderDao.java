@@ -12,8 +12,6 @@ import com.increff.employee.pojo.OrderPojo;
 import com.increff.employee.service.ApiException;
 import org.springframework.stereotype.Repository;
 
-import com.increff.employee.pojo.EmployeePojo;
-
 @Repository
 public class OrderDao extends AbstractDao {
 
@@ -46,27 +44,27 @@ public class OrderDao extends AbstractDao {
     public OrderPojo checkOrderExists(String barcode) {
         TypedQuery<OrderPojo> query = getQuery(check, OrderPojo.class);
         query.setParameter("barcode",barcode);
-        OrderPojo p = getSingle(query);
+        OrderPojo p = getSingleBrand(query);
         return p;
     }
     public OrderPojo select(String barcode) {
         System.out.println("anknanana");
         TypedQuery<OrderPojo> query = getQuery(select_barcode, OrderPojo.class);
         query.setParameter("barcode", barcode);
-        return getSingle(query);
+        return getSingleBrand(query);
     }
 
     public OrderPojo checkName(String name) {
         System.out.println("anknanana");
         TypedQuery<OrderPojo> query = getQuery(select_name, OrderPojo.class);
         query.setParameter("name", name);
-        return getSingle(query);
+        return getSingleBrand(query);
     }
 
     public OrderPojo select(int id) {
         TypedQuery<OrderPojo> query = getQuery(select_id, OrderPojo.class);
         query.setParameter("id", id);
-        return getSingle(query);
+        return getSingleBrand(query);
     }
 
 
@@ -74,7 +72,7 @@ public class OrderDao extends AbstractDao {
         TypedQuery<OrderPojo> query = getQuery(select_order, OrderPojo.class);
         query.setParameter("name", name);
         query.setParameter("category", category);
-        return getSingle(query);
+        return getSingleBrand(query);
     }
 
     public List<OrderPojo> selectAll() {

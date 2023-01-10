@@ -16,6 +16,14 @@ body {
 	text-align: center;
 }
 
+.my-custom-scrollbar {
+  position: relative;
+  max-height: calc(60vh);
+  overflow: auto;
+}
+.table-wrapper-scroll-y {
+  display: block;
+}
 
 .thick {
   font-weight: 900;

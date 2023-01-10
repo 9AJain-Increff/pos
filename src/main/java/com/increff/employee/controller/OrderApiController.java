@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
 @Api
 @RestController
 public class OrderApiController {
@@ -20,8 +21,7 @@ public class OrderApiController {
     @ApiOperation(value = "Adds a order")
     @RequestMapping(path = "/api/order", method = RequestMethod.POST)
     public void addOrder(@RequestBody List<OrderItemForm> form) throws ApiException {
-        System.out.println("ankur jainnnnnnnnnnn");
-        dto.addingOrder(form);
+        dto.addOrder(form);
     }
 
     @ApiOperation(value = "Deletes a order")
@@ -33,7 +33,6 @@ public class OrderApiController {
     @ApiOperation(value = "Gets list of all orders")
     @RequestMapping(path = "/api/order", method = RequestMethod.GET)
     public List<OrderData> getAllOrder() {
-
         return dto.gettingAllOrder();
     }
 
@@ -41,18 +40,15 @@ public class OrderApiController {
     @ApiOperation(value = "Gets a order by ID")
     @RequestMapping(path = "/api/order/{id}", method = RequestMethod.GET)
     public List<OrderItemData> get(@PathVariable int id) throws ApiException {
-        List<OrderItemData> p = dto.get(id);
-//        System.out.println("ankur jainiiiiiiiiiinini      "+p.getBarcode());
-        return (p);
+        return dto.getOrderById(id);
     }
-
 
 
     @ApiOperation(value = "Edit a Order")
     @RequestMapping(path = "/api/order/{id}", method = RequestMethod.PUT)
     public void editOrder(@PathVariable int id, @RequestBody List<OrderItemForm> form) throws ApiException {
         System.out.println("apicontroller");
-        dto.updating(id,form);
+        dto.updating(id, form);
 
     }
 

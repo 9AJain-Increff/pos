@@ -1,18 +1,22 @@
 package com.increff.employee.service;
 
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.transaction.Transactional;
 
 import com.increff.employee.dao.OrderDao;
-import com.increff.employee.model.InventoryData;
+import com.increff.employee.model.InventoryData; // TODO: Remove unused imports
 import com.increff.employee.pojo.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.increff.employee.dao.EmployeeDao;
 import com.increff.employee.util.StringUtil;
+
+import static com.increff.employee.util.ConversionUtil.convertToOrderPojo;
 
 @Service
 public class OrderService {
@@ -30,14 +34,16 @@ public class OrderService {
     }
 
 
-    @Transactional(rollbackOn = ApiException.class)
-    public OrderPojo get(int id) throws ApiException {
-        return getCheck(id);
-    }
+
 
     @Transactional
     public List<OrderPojo> getAll() {
         return dao.selectAll();
+    }
+    public OrderPojo createNewOrder() throws ApiException {
+        LocalDateTime date = LocalDateTime.now(ZoneOffset.UTC);
+        OrderPojo newOrder = convertToOrderPojo(date);
+        return dao.insert(newOrder);
     }
 
 //    @Transactional(rollbackOn  = ApiException.class)
@@ -71,7 +77,7 @@ public class OrderService {
 
 
     @Transactional
-    public OrderPojo getCheck(int id) throws ApiException {
+    public OrderPojo checkOrderExist(int id) throws ApiException {
         OrderPojo p = dao.select(id);
         if (p == null) {
             throw new ApiException("Order with given ID does not exit, id: " + id);

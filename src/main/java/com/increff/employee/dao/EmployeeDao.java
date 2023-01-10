@@ -36,7 +36,7 @@ public class EmployeeDao extends AbstractDao {
 	public EmployeePojo select(int id) {
 		TypedQuery<EmployeePojo> query = getQuery(select_id, EmployeePojo.class);
 		query.setParameter("id", id);
-		return getSingle(query);
+		return getSingleBrand(query);
 	}
 
 	public List<EmployeePojo> selectAll() {

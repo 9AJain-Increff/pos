@@ -1,18 +1,13 @@
 package com.increff.employee.service;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.transaction.Transactional;
 
 import com.increff.employee.dao.OrderItemDao;
-import com.increff.employee.model.OrderItemData;
 import com.increff.employee.pojo.InventoryPojo;
 import com.increff.employee.pojo.OrderItemPojo;
-import com.increff.employee.pojo.OrderPojo;
-import com.increff.employee.pojo.ProductPojo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -38,13 +33,14 @@ public class OrderItemService {
 
     @Transactional
     public void delete(int id) {
+        // TODO: throw ApiException
         dao.delete(id);
     }
 
 
     @Transactional(rollbackOn = ApiException.class)
-    public List<OrderItemPojo> get(int id) throws ApiException {
-        return getCheck(id);
+    public List<OrderItemPojo> getOrderItemsById(int id) throws ApiException {
+        return dao.select(id);
     }
 
     @Transactional
@@ -118,12 +114,7 @@ public class OrderItemService {
         return p;
     }
 
-    @Transactional
-    public List<OrderItemPojo> getCheck(int id) throws ApiException {
-        List<OrderItemPojo> p = dao.select(id);
 
-        return p;
-    }
 
 //    public Boolean checkOrderItemExists(String barcode) throws ApiException {
 //        OrderItemPojo p = dao.select(barcode);

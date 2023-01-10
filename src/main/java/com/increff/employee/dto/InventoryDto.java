@@ -53,13 +53,13 @@ public class InventoryDto {
     }
 
 
-    public void updating(String barcode, InventoryForm form) throws ApiException  {
+    public void updating( InventoryForm form) throws ApiException  {
 
         InventoryPojo p = convertToInventoryPojo(form);
 //        Boolean inventoryExist = service.getCheck(p.getBarcode());
         Boolean productExist = productService.checkProductExists(p.getBarcode());
         if( productExist){
-            service.update(barcode,p);
+            service.update(p);
         }
     }
 

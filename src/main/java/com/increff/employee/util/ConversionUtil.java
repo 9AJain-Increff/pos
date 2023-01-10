@@ -97,14 +97,14 @@ public class ConversionUtil {
     }
 
 
-    public static OrderItemData convertToOrderItemData(OrderItemPojo p) {
+    public static OrderItemData convertToOrderItemData(OrderItemPojo p, String productName) {
         OrderItemData d = new OrderItemData();
         d.setBarcode(p.getBarcode());
         d.setPrice(p.getPrice());
         d.setQuantity(p.getQuantity());
         d.setOrderId(p.getOrderId());
         d.setId(p.getId());
-
+        d.setName(productName);
         return d;
     }
 
