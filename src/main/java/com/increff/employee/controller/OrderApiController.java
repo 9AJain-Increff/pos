@@ -19,6 +19,7 @@ public class OrderApiController {
     private OrderDto dto;
 
     @ApiOperation(value = "Adds a order")
+    // todo change path
     @RequestMapping(path = "/api/order", method = RequestMethod.POST)
     public void addOrder(@RequestBody List<OrderItemForm> form) throws ApiException {
         dto.addOrder(form);
@@ -45,6 +46,7 @@ public class OrderApiController {
 
 
     @ApiOperation(value = "Edit a Order")
+    // todo replace with logger
     @RequestMapping(path = "/api/order/{id}", method = RequestMethod.PUT)
     public void editOrder(@PathVariable int id, @RequestBody List<OrderItemForm> form) throws ApiException {
         System.out.println("apicontroller");

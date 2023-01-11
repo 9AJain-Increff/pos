@@ -32,7 +32,7 @@ public class ProductApiController {
 
     @ApiOperation(value = "Gets list of all products")
     @RequestMapping(path = "/api/product", method = RequestMethod.GET)
-    public List<ProductData> getAllProduct() {
+    public List<ProductData> getAllProduct() throws ApiException {
 
         return dto.getAllProduct();
     }

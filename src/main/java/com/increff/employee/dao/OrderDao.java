@@ -1,5 +1,6 @@
 package com.increff.employee.dao;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -24,6 +25,9 @@ public class OrderDao extends AbstractDao {
 
     private static String select_order = "select p from OrderPojo p where name=:name AND category=:category";
     private static String check = "select p from OrderPojo p where barcode=:barcode";
+    private static String get_between_date = "select p from OrderPojo p where createdOn IN BETWEEN :start and :end";
+
+
     @PersistenceContext
     private EntityManager em;
 
@@ -79,6 +83,15 @@ public class OrderDao extends AbstractDao {
         TypedQuery<OrderPojo> query = getQuery(select_all, OrderPojo.class);
 
         return query.getResultList();
+    }
+
+    public List<OrderPojo> getOrdersForReport(LocalDateTime start, LocalDateTime end){
+
+        TypedQuery<OrderPojo> query = getQuery(get_between_date, OrderPojo.class);
+        query.setParameter("start", start);
+        query.setParameter("end", end);
+        return query.getResultList();
+
     }
     @Transactional
     public void update(OrderPojo p) {

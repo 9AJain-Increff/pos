@@ -12,28 +12,18 @@ public class ProductPojo {
     private int id;
     private String name;
 
+    private Integer brandId;
 
-    private String brandName;
+    public Integer getBrandId() {
+        return brandId;
+    }
 
-    private String brandCategory;
+    public void setBrandId(Integer brandId) {
+        this.brandId = brandId;
+    }
+
     private int price;
     private String barcode;
-
-    public String getBrandName() {
-        return brandName;
-    }
-
-    public void setBrandName(String brandName) {
-        this.brandName = brandName;
-    }
-
-    public String getBrandCategory() {
-        return brandCategory;
-    }
-
-    public void setBrandCategory(String brandCategory) {
-        this.brandCategory = brandCategory;
-    }
 
     public String getBarcode() {
         return barcode;

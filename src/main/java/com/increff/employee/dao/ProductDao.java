@@ -18,16 +18,17 @@ public class ProductDao extends AbstractDao {
     private static String delete_barcode = "delete from ProductPojo p where barcode=:barcode";
     private static String select_barcode = "select p from ProductPojo p where barcode=:barcode";
 
-    private static String select_name = "select p from ProductPojo p where name=:name";
+    private static String select_name = "select p from ProductPojo p where name=:name , brandName=:brandName AND brandCategory=:brandCategory";
     private static String select_id = "select p from ProductPojo p where id=:id";
     private static String select_all = "select p from ProductPojo p";
 
     private static String select_product = "select p from ProductPojo p where name=:name AND category=:category";
     private static String check = "select p from ProductPojo p where barcode=:barcode";
+    private static String select_product_by_name = "select p from ProductPojo p where name=:name";
     @PersistenceContext
     private EntityManager em;
 
-    public void insert(ProductPojo p) throws ApiException {
+    public void add(ProductPojo p) throws ApiException {
         System.out.println("ankur jain");
         em.persist(p);
 
@@ -53,9 +54,15 @@ public class ProductDao extends AbstractDao {
         return getSingleBrand(query);
     }
 
-    public ProductPojo getProductByName(String name) {
+    public ProductPojo getProductByBrandName(
+            String name,
+            String brandName,
+            String brandCategory) {
         TypedQuery<ProductPojo> query = getQuery(select_name, ProductPojo.class);
         query.setParameter("name", name);
+        query.setParameter("brandName", brandName);
+        query.setParameter("brandCategory", brandCategory);
+        System.out.println(query);
         return getSingleBrand(query);
     }
 
@@ -78,6 +85,12 @@ public class ProductDao extends AbstractDao {
 
         return query.getResultList();
     }
+    public ProductPojo getProductByProductName(ProductPojo product) {
+        TypedQuery<ProductPojo> query = getQuery(select_product_by_name, ProductPojo.class);
+        query.setParameter("name", product.getName());
+        return getSingleBrand(query);
+    }
+
     @Transactional
     public void update(ProductPojo p) {
 

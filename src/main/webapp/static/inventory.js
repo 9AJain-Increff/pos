@@ -1,114 +1,3 @@
-//
-//function getInventoryUrl(){
-//	var baseUrl = $("meta[name=baseUrl]").attr("content")
-//	return baseUrl + "/api/inventory";
-//}
-//
-////BUTTON ACTIONS
-//function addInventory(event){
-//	//Set the values to update
-//	var $form = $("#inventory-form");
-//	var json = toJson($form);
-//	var url = getInventoryUrl();
-//    console.log(url);
-//    console.log("ankur jain");
-//    console.log(json);
-//	$.ajax({
-//	   url: url,
-//	   type: 'POST',
-//	   data: json,
-//	   headers: {
-//       	'Content-Type': 'application/json'
-//       },
-//	   success: function(response) {
-//	   		getInventoryList();
-//	   },
-//	   error: handleAjaxError
-//	});
-//
-//	return false;
-//}
-//
-//function getInventoryList(){
-//	var url = getInventoryUrl();
-//	$.ajax({
-//	   url: url,
-//	   type: 'GET',
-//	   success: function(data) {
-//	   		displayInventoryList(data);
-//	   },
-//	   error: handleAjaxError
-//	});
-//}
-//
-//function deleteInventory(id){
-//	var url = getInventoryUrl() + "/" + id;
-//	console.log('pppppppppppppppppppppppp')
-//    console.log(url);
-//	$.ajax({
-//	   url: url,
-//	   type: 'DELETE',
-//	   success: function(data) {
-//	   		getInventoryList();
-//	   },
-//	   error: handleAjaxError
-//	});
-//}
-//
-////UI DISPLAY METHODS
-//
-//function displayEditInventory(id){
-//console.log('jjjjjjjjjjjjjjjjjjjjjjjjjj')
-//	var url = getInventoryUrl() + "/" + id;
-//	console.log(url);
-//	console.log('ttttttttttttttttttt')
-//	$.ajax({
-//	   url: url,
-//	   type: 'PUT',
-//	   success: function(data) {
-//	   		displayInventoryList(data);
-//	   },
-//	   error: handleAjaxError
-//	});
-//}
-//
-//
-//
-//
-//function displayInventoryList(data){
-//	console.log('Printing Inventory data');
-//	var $tbody = $('#inventory-table').find('tbody');
-//	$tbody.empty();
-//	for(var i in data){
-//		var e = data[i];
-//		console.log("ppppppppppppppppp")
-//		console.log(e);
-//		var buttonHtml = '<button onclick="deleteInventory(' + e.id + ')">delete</button>'
-//		buttonHtml += ' <button onclick="displayEditInventory(' + e.id + ')">edit</button>'
-//		var row = '<tr>'
-//		+ '<td>' + e.id + '</td>'
-//		+ '<td>' + e.name + '</td>'
-//        + '<td>' + e.category + '</td>'
-//		+ '<td>' + buttonHtml + '</td>'
-//		+ '</tr>';
-//        $tbody.append(row);
-//	}
-//}
-//
-//
-////INITIALIZATION CODE
-//function init(){
-//	$('#add-inventory').click(addInventory);
-//	$('#refresh-data').click(getInventoryList);
-//
-//}
-//
-//$(document).ready(init);
-//$(document).ready(getInventoryList);
-//
-
-
-
 
 
 
@@ -336,6 +225,34 @@ function displayInventory(data){
 }
 
 
+function createInventory(){
+	$('#add-inventory-modal').modal('toggle');
+	//Get the ID
+	var url = getInventoryUrl() ;
+
+	//Set the values to update
+	var $form = $("#inventory-add-form");
+	var json = toJson($form);
+	$.ajax({
+	   url: url,
+	   type: 'POST',
+	   data: json,
+	   headers: {
+       	'Content-Type': 'application/json'
+       },
+	   success: function(response) {
+	   	$('#add-inventory-modal').modal('toggle');
+	   		getInventoryList();
+	   },
+	   error:
+	   handleAjaxError
+
+	});
+
+	return false;
+}
+
+
 //INITIALIZATION CODE
 function init(){
 	$('#add-inventory').click(addInventory);
@@ -345,6 +262,8 @@ function init(){
 	$('#process-data').click(processData);
 	$('#download-errors').click(downloadErrors);
     $('#inventoryFile').on('change', updateFileName)
+  	$('#create-new-inventory').click(createInventory);
+
     var element = document.getElementById("inventory-icon");
     element.classList.add("thick");
 }

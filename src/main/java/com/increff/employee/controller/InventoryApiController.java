@@ -1,20 +1,13 @@
 package com.increff.employee.controller;
 
 import com.increff.employee.dto.InventoryDto;
-import com.increff.employee.dto.ProductDto;
 import com.increff.employee.model.*;
-import com.increff.employee.pojo.InventoryPojo;
-import com.increff.employee.pojo.EmployeePojo;
-import com.increff.employee.pojo.UserPojo;
 import com.increff.employee.service.ApiException;
-import com.increff.employee.service.InventoryService;
-import com.increff.employee.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 @Api
 @RestController
@@ -27,7 +20,7 @@ public class InventoryApiController {
     @ApiOperation(value = "Adds a inventory")
     @RequestMapping(path = "/api/inventory", method = RequestMethod.POST)
     public void addInventory(@RequestBody InventoryForm form) throws ApiException {
-        dto.addingInventory(form);
+        dto.addInventory(form);
     }
 
     @ApiOperation(value = "Deletes a inventory")
@@ -38,9 +31,9 @@ public class InventoryApiController {
 
     @ApiOperation(value = "Gets list of all inventorys")
     @RequestMapping(path = "/api/inventory", method = RequestMethod.GET)
-    public List<InventoryData> getAllInventory() {
-        System.out.println("anknanana");
-        return dto.gettingAllInventory();
+    public List<InventoryData> getAllInventory() throws ApiException {
+
+        return dto.getAllInventory();
     }
 
 

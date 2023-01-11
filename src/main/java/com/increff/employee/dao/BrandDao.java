@@ -52,6 +52,7 @@ public class BrandDao extends AbstractDao {
         return getSingleBrand(query);
     }
 
+
     public List<BrandPojo> getAllBrand() {
         TypedQuery<BrandPojo> query = getQuery(select_all, BrandPojo.class);
 

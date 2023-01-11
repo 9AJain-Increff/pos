@@ -1,5 +1,6 @@
 package com.increff.employee.dao;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -9,6 +10,7 @@ import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
 
 import com.increff.employee.pojo.OrderItemPojo;
+import com.increff.employee.pojo.OrderPojo;
 import com.increff.employee.service.ApiException;
 import org.springframework.stereotype.Repository;
 
@@ -25,6 +27,8 @@ public class OrderItemDao extends AbstractDao {
     private static String select_orderItem = "select p from OrderItemPojo p where id=:id ";
     private static String select_orderItemByBarcode = "select p from OrderItemPojo p where orderId=:orderId and barcode=:barcode";
     private static String check = "select p from OrderItemPojo p where barcode=:barcode";
+    private static String get_between_date = "select p from OrderPojo p where createdOn IN BETWEEN :start and :end";
+
     @PersistenceContext
     private EntityManager em;
 
@@ -87,6 +91,14 @@ public class OrderItemDao extends AbstractDao {
         TypedQuery<OrderItemPojo> query = getQuery(select_all, OrderItemPojo.class);
 
         return query.getResultList();
+    }
+    public List<OrderPojo> getOrdersForReport(LocalDateTime start, LocalDateTime end){
+
+        TypedQuery<OrderPojo> query = getQuery(get_between_date, OrderPojo.class);
+        query.setParameter("start", start);
+        query.setParameter("end", end);
+        return query.getResultList();
+
     }
     @Transactional
     public void update(OrderItemPojo p) {

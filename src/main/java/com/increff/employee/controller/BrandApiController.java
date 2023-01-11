@@ -5,7 +5,9 @@ import com.increff.employee.model.*;
 import com.increff.employee.service.ApiException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.jetbrains.annotations.Async;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -51,5 +53,10 @@ public class BrandApiController {
     public void editBrand(@PathVariable int id, @RequestBody BrandForm form) throws ApiException {
         dto.updateBrand(id, form);
     }
+//
+//    @Scheduled(cron = "0 0 0 ? * * *")
+//    private void cron() {
+//
+//    }
 
 }

@@ -27,24 +27,22 @@ public class ConversionUtil {
     }
 
 
-    public static ProductData convertToProductData(ProductPojo p) {
+    public static ProductData convertToProductData(ProductPojo p, BrandPojo b) {
         ProductData d = new ProductData();
         d.setName(p.getName());
-        d.setBrandName(p.getBrandName());
-        d.setBrandCategory(p.getBrandCategory());
+        d.setBrandName(b.getName());
+        d.setBrandCategory(b.getCategory());
         d.setBarcode(p.getBarcode());
         d.setPrice(p.getPrice());
         d.setId(p.getId());
         return d;
     }
 
-    public static  ProductPojo convertToProductPojo(ProductForm f) {
+    public static  ProductPojo convertToProductPojo(ProductForm f, int brandId) {
         ProductPojo p = new ProductPojo();
         p.setName(f.getName());
-        p.setBrandCategory(f.getBrandCategory());
+        p.setBrandId(brandId);
         p.setPrice(f.getPrice());
-        p.setBrandName(f.getBarcode());
-        p.setBrandName(f.getBrandName());
         p.setBarcode(f.getBarcode());
         return p;
     }

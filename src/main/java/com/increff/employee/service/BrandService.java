@@ -1,11 +1,13 @@
 package com.increff.employee.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.transaction.Transactional;
 
 import com.increff.employee.dao.BrandDao;
 import com.increff.employee.pojo.BrandPojo;
+import com.increff.employee.pojo.ProductPojo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,8 +17,12 @@ public class BrandService {
     @Autowired
     private BrandDao dao;
 
-    public BrandPojo getBrandByName(String name, String category){
-        return (dao.getBrand(name,category));
+    public BrandPojo checkBrandByName(String name, String category) throws ApiException {
+       BrandPojo b = dao.getBrand(name,category);
+       if(b== null){
+           throw new ApiException("Brand Doesn't exist");
+       }
+       return b;
     }
 
     @Transactional(rollbackOn = ApiException.class)
@@ -64,6 +70,22 @@ public class BrandService {
         }
     }
 
+
+    public BrandPojo getBrandId(String brandName, String brandCategory) throws ApiException {
+
+        BrandPojo brand = dao.getBrand(brandName, brandCategory);
+        if(brand == null)
+            throw new ApiException("Brand with given name and category does not exit " );
+        return brand;
+    }
+
+    public List<BrandPojo> getBrandsByProducts(List<ProductPojo> products) throws ApiException {
+        List<BrandPojo> brands = new ArrayList<>();
+        for(ProductPojo product : products){
+            brands.add((getBrandById(product.getBrandId())));
+        }
+        return brands;
+    }
 
 
 

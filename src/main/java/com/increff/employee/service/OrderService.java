@@ -8,13 +8,9 @@ import java.util.List;
 import javax.transaction.Transactional;
 
 import com.increff.employee.dao.OrderDao;
-import com.increff.employee.model.InventoryData; // TODO: Remove unused imports
 import com.increff.employee.pojo.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import com.increff.employee.dao.EmployeeDao;
-import com.increff.employee.util.StringUtil;
 
 import static com.increff.employee.util.ConversionUtil.convertToOrderPojo;
 
@@ -105,6 +101,9 @@ public class OrderService {
     }
 
 
+    public List<OrderPojo> getOrdersBetweenTime(LocalDateTime start, LocalDateTime end){
+        return dao.getOrdersForReport(start, end);
+    }
 
 
 

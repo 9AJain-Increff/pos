@@ -4,16 +4,12 @@ package com.increff.employee.dto;
 import com.increff.employee.model.InventoryData;
 import com.increff.employee.model.InventoryForm;
 import com.increff.employee.pojo.InventoryPojo;
-import com.increff.employee.pojo.EmployeePojo;
 import com.increff.employee.pojo.ProductPojo;
 import com.increff.employee.service.ApiException;
-import com.increff.employee.service.BrandService;
 import com.increff.employee.service.InventoryService;
 import com.increff.employee.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,14 +33,12 @@ public class InventoryDto {
         InventoryPojo b = service.get(barcode);
         return convertToInventoryData(b);
     }
-    public void addingInventory(InventoryForm form) throws ApiException {
+    public void addInventory(InventoryForm form) throws ApiException {
         InventoryPojo p = convertToInventoryPojo(form);
-        Boolean inventoryExist = service.getCheck(p.getBarcode());
-        Boolean productExist = productService.checkProductExists(p.getBarcode());
-        if(inventoryExist && productExist){
-            service.add(p);
 
-        }
+        service.add(p);
+
+
 
     }
 
@@ -63,23 +57,20 @@ public class InventoryDto {
         }
     }
 
-    public List<InventoryData> gettingAllInventory() {
-        System.out.println("anknanana");
-        List<InventoryPojo> list = service.getAll();
+    public List<InventoryData> getAllInventory() throws ApiException {
+        List<InventoryPojo> inventoryList = service.getAllInventory();
 
-        List<ProductPojo> productList = new ArrayList<ProductPojo>();
-
-        productList =  productService.getProductByBarcode(list);
+        List<ProductPojo> productList = service.getProductByInventory(inventoryList);
 //        System.out.println(list);
-        List<InventoryData> list2 = new ArrayList<InventoryData>();
+        List<InventoryData> inventoryDataList = new ArrayList<InventoryData>();
 
 
         System.out.println(productList.size());
-        for (int i = 0; i < list.size(); i++) {
-            list2.add(convertToInventoryData(list.get(i), productList.get(i)));
+        for (int i = 0; i < inventoryList.size(); i++) {
+            inventoryDataList.add(convertToInventoryData(inventoryList.get(i), productList.get(i)));
         }
 
-        return list2;
+        return inventoryDataList;
     }
 
 //    private static InventoryData convert(InventoryPojo p) {

@@ -6,13 +6,11 @@ import java.util.List;
 import javax.transaction.Transactional;
 
 import com.increff.employee.dao.InventoryDao;
-import com.increff.employee.model.OrderItemForm;
 import com.increff.employee.pojo.InventoryPojo;
+import com.increff.employee.pojo.ProductPojo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.increff.employee.dao.EmployeeDao;
-import com.increff.employee.pojo.EmployeePojo;
 import com.increff.employee.util.StringUtil;
 
 @Service
@@ -20,13 +18,15 @@ public class InventoryService {
 
     @Autowired
     private InventoryDao dao;
+    @Autowired
+    private ProductService productService;
+
 
     @Transactional(rollbackOn = ApiException.class)
     public void add(InventoryPojo p) throws ApiException {
-        normalize(p);
-
+        InventoryPojo inventory = getInventoryByBarcode(p.getBarcode());
+        ProductPojo product = productService.getProductByBarcode(p.getBarcode());
         dao.insert(p);
-
     }
 
     @Transactional
@@ -59,8 +59,10 @@ public class InventoryService {
     }
 
     @Transactional
-    public List<InventoryPojo> getAll() {
+    public List<InventoryPojo> getAllInventory() {
         return dao.selectAll();
+
+
     }
 
     @Transactional(rollbackOn  = ApiException.class)
@@ -75,16 +77,8 @@ public class InventoryService {
 //        dao.update(ex);
     }
 
-    @Transactional
-    public Boolean getCheck(String barcode) throws ApiException {
-        InventoryPojo p = dao.select(barcode);
-        if (p == null) {
-            return true;
-        }
-        else{
-            throw new ApiException("Inventory with given barcode already exit, barcode: " + barcode);
-        }
-
+    public InventoryPojo getInventoryByBarcode(String barcode) throws ApiException {
+        return dao.select(barcode);
     }
 
     public Boolean checkInventoryExists(String name,String category) throws ApiException {
@@ -97,7 +91,10 @@ public class InventoryService {
 
     }
 
-
+    public List<ProductPojo>   getProductByInventory(List<InventoryPojo> inventoryList) throws ApiException {
+       List<ProductPojo> productList =  productService.getProductByBarcode(inventoryList);
+       return productList;
+    }
 
 
 

@@ -1,5 +1,6 @@
 package com.increff.employee.service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,6 +9,7 @@ import javax.transaction.Transactional;
 import com.increff.employee.dao.OrderItemDao;
 import com.increff.employee.pojo.InventoryPojo;
 import com.increff.employee.pojo.OrderItemPojo;
+import com.increff.employee.pojo.OrderPojo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -115,44 +117,14 @@ public class OrderItemService {
     }
 
 
-
-//    public Boolean checkOrderItemExists(String barcode) throws ApiException {
-//        OrderItemPojo p = dao.select(barcode);
-//        if(p == null) {
-//            throw new ApiException(("barcode doesn't exist in orderItems"));
-//        }
-//        return true;
-//
-//    }
-
-//    @Transactional
-//    public OrderItemPojo getPrice(String barcode) throws ApiException {
-//        OrderItemPojo p = dao.select(barcode);
-//        return p;
-//    }
-
-//    public Boolean nameExist(String name) throws ApiException {
-//        OrderItemPojo p = dao.checkName(name);
-//        if(p == null) {
-//            return false;
-//        }
-//        else {
-//            throw new ApiException(("brand name+brand category +orderItem name already exist"));
-//        }
-//    }
-
-
-//    public Boolean     checkBarcodeSameOrNot(String updatedBarcode,int id) throws ApiException {
-//        OrderItemPojo p = dao.select(id);
-//        String currentBarcode = p.getBarcode();
-//
-//        if(updatedBarcode == currentBarcode) {
-//            return true;
-//        }
-//        return false;
-//
-//    }
-
+    public List<OrderItemPojo> getOrderItemByOrders(List<OrderPojo> orders) throws ApiException {
+        List<OrderItemPojo> orderItems = new ArrayList<>();
+        for(OrderPojo order : orders){
+            List<OrderItemPojo> o = getOrderItemsById(order.getId());
+            orderItems.addAll(o);
+        }
+        return orderItems;
+    }
 
     protected static void normalize(OrderItemPojo p) {
         p.setBarcode(StringUtil.toLowerCase(p.getBarcode()));
