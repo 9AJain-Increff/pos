@@ -1,32 +1,9 @@
 package com.increff.employee.model;
 
-import java.time.LocalDateTime;
-import java.util.Date;
-
-public class SalesForm {
-
-    private Date startTime;
-    private Date endTime;
+public class InventoryReportData {
     private String brandName;
-
-    public Date getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(Date startTime) {
-        this.startTime = startTime;
-    }
-
-    public Date getEndTime() {
-        return endTime;
-    }
-
-    public void setEndTime(Date endTime) {
-        this.endTime = endTime;
-    }
-
     private String brandCategory;
-
+    private Integer quantity;
 
     public String getBrandName() {
         return brandName;
@@ -42,5 +19,13 @@ public class SalesForm {
 
     public void setBrandCategory(String brandCategory) {
         this.brandCategory = brandCategory;
+    }
+
+    public Integer getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
     }
 }

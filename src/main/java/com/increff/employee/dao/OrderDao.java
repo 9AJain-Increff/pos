@@ -25,7 +25,7 @@ public class OrderDao extends AbstractDao {
 
     private static String select_order = "select p from OrderPojo p where name=:name AND category=:category";
     private static String check = "select p from OrderPojo p where barcode=:barcode";
-    private static String get_between_date = "select p from OrderPojo p where createdOn IN BETWEEN :start and :end";
+    private static String get_between_date = "select p from OrderPojo p where p.createdOn  BETWEEN :start and :end";
 
 
     @PersistenceContext

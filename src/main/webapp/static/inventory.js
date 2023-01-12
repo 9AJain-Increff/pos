@@ -14,10 +14,16 @@ function getInventoryUrl(){
 	return baseUrl + "/api/inventory";
 }
 
+function getCureentOrderItem() {
+  return {
+    barcode: $('#addBarcode').val(),
+    quantity: Number.parseInt($('#addQuantity').val()),
+  };
+}
 //BUTTON ACTIONS
 function addInventory(event){
 	//Set the values to update
-	var $form = $("#inventory-form");
+	var $form = $("#inventory-add-form");
 	var json = toJson($form);
 	var url = getInventoryUrl();
 
@@ -29,6 +35,7 @@ function addInventory(event){
        	'Content-Type': 'application/json'
        },
 	   success: function(response) {
+	   	$('#add-inventory-modal').modal('toggle');
 	   		getInventoryList();
 	   },
 	   error: handleAjaxError,
@@ -228,28 +235,28 @@ function displayInventory(data){
 function createInventory(){
 	$('#add-inventory-modal').modal('toggle');
 	//Get the ID
-	var url = getInventoryUrl() ;
-
-	//Set the values to update
-	var $form = $("#inventory-add-form");
-	var json = toJson($form);
-	$.ajax({
-	   url: url,
-	   type: 'POST',
-	   data: json,
-	   headers: {
-       	'Content-Type': 'application/json'
-       },
-	   success: function(response) {
-	   	$('#add-inventory-modal').modal('toggle');
-	   		getInventoryList();
-	   },
-	   error:
-	   handleAjaxError
-
-	});
-
-	return false;
+//	var url = getInventoryUrl() ;
+//
+//	//Set the values to update
+//	var $form = $("#inventory-add-form");
+//	var json = toJson($form);
+//	$.ajax({
+//	   url: url,
+//	   type: 'POST',
+//	   data: json,
+//	   headers: {
+//       	'Content-Type': 'application/json'
+//       },
+//	   success: function(response) {
+//	   	$('#add-inventory-modal').modal('toggle');
+//	   		getInventoryList();
+//	   },
+//	   error:
+//	   handleAjaxError
+//
+//	});
+//
+//	return false;
 }
 
 

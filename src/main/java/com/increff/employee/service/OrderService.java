@@ -1,8 +1,10 @@
 package com.increff.employee.service;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.transaction.Transactional;
@@ -99,10 +101,17 @@ public class OrderService {
             throw new ApiException(("brand name+brand category +order name already exist"));
         }
     }
+    public LocalDateTime convertToLocalDateViaInstant(Date dateToConvert) {
+        return dateToConvert.toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate().atStartOfDay();
+    }
 
 
-    public List<OrderPojo> getOrdersBetweenTime(LocalDateTime start, LocalDateTime end){
-        return dao.getOrdersForReport(start, end);
+    public List<OrderPojo> getOrdersBetweenTime(Date start, Date end){
+        LocalDateTime s = convertToLocalDateViaInstant(start);
+        LocalDateTime e = convertToLocalDateViaInstant(end);
+        return dao.getOrdersForReport(s, e);
     }
 
 

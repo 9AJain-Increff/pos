@@ -24,9 +24,14 @@ public class InventoryService {
 
     @Transactional(rollbackOn = ApiException.class)
     public void add(InventoryPojo p) throws ApiException {
-        InventoryPojo inventory = getInventoryByBarcode(p.getBarcode());
         ProductPojo product = productService.getProductByBarcode(p.getBarcode());
-        dao.insert(p);
+        InventoryPojo exist = dao.select(p.getBarcode());
+        if(exist == null){
+            dao.insert(p);
+        }
+        else {
+            update(p);
+        }
     }
 
     @Transactional
@@ -69,9 +74,8 @@ public class InventoryService {
     public void update(InventoryPojo p) throws ApiException {
         normalize(p);
         InventoryPojo ex = dao.select(p.getBarcode());
-
-            ex.setQuantity((p.getQuantity()));
-            ex.setBarcode(p.getBarcode());
+        ex.setQuantity((p.getQuantity()+ex.getQuantity()));
+        ex.setBarcode(p.getBarcode());
 
 
 //        dao.update(ex);

@@ -1,0 +1,62 @@
+<!doctype html>
+
+<html lang="en">
+
+<head th:replace="snippets.html :: name_head"></head>
+
+<body>
+
+<nav th:replace="snippets.html :: name_app_navbar"></nav>
+
+<div class="container mt-4">
+
+
+    <div class="row">
+        <h1 class="col my-auto">Reports</h1>
+    </div>
+
+    <!-- Blank Row -->
+    <div class="row m-4">
+        &nbsp;
+    </div>
+    <div class="row m-auto justify-content-center">
+        <div class="col-3">
+            <a th:href="@{/ui/report/inventory-report}" class="">
+                <i data-toggle="tooltip" title="Inventory report" class="fa fa-warehouse fa-5x"></i>
+            </a>
+            <p>Inventory report</p>
+            <!--      <label>Inventory Report</label>-->
+        </div>
+        <div class="col-3">
+            <a th:href="@{/ui/report/brand}" class="">
+                <i data-toggle="tooltip" title="Brand-category report" class="fa fa-tag fa-5x"></i>
+            </a>
+            <p>Brand-category report</p>
+            <!--      <label>Brand Category Report</label>-->
+        </div>
+        <div class="col-3">
+            <a th:href="@{/ui/report/sales}" class="">
+                <i data-toggle="tooltip" title="Sales report" class="fa fa-chart-line fa-5x"></i>
+            </a>
+            <p>Sales report</p>
+            <!--      <label>Sales Report</label>-->
+        </div>
+        <div class="col-3">
+            <a th:href="@{/ui/reports/dailyReport}" class="">
+                <i data-toggle="tooltip" title="Daily report" class="fa fa-pie-chart fa-5x"></i>
+            </a>
+            <p>Sales report</p>
+            <!--      <label>Sales Report</label>-->
+        </div>
+    </div>
+
+
+</div> <!-- Container end-->
+
+<footer th:replace="snippets.html :: name_footer"></footer>
+
+<!--<script th:src="@{/js/reports.js}"/></script>-->
+
+</body>
+
+</html>
