@@ -10,7 +10,7 @@
 
 <div class="container mt-4">
 
-    <h1>Brand Report</h1>
+    <h1>Daily Report</h1>
 
 
 
@@ -22,12 +22,13 @@
 
         <!-- Table -->
         <div class="col-12">
-            <table class="table table-striped css-serial" id="brand-table">
+            <table class="table table-striped css-serial" id="daily-report-table">
                 <thead>
                 <tr>
-                    <th scope="col">Sr. No</th>
-                    <th scope="col">Brand</th>
-                    <th scope="col">Category</th>
+                    <th scope="col">Date</th>
+                    <th scope="col">invoiced_orders_count</th>
+                    <th scope="col">invoiced_items_count</th>
+                    <th scope="col">total_revenue</th>
 
                 </tr>
                 </thead>
@@ -42,7 +43,7 @@
 
 <footer th:replace="snippets.html :: name_footer"></footer>
 
-<script th:src="@{/static/brandReport.js}"/></script>
+<script th:src="@{/static/dailyReport.js}"/></script>
 
 </body>
 

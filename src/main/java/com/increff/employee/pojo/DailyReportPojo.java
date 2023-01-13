@@ -1,10 +1,25 @@
-package com.increff.employee.model;
+package com.increff.employee.pojo;
 
-import org.hibernate.secure.spi.IntegrationException;
-
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import java.time.LocalDate;
 
-public class DailyData {
+@Entity
+public class DailyReportPojo {
+    @Id
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    private int id;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
     private Integer ordersQuantity;
     private  Integer orderItemsQuantity;
     private Integer revenue;
@@ -42,4 +57,5 @@ public class DailyData {
     public void setRevenue(Integer revenue) {
         this.revenue = revenue;
     }
+
 }

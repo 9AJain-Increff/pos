@@ -1,122 +1,3 @@
-//
-//function getBrandUrl(){
-//	var baseUrl = $("meta[name=baseUrl]").attr("content")
-//	return baseUrl + "/api/brand";
-//}
-//
-////BUTTON ACTIONS
-//function addBrand(event){
-//	//Set the values to update
-//	var $form = $("#brand-form");
-//	var json = toJson($form);
-//	var url = getBrandUrl();
-//    console.log(url);
-//    console.log("ankur jain");
-//    console.log(json);
-//	$.ajax({
-//	   url: url,
-//	   type: 'POST',
-//	   data: json,
-//	   headers: {
-//       	'Content-Type': 'application/json'
-//       },
-//	   success: function(response) {
-//	   		getBrandList();
-//	   },
-//	   error: handleAjaxError
-//	});
-//
-//	return false;
-//}
-//
-//function getBrandList(){
-//	var url = getBrandUrl();
-//	$.ajax({
-//	   url: url,
-//	   type: 'GET',
-//	   success: function(data) {
-//	   		displayBrandList(data);
-//	   },
-//	   error: handleAjaxError
-//	});
-//}
-//
-//function deleteBrand(id){
-//	var url = getBrandUrl() + "/" + id;
-//	console.log('pppppppppppppppppppppppp')
-//    console.log(url);
-//	$.ajax({
-//	   url: url,
-//	   type: 'DELETE',
-//	   success: function(data) {
-//	   		getBrandList();
-//	   },
-//	   error: handleAjaxError
-//	});
-//}
-//
-////UI DISPLAY METHODS
-//
-//function displayEditBrand(id){
-//console.log('jjjjjjjjjjjjjjjjjjjjjjjjjj')
-//	var url = getBrandUrl() + "/" + id;
-//	console.log(url);
-//	console.log('ttttttttttttttttttt')
-//	$.ajax({
-//	   url: url,
-//	   type: 'PUT',
-//	   success: function(data) {
-//	   		displayBrandList(data);
-//	   },
-//	   error: handleAjaxError
-//	});
-//}
-//
-//
-//
-//
-//function displayBrandList(data){
-//	console.log('Printing Brand data');
-//	var $tbody = $('#brand-table').find('tbody');
-//	$tbody.empty();
-//	for(var i in data){
-//		var e = data[i];
-//		console.log("ppppppppppppppppp")
-//		console.log(e);
-//		var buttonHtml = '<button onclick="deleteBrand(' + e.id + ')">delete</button>'
-//		buttonHtml += ' <button onclick="displayEditBrand(' + e.id + ')">edit</button>'
-//		var row = '<tr>'
-//		+ '<td>' + e.id + '</td>'
-//		+ '<td>' + e.name + '</td>'
-//        + '<td>' + e.category + '</td>'
-//		+ '<td>' + buttonHtml + '</td>'
-//		+ '</tr>';
-//        $tbody.append(row);
-//	}
-//}
-//
-//
-////INITIALIZATION CODE
-//function init(){
-//	$('#add-brand').click(addBrand);
-//	$('#refresh-data').click(getBrandList);
-//
-//}
-//
-//$(document).ready(init);
-//$(document).ready(getBrandList);
-//
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -128,7 +9,7 @@ function getBrandUrl(){
 //BUTTON ACTIONS
 function addBrand(event){
 	//Set the values to update
-	var $form = $("#brand-form");
+	var $form = $("#brand-add-form");
 	var json = toJson($form);
 	var url = getBrandUrl();
 
@@ -140,7 +21,8 @@ function addBrand(event){
        	'Content-Type': 'application/json'
        },
 	   success: function(response) {
-	   		getBrandList();
+	   	$('#add-brand-modal').modal('toggle');
+	   	getBrandList();
 	   },
 	   error: handleAjaxError,
 	});
@@ -319,14 +201,23 @@ function displayUploadData(){
 }
 
 function displayBrand(data){
-    console.log('displayBrand')
 	$("#brand-edit-form input[name=name]").val(data.name);
 	$("#brand-edit-form input[name=category]").val(data.category);
 	$("#brand-edit-form input[name=id]").val(data.id);
 	$('#edit-brand-modal').modal('toggle');
 }
 
+function createNewBrand(){
+    	$('#add-brand-modal').modal('toggle');
 
+}
+
+function displayAddBrand(data){
+	$("#brand-edit-form input[name=name]").val('');
+	$("#brand-edit-form input[name=category]").val('');
+	$("#brand-edit-form input[name=id]").val('');
+	$('#add-brand-modal').modal('toggle');
+}
 //INITIALIZATION CODE
 function init(){
 	$('#add-brand').click(addBrand);
@@ -336,6 +227,8 @@ function init(){
 	$('#process-data').click(processData);
 	$('#download-errors').click(downloadErrors);
     $('#brandFile').on('change', updateFileName)
+   	$('#create-new-brand').click(displayAddBrand);
+
     var element = document.getElementById("brand-icon");
     element.classList.add("thick");
 }

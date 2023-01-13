@@ -24,7 +24,7 @@ public class BrandDao extends AbstractDao {
     @PersistenceContext
     private EntityManager em;
 
-    @Transactional
+
     public void insert(BrandPojo p) throws ApiException {
 
             em.persist(p);

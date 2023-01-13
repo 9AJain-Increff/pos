@@ -117,6 +117,16 @@ public class ConversionUtil {
         return p;
     }
 
+    public static  DailyData convertToDailyData(DailyReportPojo d) {
+        DailyData p = new DailyData();
+        p.setDate(d.getDate());
+        p.setRevenue(d.getRevenue());
+        p.setOrderItemsQuantity(d.getOrderItemsQuantity());
+        p.setOrdersQuantity(d.getOrdersQuantity());
+
+        return p;
+    }
+
 //        private static  OrderPojo convertToOrderPojo(OrderItemForm f) {
 //        OrderItemPojo p = new OrderPojo();
 //        p.setQuantity(f.getQuantity());
