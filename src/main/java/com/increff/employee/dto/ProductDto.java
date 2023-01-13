@@ -29,8 +29,6 @@ public class ProductDto {
     @Autowired
     private ProductService service;
 
-    @Autowired
-    private InventoryService inventoryService;
 
     @Autowired
     private BrandService brandService;

@@ -3,7 +3,7 @@
 
 function getBrandUrl(){
 	var baseUrl = $("meta[name=baseUrl]").attr("content")
-	return baseUrl + "/api/brand";
+	return baseUrl + "/api/brands";
 }
 
 //BUTTON ACTIONS
@@ -95,6 +95,7 @@ function processData(){
 
 function readFileDataCallback(results){
 	fileData = results.data;
+	console.log('ankur jain', fileData)
 	uploadRows();
 }
 
@@ -112,7 +113,7 @@ function uploadRows(){
 
 	var json = JSON.stringify(row);
 	var url = getBrandUrl();
-
+    console.log(url, json);
 	//Make ajax call
 	$.ajax({
 	   url: url,

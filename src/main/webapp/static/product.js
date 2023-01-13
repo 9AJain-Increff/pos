@@ -12,7 +12,7 @@
 
 function getProductUrl(){
 	var baseUrl = $("meta[name=baseUrl]").attr("content")
-	return baseUrl + "/api/product";
+	return baseUrl + "/api/products";
 }
 
 //BUTTON ACTIONS

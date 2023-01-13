@@ -5,11 +5,11 @@ function getBaseUrl() {
 }
 
 function getOrderUrl() {
-  return getBaseUrl() + '/api/order/';
+  return getBaseUrl() + '/api/orders/';
 }
 
 function getProductUrl() {
-  return getBaseUrl() + '/api/product';
+  return getBaseUrl() + '/api/products';
 }
 
 function getOrderList() {

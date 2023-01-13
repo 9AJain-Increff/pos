@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 @Api
 @RestController
+@RequestMapping(path = "/api/inventory")
 public class InventoryApiController {
 
 
@@ -18,19 +19,19 @@ public class InventoryApiController {
     private InventoryDto dto;
 
     @ApiOperation(value = "Adds a inventory")
-    @RequestMapping(path = "/api/inventory", method = RequestMethod.POST)
+    @RequestMapping(path = "", method = RequestMethod.POST)
     public void addInventory(@RequestBody InventoryForm form) throws ApiException {
         dto.addInventory(form);
     }
 
     @ApiOperation(value = "Deletes a inventory")
-    @RequestMapping(path = "/api/inventory/{barcode}", method = RequestMethod.DELETE)
+    @RequestMapping(path = "/{barcode}", method = RequestMethod.DELETE)
     public void deleteInventory(@PathVariable String barcode) throws ApiException {
         dto.deleting(barcode);
     }
 
     @ApiOperation(value = "Gets list of all inventorys")
-    @RequestMapping(path = "/api/inventory", method = RequestMethod.GET)
+    @RequestMapping(path = "", method = RequestMethod.GET)
     public List<InventoryData> getAllInventory() throws ApiException {
 
         return dto.getAllInventory();
@@ -38,7 +39,7 @@ public class InventoryApiController {
 
 
     @ApiOperation(value = "Gets a inventory by barode")
-    @RequestMapping(path = "/api/inventory/{barcode}", method = RequestMethod.GET)
+    @RequestMapping(path = "/{barcode}", method = RequestMethod.GET)
     public InventoryData get(@PathVariable String barcode) throws ApiException {
         InventoryData p = dto.get(barcode);
         return (p);
@@ -47,7 +48,7 @@ public class InventoryApiController {
 
 
     @ApiOperation(value = "Edit a Inventory")
-    @RequestMapping(path = "/api/inventory/{barcode}", method = RequestMethod.PUT)
+    @RequestMapping(path = "/{barcode}", method = RequestMethod.PUT)
     public void editInventory(@PathVariable String barcode, @RequestBody InventoryForm form) throws ApiException {
         dto.updating(form);
     }

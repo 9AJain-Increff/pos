@@ -75,6 +75,7 @@ public class ReportService {
             String brandCategory,
             Date startTime,
             Date endTime) throws ApiException {
+
         List<OrderPojo> orders = orderService.getOrdersBetweenTime(startTime, endTime);
         List<OrderItemPojo> orderItems = orderItemService.getOrderItemByOrders(orders);
         List<OrderItemPojo> filteredOrderItems= filterOrderItems(orderItems,brandName, brandCategory);

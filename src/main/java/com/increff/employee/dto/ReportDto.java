@@ -20,6 +20,7 @@ public class ReportDto {
     private ReportService reportService;
     public List<SalesData> getSalesReport(SalesForm form) throws ApiException {
 
+
         List<SalesData> salesReport = reportService.getSalesReport(form.getBrandName(), form.getBrandCategory(),
                 form.getStartTime(), form.getEndTime());
         return salesReport;

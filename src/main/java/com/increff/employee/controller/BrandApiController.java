@@ -14,6 +14,7 @@ import java.util.List;
 
 @Api
 @RestController
+@RequestMapping(path = "/api/brands")
 public class BrandApiController {
 
 
@@ -21,19 +22,19 @@ public class BrandApiController {
     private BrandDto dto;
 
     @ApiOperation(value = "Adds a brand")
-    @RequestMapping(path = "/api/brand", method = RequestMethod.POST)
+    @RequestMapping(path = "", method = RequestMethod.POST)
     public void addBrand(@RequestBody BrandForm form) throws ApiException {
         dto.addBrand(form);
     }
 
     @ApiOperation(value = "Deletes a brand")
-    @RequestMapping(path = "/api/brand/{id}", method = RequestMethod.DELETE)
+    @RequestMapping(path = "/{id}", method = RequestMethod.DELETE)
     public void deleteBrand(@PathVariable int id) throws ApiException {
         dto.deleteBrand(id);
     }
 
     @ApiOperation(value = "Gets list of all brands")
-    @RequestMapping(path = "/api/brand", method = RequestMethod.GET)
+    @RequestMapping(path = "", method = RequestMethod.GET)
     public List<BrandData> getAllBrand() {
 
         return dto.getAllBrand();
@@ -41,7 +42,7 @@ public class BrandApiController {
 
 
     @ApiOperation(value = "Gets a brand by ID")
-    @RequestMapping(path = "/api/brand/{id}", method = RequestMethod.GET)
+    @RequestMapping(path = "{id}", method = RequestMethod.GET)
     public BrandData get(@PathVariable int id) throws ApiException {
         BrandData p = dto.getBrandById(id);
         return (p);
@@ -49,7 +50,7 @@ public class BrandApiController {
 
 
     @ApiOperation(value = "Edit a Brand")
-    @RequestMapping(path = "/api/brand/{id}", method = RequestMethod.PUT)
+    @RequestMapping(path = "{id}", method = RequestMethod.PUT)
     public void editBrand(@PathVariable int id, @RequestBody BrandForm form) throws ApiException {
         dto.updateBrand(id, form);
     }
