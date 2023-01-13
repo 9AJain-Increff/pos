@@ -10,33 +10,33 @@
 
 <div class="container">
 
-<!--    <h3>Inventory</h3>-->
+    <!--    <h3>Inventory</h3>-->
 
-<!--    &lt;!&ndash; Top row with form&ndash;&gt;-->
-<!--&lt;!&ndash;    <div class="row">&ndash;&gt;-->
-<!--&lt;!&ndash;        <div class="col-12">&ndash;&gt;-->
-<!--&lt;!&ndash;            <form class="form-inline" id="inventory-form">&ndash;&gt;-->
-<!--&lt;!&ndash;                <div class="form-group">&ndash;&gt;-->
-<!--&lt;!&ndash;                    <label for="inputBarcode" class="col-sm-2 col-form-label">Barcode</label>&ndash;&gt;-->
-<!--&lt;!&ndash;                    <div class="col-sm-10">&ndash;&gt;-->
-<!--&lt;!&ndash;                        <input type="text" class="form-control" name="barcode" id="inputBarcode" placeholder="enter barcode">&ndash;&gt;-->
-<!--&lt;!&ndash;                    </div>&ndash;&gt;-->
-<!--&lt;!&ndash;                </div>&ndash;&gt;-->
+    <!--    &lt;!&ndash; Top row with form&ndash;&gt;-->
+    <!--&lt;!&ndash;    <div class="row">&ndash;&gt;-->
+    <!--&lt;!&ndash;        <div class="col-12">&ndash;&gt;-->
+    <!--&lt;!&ndash;            <form class="form-inline" id="inventory-form">&ndash;&gt;-->
+    <!--&lt;!&ndash;                <div class="form-group">&ndash;&gt;-->
+    <!--&lt;!&ndash;                    <label for="inputBarcode" class="col-sm-2 col-form-label">Barcode</label>&ndash;&gt;-->
+    <!--&lt;!&ndash;                    <div class="col-sm-10">&ndash;&gt;-->
+    <!--&lt;!&ndash;                        <input type="text" class="form-control" name="barcode" id="inputBarcode" placeholder="enter barcode">&ndash;&gt;-->
+    <!--&lt;!&ndash;                    </div>&ndash;&gt;-->
+    <!--&lt;!&ndash;                </div>&ndash;&gt;-->
 
-<!--&lt;!&ndash;                <div class="form-group">&ndash;&gt;-->
-<!--&lt;!&ndash;                    <label for="inputQuantity" class="col-sm-2 col-form-label">Quantity</label>&ndash;&gt;-->
-<!--&lt;!&ndash;                    <div class="col-sm-10">&ndash;&gt;-->
-<!--&lt;!&ndash;                        <input type="text" class="form-control" name="quantity" id="inputQuantity" placeholder="enter quantity">&ndash;&gt;-->
-<!--&lt;!&ndash;                    </div>&ndash;&gt;-->
-<!--&lt;!&ndash;                </div>&ndash;&gt;-->
-<!--                <button type="button" class="btn btn-primary" id="create-new-inventory">Add</button>-->
-<!--                &nbsp;-->
-<!--&lt;!&ndash;                <button type="button" class="btn btn-primary" id="refresh-data">Refresh</button>&ndash;&gt;-->
-<!--&lt;!&ndash;                &nbsp;&ndash;&gt;-->
-<!--&lt;!&ndash;                <button type="button" class="btn btn-primary" id="upload-data">Upload</button>&ndash;&gt;-->
-<!--&lt;!&ndash;            </form>&ndash;&gt;-->
-<!--&lt;!&ndash;        </div>&ndash;&gt;-->
-<!--    </div>-->
+    <!--&lt;!&ndash;                <div class="form-group">&ndash;&gt;-->
+    <!--&lt;!&ndash;                    <label for="inputQuantity" class="col-sm-2 col-form-label">Quantity</label>&ndash;&gt;-->
+    <!--&lt;!&ndash;                    <div class="col-sm-10">&ndash;&gt;-->
+    <!--&lt;!&ndash;                        <input type="text" class="form-control" name="quantity" id="inputQuantity" placeholder="enter quantity">&ndash;&gt;-->
+    <!--&lt;!&ndash;                    </div>&ndash;&gt;-->
+    <!--&lt;!&ndash;                </div>&ndash;&gt;-->
+    <!--                <button type="button" class="btn btn-primary" id="create-new-inventory">Add</button>-->
+    <!--                &nbsp;-->
+    <!--&lt;!&ndash;                <button type="button" class="btn btn-primary" id="refresh-data">Refresh</button>&ndash;&gt;-->
+    <!--&lt;!&ndash;                &nbsp;&ndash;&gt;-->
+    <!--&lt;!&ndash;                <button type="button" class="btn btn-primary" id="upload-data">Upload</button>&ndash;&gt;-->
+    <!--&lt;!&ndash;            </form>&ndash;&gt;-->
+    <!--&lt;!&ndash;        </div>&ndash;&gt;-->
+    <!--    </div>-->
     <div class="row align-content-between">
         <div class="col-8">
             <h3>Inventory</h3>
@@ -78,26 +78,33 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
+
                     <h5 class="modal-title">Edit Inventory</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form class="form-inline" id="inventory-edit-form">
-                        <div class="form-group">
-                            <label for="editBarcode" class="col-sm-2 col-form-label">Barcode</label>
-                            <div class="col-sm-10">
-                                <input type="text" class="form-control"id="editBarcode" name="barcode" placeholder="enter barcode">
+                    <form id="inventory-edit-form">
+                        <div class="form-group row">
+                            <div class="col-sm-3">
+                                <label for="editBarcode" class="col-sm-2 col-form-label">Barcode</label>
+                            </div>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" id="editBarcode" name="barcode"
+                                       placeholder="enter barcode">
                             </div>
                         </div>
-                        <div class="form-group">
-                            <label for="editQuantity" class="col-sm-2 col-form-label">Quantity</label>
-                            <div class="col-sm-10">
-                                <input type="number" class="form-control"id="editQuantity" name="quantity" placeholder="enter quantity">
+                        <div class="form-group row">
+                            <div class="col-sm-3">
+                                <label for="editQuantity" class="col-sm-2 col-form-label">Quantity</label>
+                            </div>
+                            <div class="col-sm-9">
+                                <input type="number" class="form-control" id="editQuantity" name="quantity"
+                                       placeholder="enter quantity">
                             </div>
                         </div>
-                        <input type="hidden" name="id" >
+                        <input type="hidden" name="id">
                     </form>
                 </div>
                 <div class="modal-footer">
@@ -120,20 +127,26 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form class="form-inline" id="inventory-add-form">
-                        <div class="form-group">
-                            <label for="editBarcode" class="col-sm-2 col-form-label">Barcode</label>
-                            <div class="col-sm-10">
-                                <input type="text" class="form-control"id="addBarcode" name="barcode" placeholder="enter barcode">
+                    <form id="inventory-add-form">
+                        <div class="form-group row">
+                            <div class="col-sm-3">
+                                <label for="editBarcode" class="col-sm-2 col-form-label">Barcode</label>
+                            </div>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" id="addBarcode" name="barcode"
+                                       placeholder="enter barcode">
                             </div>
                         </div>
-                        <div class="form-group">
-                            <label for="editQuantity" class="col-sm-2 col-form-label">Quantity</label>
-                            <div class="col-sm-10">
-                                <input type="number" class="form-control"id="addQuantity" name="quantity" placeholder="enter quantity">
+                        <div class="form-group row">
+                            <div class="col-sm-3">
+                                <label for="editQuantity" class="col-sm-2 col-form-label">Quantity</label>
+                            </div>
+                            <div class="col-sm-9">
+                                <input type="number" class="form-control" id="addQuantity" name="quantity"
+                                       placeholder="enter quantity">
                             </div>
                         </div>
-                        <input type="hidden" name="id" >
+                        <input type="hidden" name="id">
                     </form>
                 </div>
                 <div class="modal-footer">
@@ -182,7 +195,8 @@
 
 <footer th:replace="snippets.html :: name_footer"></footer>
 
-<script th:src="@{/static/inventory.js}"/></script>
+<script th:src="@{/static/inventory.js}"/>
+</script>
 
 </body>
 
