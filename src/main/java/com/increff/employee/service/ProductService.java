@@ -132,6 +132,15 @@ public class ProductService {
     }
 
 
+    public BrandPojo checkBrandNameAndCategory(ProductPojo product, String brandName, String brandCategory) throws ApiException {
+        BrandPojo brand = brandService.getAndCheckBrandById(product.getBrandId());
+        if(brand.getName().equals(brandName) && brand.getCategory().equals(brandCategory)){
+            return brand;
+        }
+        else{
+            throw new ApiException("brand name and category can't be changed");
+        }
+    }
 
     public ProductPojo checkProductByBrandName(
             String name,

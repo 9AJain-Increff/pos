@@ -46,16 +46,9 @@ public class ProductDto {
 //    TODO can i throw the error from here AND what if the barcode changes from postman
     public void update(String barcode, ProductForm form) throws ApiException  {
         ProductPojo product = productService.getAndCheckProductByBarcode(barcode);
-        BrandPojo brand = productService.getBrandByProduct(product);
-        if(brand.getName().equals(form.getBrandName()) && brand.getCategory().equals(form.getBrandCategory())){
-            ProductPojo productPojo = convertToProductPojo(form, brand.getId());
-            productService.update(productPojo, brand, barcode);
-        }
-        else{
-            throw new ApiException("brand name and category can't be changed");
-        }
-
-
+        BrandPojo brand = productService.checkBrandNameAndCategory(product, form.getBrandName(), form.getBrandCategory());
+        ProductPojo productPojo = convertToProductPojo(form, brand.getId());
+        productService.update(productPojo, brand, barcode);
     }
 
 
