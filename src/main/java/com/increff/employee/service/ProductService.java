@@ -31,28 +31,8 @@ public class ProductService {
     public void addProduct(ProductPojo product, InventoryPojo inventoryPojo, BrandPojo brand) throws ApiException {
         checkBarcode(product.getBarcode());
         dao.add(product);
-        inventoryService.add(inventoryPojo);
+        inventoryService.addInventory(inventoryPojo);
     }
-    public void checkProductExist(ProductPojo product, BrandPojo brand) throws ApiException {
-        ProductPojo exist = dao.getProductByProductName(product);
-        if(exist!=null){
-            if(exist.getBrandId() == brand.getId()){
-                throw new ApiException("Product with given name already exist " );
-            }
-        }
-
-    }
-
-    @Transactional
-//    public void delete(String barcode) {
-//        dao.delete(barcode);
-//    }
-
-
-//    @Transactional(rollbackOn = ApiException.class)
-//    public ProductPojo get(int id) throws ApiException {
-//        return getCheck(id);
-//    }
 
     public List<BrandPojo> getBrandsByProducts(List<ProductPojo> products) throws ApiException {
         return brandService.getBrandsByProducts(products);
@@ -72,28 +52,6 @@ public class ProductService {
         exist.setPrice(product.getPrice());
     }
 
-    public List<ProductPojo> getProductPojo(List<String> barcode) throws ApiException {
-        List<ProductPojo> productPojoList = new ArrayList<>();
-        for (String orderItemBarcode : barcode) {
-            ProductPojo productPojo = getProductByBarcode(orderItemBarcode);
-            productPojoList.add(productPojo);
-        }
-        return productPojoList;
-    }
-
-
-    public List<ProductPojo> getProductByBarcode (List<InventoryPojo> list ) {
-        System.out.println("anknanana");
-        List<ProductPojo> list2 = new ArrayList<ProductPojo>();
-        list.forEach((temp) -> {
-            System.out.println("ppppppppppppp");
-            System.out.println(temp.getBarcode());
-                    ProductPojo p =dao.getProductByBarcode(temp.getBarcode());
-                    list2.add(p);
-                });
-
-        return list2;
-    }
 
     @Transactional
     public ProductPojo getProductByBarcode(String barcode) throws ApiException {
@@ -112,14 +70,6 @@ public class ProductService {
         return p;
     }
 
-    public Boolean checkProductExists(String barcode) throws ApiException {
-        ProductPojo p = dao.getProductByBarcode(barcode);
-        if(p == null) {
-            throw new ApiException(("barcode doesn't exist in products"));
-        }
-        return true;
-
-    }
 
     public ProductPojo checkBarcode(String barcode) throws ApiException {
 
@@ -142,18 +92,6 @@ public class ProductService {
         }
     }
 
-    public ProductPojo checkProductByBrandName(
-            String name,
-            String brandName,
-            String brandCategory) throws ApiException {
-
-        ProductPojo p = dao.getProductByBrandName(name, brandName, brandCategory);
-        if(p != null){
-            throw new ApiException(("product already exist "));
-        }
-
-        return p;
-    }
 
     public Map<String, ProductPojo> getProductsBybarcodes(List<String> barcodes ) {
         Map<String, ProductPojo> mapping = new HashMap<>();

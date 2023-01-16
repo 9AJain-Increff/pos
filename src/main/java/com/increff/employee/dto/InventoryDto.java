@@ -7,7 +7,6 @@ import com.increff.employee.pojo.InventoryPojo;
 import com.increff.employee.pojo.ProductPojo;
 import com.increff.employee.service.ApiException;
 import com.increff.employee.service.InventoryService;
-import com.increff.employee.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -29,13 +28,8 @@ public class InventoryDto {
     }
     public void addInventory(InventoryForm form) throws ApiException {
         InventoryPojo p = convertToInventoryPojo(form);
-        inventoryService.add(p);
+        inventoryService.addInventory(p);
     }
-
-    public void deleting(String barcode) throws ApiException  {
-        inventoryService.delete(barcode);
-    }
-
 
     public void updateInventory(InventoryForm form) throws ApiException  {
 

@@ -21,7 +21,7 @@ import static com.increff.employee.util.ConversionUtil.convertToOrderPojo;
 public class OrderService {
 
     @Autowired
-    private OrderDao dao;
+    private OrderDao orderDao;
     @Autowired
     private InventoryService inventoryService;
     @Autowired
@@ -29,41 +29,27 @@ public class OrderService {
     @Autowired
     private OrderItemService orderItemService;
     @Transactional(rollbackOn = ApiException.class)
-    public OrderPojo add(OrderPojo p) throws ApiException {
+    public OrderPojo addOrder(OrderPojo p) throws ApiException {
         normalize(p);
-        return dao.insert(p);
+        return orderDao.insert(p);
     }
-    @Transactional
-    public void delete(int id) {
-        dao.delete(id);
-    }
+//    @Transactional
+//    public void delete(int id) {
+//        dao.delete(id);
+//    }
 
 
 
 
     @Transactional
     public List<OrderPojo> getAll() {
-        return dao.selectAll();
+        return orderDao.selectAll();
     }
     public OrderPojo createNewOrder() throws ApiException {
         LocalDateTime date = LocalDateTime.now(ZoneOffset.UTC);
         OrderPojo newOrder = convertToOrderPojo(date);
-        return dao.insert(newOrder);
+        return orderDao.insert(newOrder);
     }
-
-//    @Transactional(rollbackOn  = ApiException.class)
-//    public void update(int id, OrderPojo p) throws ApiException {
-//        normalize(p);
-//        OrderPojo ex = getCheck(id);
-//        System.out.println(p.getName());
-//        ex.setName(p.getName());
-//        ex.setPrice(p.getPrice());
-////        else{
-////            throw new ApiException("order name + category already exists");
-////        }
-//
-////        dao.update(ex);
-//    }
 
     public List<InventoryPojo> getInventoryPojo(List<String> barcode) throws ApiException {
         List<InventoryPojo> inventoryPojoList = new ArrayList<>();
@@ -81,7 +67,7 @@ public class OrderService {
     }
     public void addOrderItems(List<OrderItemPojo> addedOrderItems) throws ApiException {
         for (OrderItemPojo orderItemPojo : addedOrderItems) {
-            orderItemService.add(orderItemPojo);
+            orderItemService.addOrderItem(orderItemPojo);
         }
     }
     public void deleteInventory(List<InventoryPojo> inventoryPojoList) throws ApiException {
@@ -114,48 +100,17 @@ public class OrderService {
     public List<OrderItemPojo> getOrderItemsById(int id) throws ApiException {
         return orderItemService.getOrderItemsById(id);
     }
-    public List<OrderPojo> getOrderByBarcode (List<InventoryPojo> list ) {
-        System.out.println("anknanana");
-        List<OrderPojo> list2 = new ArrayList<OrderPojo>();
-        list.forEach((temp) -> {
-            System.out.println("ppppppppppppp");
-            System.out.println(temp.getBarcode());
-            OrderPojo p =dao.select(temp.getBarcode());
-            list2.add(p);
-        });
-
-        return list2;
-    }
-
 
 
     @Transactional
     public OrderPojo checkOrderExist(int id) throws ApiException {
-        OrderPojo p = dao.select(id);
+        OrderPojo p = orderDao.select(id);
         if (p == null) {
             throw new ApiException("Order with given ID does not exit, id: " + id);
         }
         return p;
     }
 
-    public Boolean checkOrderExists(String barcode) throws ApiException {
-        OrderPojo p = dao.select(barcode);
-        if(p == null) {
-            throw new ApiException(("barcode doesn't exist in orders"));
-        }
-        return true;
-
-    }
-
-    public Boolean nameExist(String name) throws ApiException {
-        OrderPojo p = dao.checkName(name);
-        if(p == null) {
-            return false;
-        }
-        else {
-            throw new ApiException(("brand name+brand category +order name already exist"));
-        }
-    }
     public LocalDateTime convertToLocalDateViaInstant(Date dateToConvert) {
         return dateToConvert.toInstant()
                 .atZone(ZoneId.systemDefault())
@@ -166,7 +121,7 @@ public class OrderService {
     public List<OrderPojo> getOrdersBetweenTime(Date start, Date end){
         LocalDateTime s = convertToLocalDateViaInstant(start);
         LocalDateTime e = convertToLocalDateViaInstant(end);
-        return dao.getOrdersForReport(s, e);
+        return orderDao.getOrdersForReport(s, e);
     }
 
 
