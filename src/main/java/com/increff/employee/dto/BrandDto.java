@@ -23,7 +23,7 @@ public class BrandDto {
 
 
     public BrandData getBrandById(int id) throws ApiException {
-         BrandPojo brandPojo = service.getBrandById(id);
+         BrandPojo brandPojo = service.getAndCheckBrandById(id);
          return convertToBrandData(brandPojo);
     }
     public void addBrand(BrandForm form) throws ApiException {
@@ -31,9 +31,6 @@ public class BrandDto {
         service.addBrand(p);
     }
 
-    public void deleteBrand(int id) throws ApiException  {
-        service.delete(id);
-    }
 
 
     public void updateBrand(int id, BrandForm form) throws ApiException  {

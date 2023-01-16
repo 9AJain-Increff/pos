@@ -27,11 +27,6 @@ public class BrandApiController {
         dto.addBrand(form);
     }
 
-    @ApiOperation(value = "Deletes a brand")
-    @RequestMapping(path = "/{id}", method = RequestMethod.DELETE)
-    public void deleteBrand(@PathVariable int id) throws ApiException {
-        dto.deleteBrand(id);
-    }
 
     @ApiOperation(value = "Gets list of all brands")
     @RequestMapping(path = "", method = RequestMethod.GET)

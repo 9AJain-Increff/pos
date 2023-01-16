@@ -29,7 +29,6 @@ public class ProductService {
     private InventoryService inventoryService;
     @Transactional(rollbackOn = ApiException.class)
     public void addProduct(ProductPojo product, InventoryPojo inventoryPojo, BrandPojo brand) throws ApiException {
-        checkProductExist(product, brand);
         checkBarcode(product.getBarcode());
         dao.add(product);
         inventoryService.add(inventoryPojo);
@@ -45,9 +44,9 @@ public class ProductService {
     }
 
     @Transactional
-    public void delete(String barcode) {
-        dao.delete(barcode);
-    }
+//    public void delete(String barcode) {
+//        dao.delete(barcode);
+//    }
 
 
 //    @Transactional(rollbackOn = ApiException.class)
@@ -55,16 +54,20 @@ public class ProductService {
 //        return getCheck(id);
 //    }
 
-    @Transactional
-    public List<ProductPojo> getAllProduct() {
+    public List<BrandPojo> getBrandsByProducts(List<ProductPojo> products) throws ApiException {
+        return brandService.getBrandsByProducts(products);
+    }
+    public BrandPojo getBrandByProduct(ProductPojo product) throws ApiException {
+        return brandService.getAndCheckBrandById(product.getBrandId());
+    }
+
+    public List<ProductPojo> getAllProduct() throws ApiException {
         return dao.getAllProduct();
     }
 
     @Transactional(rollbackOn  = ApiException.class)
     public void update(ProductPojo product, BrandPojo brand, String barcode) throws ApiException {
-        checkProductExist(product, brand);
-        checkBarcode(product.getBarcode());
-        ProductPojo exist = getProductByBarcode(product.getBarcode());
+        ProductPojo exist = getAndCheckProductByBarcode(product.getBarcode());
         exist.setName(product.getName());
         exist.setPrice(product.getPrice());
     }
@@ -72,7 +75,7 @@ public class ProductService {
     public List<ProductPojo> getProductPojo(List<String> barcode) throws ApiException {
         List<ProductPojo> productPojoList = new ArrayList<>();
         for (String orderItemBarcode : barcode) {
-            ProductPojo productPojo = getByBarcode(orderItemBarcode);
+            ProductPojo productPojo = getProductByBarcode(orderItemBarcode);
             productPojoList.add(productPojo);
         }
         return productPojoList;
@@ -93,7 +96,7 @@ public class ProductService {
     }
 
     @Transactional
-    public ProductPojo getByBarcode(String barcode) throws ApiException {
+    public ProductPojo getProductByBarcode(String barcode) throws ApiException {
         ProductPojo p = dao.getProductByBarcode(barcode);
         if (p == null) {
             throw new ApiException("Product with given barcode does not exit, id: " + barcode);
@@ -101,7 +104,7 @@ public class ProductService {
         return p;
     }
 
-    public ProductPojo getProductByBarcode(String barcode) throws ApiException {
+    public ProductPojo getAndCheckProductByBarcode(String barcode) throws ApiException {
         ProductPojo p = dao.getProductByBarcode(barcode);
         if (p == null) {
             throw new ApiException("Product with given barcode does not exit, barcode: " + barcode);
@@ -151,7 +154,16 @@ public class ProductService {
         return mapping;
     }
 
-    public  BrandPojo getBrandId(String brandName, String brandCategory) throws ApiException {
+    public List<ProductPojo> getProducts(List<String> barcodes ) {
+        List<ProductPojo> products = new ArrayList<>();
+        for(String barcode: barcodes){
+            products.add(dao.getProductByBarcode(barcode));
+        }
+        return products;
+    }
+
+
+    public  BrandPojo getAndCheckBrandId(String brandName, String brandCategory) throws ApiException {
 
         return brandService.getBrandId(brandName, brandCategory);
     }

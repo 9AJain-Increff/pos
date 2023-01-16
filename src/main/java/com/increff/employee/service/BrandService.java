@@ -17,13 +17,6 @@ public class BrandService {
     @Autowired
     private BrandDao dao;
 
-    public BrandPojo checkBrandByName(String name, String category) throws ApiException {
-       BrandPojo b = dao.getBrand(name,category);
-       if(b== null){
-           throw new ApiException("Brand Doesn't exist");
-       }
-       return b;
-    }
 
     @Transactional(rollbackOn = ApiException.class)
     public void addBrand(BrandPojo brandPojo) throws ApiException {
@@ -35,18 +28,9 @@ public class BrandService {
         }
     }
 
-    @Transactional
-    public void delete(int id) throws ApiException {
-        BrandPojo brand = dao.getBrandById(id);
-        if(brand == null)
-            throw new ApiException("Brand with given ID does not exit, id: " + id);
-        else
-            dao.delete(id);
-    }
 
 
-    @Transactional(rollbackOn = ApiException.class)
-    public BrandPojo getBrandById(int id) throws ApiException {
+    public BrandPojo getAndCheckBrandById(int id) throws ApiException {
         BrandPojo brandPojo = dao.getBrandById(id);
         if (brandPojo == null) {
             throw new ApiException("Brand with given ID does not exit, id: " + id);
@@ -54,7 +38,6 @@ public class BrandService {
         return brandPojo;
     }
 
-    @Transactional
     public List<BrandPojo> getAllBrand() {
         return dao.getAllBrand();
     }
@@ -82,7 +65,7 @@ public class BrandService {
     public List<BrandPojo> getBrandsByProducts(List<ProductPojo> products) throws ApiException {
         List<BrandPojo> brands = new ArrayList<>();
         for(ProductPojo product : products){
-            brands.add((getBrandById(product.getBrandId())));
+            brands.add((getAndCheckBrandById(product.getBrandId())));
         }
         return brands;
     }

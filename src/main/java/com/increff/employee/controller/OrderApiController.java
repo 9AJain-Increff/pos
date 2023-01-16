@@ -17,32 +17,32 @@ public class OrderApiController {
 
 
     @Autowired
-    private OrderDto dto;
+    private OrderDto orderDto;
 
     @ApiOperation(value = "Adds a order")
     // todo change path
     @RequestMapping(path = "", method = RequestMethod.POST)
     public void addOrder(@RequestBody List<OrderItemForm> form) throws ApiException {
-        dto.addOrder(form);
+        orderDto.addOrder(form);
     }
 
-    @ApiOperation(value = "Deletes a order")
-    @RequestMapping(path = "/{id}", method = RequestMethod.DELETE)
-    public void deleteOrder(@PathVariable int id) throws ApiException {
-        dto.deleting(id);
-    }
+//    @ApiOperation(value = "Deletes a order")
+//    @RequestMapping(path = "/{id}", method = RequestMethod.DELETE)
+//    public void deleteOrder(@PathVariable int id) throws ApiException {
+//        orderDto.deleting(id);
+//    }
 
     @ApiOperation(value = "Gets list of all orders")
     @RequestMapping(path = "", method = RequestMethod.GET)
     public List<OrderData> getAllOrder() {
-        return dto.gettingAllOrder();
+        return orderDto.gettingAllOrder();
     }
 
 
     @ApiOperation(value = "Gets a order by ID")
     @RequestMapping(path = "/{id}", method = RequestMethod.GET)
     public List<OrderItemData> get(@PathVariable int id) throws ApiException {
-        return dto.getOrderById(id);
+        return orderDto.getOrderById(id);
     }
 
 
@@ -50,7 +50,7 @@ public class OrderApiController {
     // todo replace with logger
     @RequestMapping(path = "/{id}", method = RequestMethod.PUT)
     public void editOrder(@PathVariable int id, @RequestBody List<OrderItemForm> form) throws ApiException {
-        dto.updating(id, form);
+        orderDto.updateOrder(id, form);
 
     }
 

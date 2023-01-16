@@ -24,7 +24,7 @@ public class InventoryService {
 
     @Transactional(rollbackOn = ApiException.class)
     public void add(InventoryPojo p) throws ApiException {
-        ProductPojo product = productService.getProductByBarcode(p.getBarcode());
+        ProductPojo product = productService.getAndCheckProductByBarcode(p.getBarcode());
         InventoryPojo exist = dao.select(p.getBarcode());
         if(exist == null){
             dao.insert(p);
@@ -42,20 +42,13 @@ public class InventoryService {
     public List<InventoryPojo> getInventoryPojo(List<String> barcode) throws ApiException {
         List<InventoryPojo> inventoryPojoList = new ArrayList<>();
         for (String temp : barcode) {
-            InventoryPojo inventoryPojo = get(temp);
+            InventoryPojo inventoryPojo = getAndCheckInventoryByBarcode(temp);
             inventoryPojoList.add(inventoryPojo);
-//            if (temp.getQuantity() > inventoryPojo.getQuantity()) {
-//                throw new ApiException("Maximum available quantity for the barcode" + temp.getBarcode() + " is " + inventoryPojo.getQuantity());
-//            }
-//            else{
-//                inventoryPojo.setQuantity(inventoryPojo.getQuantity()-temp.getQuantity());
-//                update(temp.getBarcode(),inventoryPojo);
-//            }
         }
         return inventoryPojoList;
     }
     @Transactional(rollbackOn = ApiException.class)
-    public InventoryPojo get(String barcode) throws ApiException {
+    public InventoryPojo getAndCheckInventoryByBarcode(String barcode) throws ApiException {
         InventoryPojo p = dao.select(barcode);
         if (p == null) {
             throw new ApiException("Inventory with given ID does not exit, id: " + barcode);
@@ -76,9 +69,6 @@ public class InventoryService {
         InventoryPojo ex = dao.select(p.getBarcode());
         ex.setQuantity((p.getQuantity()+ex.getQuantity()));
         ex.setBarcode(p.getBarcode());
-
-
-//        dao.update(ex);
     }
 
     public InventoryPojo getInventoryByBarcode(String barcode) throws ApiException {
@@ -95,12 +85,14 @@ public class InventoryService {
 
     }
 
-    public List<ProductPojo>   getProductByInventory(List<InventoryPojo> inventoryList) throws ApiException {
-       List<ProductPojo> productList =  productService.getProductByBarcode(inventoryList);
+    public List<ProductPojo> getProductsByBarcodes(List<String> barcodes) throws ApiException {
+       List<ProductPojo> productList =  productService.getProducts(barcodes);
        return productList;
     }
 
-
+    public ProductPojo checkProductExists(String barcode) throws ApiException {
+        return productService.getProductByBarcode(barcode);
+    }
 
     protected static void normalize(InventoryPojo p) {
         p.setBarcode(StringUtil.toLowerCase(p.getBarcode()));

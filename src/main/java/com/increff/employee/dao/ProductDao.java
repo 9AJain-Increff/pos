@@ -29,17 +29,14 @@ public class ProductDao extends AbstractDao {
     private EntityManager em;
 
     public void add(ProductPojo p) throws ApiException {
-        System.out.println("ankur jain");
         em.persist(p);
-
-
     }
 
-    public int delete(String barcode) {
-        Query query = em.createQuery(delete_barcode);
-        query.setParameter("barcode", barcode);
-        return query.executeUpdate();
-    }
+//    public int delete(String barcode) {
+//        Query query = em.createQuery(delete_barcode);
+//        query.setParameter("barcode", barcode);
+//        return query.executeUpdate();
+//    }
 
 
     public ProductPojo checkProductExists(String barcode) {

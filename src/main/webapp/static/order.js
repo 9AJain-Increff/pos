@@ -213,6 +213,53 @@ const sec = timeUTC.second;
   return dformat;
 }
 
+function callPdfGenerator(id){
+    var url = getOrderUrl()+id;
+          $.ajax({
+            url: url,
+            type: 'GET',
+            success: function (data) {
+            console.log('data from backend')
+              console.log(data);
+              orderItems = data;
+               getPdf(orderItems)
+    //          return data;
+            },
+            error: handleAjaxError,
+          });
+}
+
+function getPdf(orderItems){
+const pdfUrl = 'http://localhost:8000/invoice/api/generate';
+
+       getData = orderItems.map((it) => {
+        return {
+          barcode: it.barcode,
+          quantity: it.quantity,
+          sellingPrice: it.price,
+          name: it.name,
+          id: it.id
+        };
+      });
+      var data= {id: 1, datetime : "2021-08-20 14:17:43",items:getData };
+//
+//    data[id]=1;
+//    data[sateTime]="29/09/2015";
+
+      const json = JSON.stringify(data);
+      console.log(json);
+      $.ajax({
+          url: pdfUrl,
+          type: 'POST',
+          data: json,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          success: function(base64){
+          console.log(base64)
+          },
+          error: handleAjaxError,
+        });}
 
 function displayOrderList(orders) {
   var $tbody = $('#order-table').find('tbody');
@@ -233,6 +280,9 @@ function displayOrderList(orders) {
                 <button onclick="displayEditModal(${order.id})">
                   Edit
                 </button>
+                <button onclick="callPdfGenerator(${order.id})">
+                                  Download pdf
+                                </button>
             </td>
         </tr>
     `;

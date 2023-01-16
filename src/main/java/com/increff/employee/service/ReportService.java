@@ -1,16 +1,13 @@
 package com.increff.employee.service;
 
 import com.increff.employee.dao.DailyReportDao;
-import com.increff.employee.dto.ReportDto;
 import com.increff.employee.model.*;
 import com.increff.employee.pojo.*;
-import javafx.scene.layout.BorderPane;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -62,8 +59,8 @@ public class ReportService {
     private List<OrderItemPojo> filterOrderItems(List<OrderItemPojo> orderItems , String brandName, String brandCategory) throws ApiException {
         List<OrderItemPojo> filteredOrderItems = new ArrayList<>();
         for(OrderItemPojo order: orderItems){
-            ProductPojo product = productService.getProductByBarcode(order.getBarcode());
-            BrandPojo brand = brandService.getBrandById(product.getBrandId());
+            ProductPojo product = productService.getAndCheckProductByBarcode(order.getBarcode());
+            BrandPojo brand = brandService.getAndCheckBrandById(product.getBrandId());
             if(checkValidity(brand, brandName, brandCategory)){
                 filteredOrderItems.add(order);
             }
@@ -93,7 +90,7 @@ public class ReportService {
             Map.Entry<String, ProductPojo> entry = itr.next();
             String barcode = entry.getKey();
             ProductPojo product = entry.getValue();
-            BrandPojo brand = brandService.getBrandById(product.getBrandId());
+            BrandPojo brand = brandService.getAndCheckBrandById(product.getBrandId());
             SalesData saleData = new SalesData();
             saleData.setQuantity(barcodeToQuantityMapping.get(barcode));
             saleData.setBrandCategory(brand.getCategory());
@@ -119,7 +116,7 @@ public class ReportService {
            InventoryReportData inventoryReportData = new InventoryReportData();
            inventoryReportData.setQuantity(inventory.getQuantity());
            ProductPojo product = barcodeToProductMapping.get(inventory.getBarcode());
-           BrandPojo brand = brandService.getBrandById(product.getBrandId());
+           BrandPojo brand = brandService.getAndCheckBrandById(product.getBrandId());
            inventoryReportData.setBrandCategory(brand.getCategory());
            inventoryReportData.setBrandName(brand.getName());
            inventoriesReportData.add(inventoryReportData);

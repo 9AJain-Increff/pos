@@ -7,17 +7,12 @@ import com.increff.employee.pojo.BrandPojo;
 import com.increff.employee.pojo.InventoryPojo;
 import com.increff.employee.pojo.ProductPojo;
 import com.increff.employee.service.ApiException;
-import com.increff.employee.service.BrandService;
-import com.increff.employee.service.InventoryService;
 import com.increff.employee.service.ProductService;
-import com.increff.employee.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import static com.increff.employee.util.ConversionUtil.*;
 //import static sun.java2d.loops.GraphicsPrimitive.convertTo;
@@ -27,38 +22,39 @@ public class ProductDto {
 
 
     @Autowired
-    private ProductService service;
+    private ProductService productService;
 
-
-    @Autowired
-    private BrandService brandService;
     public ProductData getProductByBarcode(String barcode) throws ApiException {
-        ProductPojo product = service.getProductByBarcode(barcode);
-        BrandPojo brand = brandService.getBrandById(product.getBrandId());
+        ProductPojo product = productService.getAndCheckProductByBarcode(barcode);
+        BrandPojo brand = productService.getBrandByProduct(product);
         return convertToProductData(product, brand);
     }
 
     public void addProduct(ProductForm form) throws ApiException {
-        BrandPojo brand = service.getBrandId(form.getBrandName(), form.getBrandCategory());
+        BrandPojo brand = productService.getAndCheckBrandId(form.getBrandName(), form.getBrandCategory());
         ProductPojo productPojo = convertToProductPojo(form, brand.getId());
-        InventoryPojo inventoryPojo = convertToInventoryPojo(productPojo.getBarcode());
-
-        service.addProduct(productPojo, inventoryPojo, brand);
-
-
+        InventoryPojo inventoryPojo = new InventoryPojo();
+        inventoryPojo.setBarcode(productPojo.getBarcode());
+        inventoryPojo.setQuantity(0);
+        productService.addProduct(productPojo, inventoryPojo, brand);
     }
 
-    public void delete(String barcode) throws ApiException  {
-        service.delete(barcode);
-    }
+//    public void delete(String barcode) throws ApiException  {
+//        service.delete(barcode);
+//    }
 
-
+//    TODO can i throw the error from here AND what if the barcode changes from postman
     public void update(String barcode, ProductForm form) throws ApiException  {
+        ProductPojo product = productService.getAndCheckProductByBarcode(barcode);
+        BrandPojo brand = productService.getBrandByProduct(product);
+        if(brand.getName().equals(form.getBrandName()) && brand.getCategory().equals(form.getBrandCategory())){
+            ProductPojo productPojo = convertToProductPojo(form, brand.getId());
+            productService.update(productPojo, brand, barcode);
+        }
+        else{
+            throw new ApiException("brand name and category can't be changed");
+        }
 
-        BrandPojo brand = service.getBrandId(form.getBrandName(), form.getBrandCategory());
-        ProductPojo productPojo = convertToProductPojo(form, brand.getId());
-
-        service.update(productPojo, brand, barcode);
 
     }
 
@@ -68,8 +64,8 @@ public class ProductDto {
 
 
     public List<ProductData> getAllProduct() throws ApiException {
-        List<ProductPojo> products = service.getAllProduct();
-        List<BrandPojo> brands = brandService.getBrandsByProducts(products);
+        List<ProductPojo> products = productService.getAllProduct();
+        List<BrandPojo> brands = productService.getBrandsByProducts(products);
         List<ProductData> productsData = new ArrayList<ProductData>();
 
         for(int index = 0; index < products.size(); index++){

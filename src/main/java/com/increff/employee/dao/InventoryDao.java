@@ -26,10 +26,7 @@ public class InventoryDao extends AbstractDao {
 
     @Transactional
     public void insert(InventoryPojo p) throws ApiException {
-
         em.persist(p);
-
-
     }
 
     public int delete(String barcode) {

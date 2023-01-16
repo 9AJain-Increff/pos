@@ -74,12 +74,7 @@ public class ConversionUtil {
         return p;
     }
 
-    public static  InventoryPojo convertToInventoryPojo(String barcode) {
-        InventoryPojo p = new InventoryPojo();
-        p.setBarcode(barcode);
-        p.setQuantity(0);
-        return p;
-    }
+
 
 
     public static OrderPojo convertToOrderPojo(LocalDateTime d) {
