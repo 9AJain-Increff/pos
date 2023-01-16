@@ -1,5 +1,6 @@
 package com.increff.employee.service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
@@ -15,6 +16,7 @@ import com.increff.employee.pojo.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import static com.increff.employee.util.ConversionUtil.convertToBrandData;
 import static com.increff.employee.util.ConversionUtil.convertToOrderPojo;
 
 @Service
@@ -112,6 +114,7 @@ public class OrderService {
     }
 
     public LocalDateTime convertToLocalDateViaInstant(Date dateToConvert) {
+
         return dateToConvert.toInstant()
                 .atZone(ZoneId.systemDefault())
                 .toLocalDate().atStartOfDay();
@@ -119,8 +122,19 @@ public class OrderService {
 
 
     public List<OrderPojo> getOrdersBetweenTime(Date start, Date end){
-        LocalDateTime s = convertToLocalDateViaInstant(start);
-        LocalDateTime e = convertToLocalDateViaInstant(end);
+        LocalDateTime s,e;
+        if(start == null) {
+            s = LocalDateTime.MIN;
+        }
+        else{
+            s = convertToLocalDateViaInstant(start);
+        }
+        if(end == null){
+            e = LocalDateTime.now(ZoneOffset.UTC);
+        }
+        else {
+            e = convertToLocalDateViaInstant(end);
+        }
         return orderDao.getOrdersForReport(s, e);
     }
 
