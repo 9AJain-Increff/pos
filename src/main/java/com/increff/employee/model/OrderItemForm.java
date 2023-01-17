@@ -8,6 +8,6 @@ public class OrderItemForm {
     private String barcode;
     private int quantity;
     private String name;
-    private  int price;
+    private  Float price;
 
 }

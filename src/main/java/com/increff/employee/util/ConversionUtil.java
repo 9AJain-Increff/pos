@@ -102,7 +102,7 @@ public class ConversionUtil {
     }
 
 
-    public static  OrderItemPojo convertToOrderItemPojo(int price,OrderItemForm o, int id) {
+    public static  OrderItemPojo convertToOrderItemPojo(Float price,OrderItemForm o, int id) {
         OrderItemPojo p = new OrderItemPojo();
         p.setQuantity(o.getQuantity());
         p.setOrderId(id);

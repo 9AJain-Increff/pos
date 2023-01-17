@@ -9,7 +9,7 @@ public class ProductForm {
 
     private String brandName;
     private String brandCategory;
-    private int price;
+    private Float price;
     private String barcode;
 
 

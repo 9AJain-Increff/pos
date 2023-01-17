@@ -1,6 +1,7 @@
 package com.increff.employee.dto;
 
 
+import com.increff.employee.model.BrandForm;
 import com.increff.employee.model.ProductData;
 import com.increff.employee.model.ProductForm;
 import com.increff.employee.pojo.BrandPojo;
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.increff.employee.util.ConversionUtil.*;
+import static com.increff.employee.util.ValidationUtil.isBlank;
 //import static sun.java2d.loops.GraphicsPrimitive.convertTo;
 
 @Component
@@ -25,12 +27,16 @@ public class ProductDto {
     private ProductService productService;
 
     public ProductData getProductByBarcode(String barcode) throws ApiException {
+        if(isBlank(barcode)){
+            throw new ApiException("barcode cannot be empty");
+        }
         ProductPojo product = productService.getAndCheckProductByBarcode(barcode);
         BrandPojo brand = productService.getBrandByProduct(product);
         return convertToProductData(product, brand);
     }
 
     public void addProduct(ProductForm form) throws ApiException {
+
         BrandPojo brand = productService.getAndCheckBrandId(form.getBrandName(), form.getBrandCategory());
         ProductPojo productPojo = convertToProductPojo(form, brand.getId());
         InventoryPojo inventoryPojo = new InventoryPojo();
@@ -66,6 +72,17 @@ public class ProductDto {
         }
         return productsData;
     }
+    private void validateFormData(ProductForm form) throws ApiException {
+        if(isBlank(form.getName())){
+            throw new ApiException("name cannot be empty");
+        }
+        if(isBlank(form.getBrandName())){
+            throw new ApiException("brand cannot be empty");
+        }
+        if(isBlank(form.getBrandCategory())){
+            throw new ApiException("category cannot be empty");
+        }
 
+    }
 
 }

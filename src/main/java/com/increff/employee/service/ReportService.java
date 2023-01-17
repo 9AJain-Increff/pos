@@ -134,7 +134,7 @@ public class ReportService {
     private List<DailyReportPojo> getDailyData(
             Map<LocalDate, Integer> dateToOrdersQuantity,
             Map<LocalDate, Integer> dateToOrderItemsQuantity,
-            Map<LocalDate, Integer> dateToRevenue){
+            Map<LocalDate, Float> dateToRevenue){
         Iterator<Map.Entry<LocalDate, Integer>> itr = dateToOrdersQuantity.entrySet().iterator();
         List<DailyReportPojo> dailyReportPojoList = new ArrayList<>();
         while(itr.hasNext())
@@ -158,7 +158,7 @@ public class ReportService {
         List<OrderPojo> orders = orderService.getAll();
         Map<LocalDate, Integer> dateToOrdersQuantity = new HashMap<>();
         Map<LocalDate, Integer> dateToOrderItemsQuantity = new HashMap<>();
-        Map<LocalDate, Integer> dateToRevenue = new HashMap<>();
+        Map<LocalDate, Float> dateToRevenue = new HashMap<>();
 
         for(OrderPojo order: orders){
             if(dateToOrdersQuantity.containsKey(order.getCreatedOn().toLocalDate()  )) {
