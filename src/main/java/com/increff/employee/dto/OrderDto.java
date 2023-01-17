@@ -102,7 +102,6 @@ public class OrderDto {
 //        orderItemService.delete(id);
 //    }
 
-
     public void addNewlyUpdatedOrderItems(List<OrderItemPojo> addedOrderItems) throws ApiException {
         List<String> barcodes = getBarcodes(addedOrderItems);
 

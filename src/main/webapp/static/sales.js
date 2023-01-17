@@ -34,6 +34,7 @@ function displaySalesReport(data) {
         count++;
         var row = '<tr>'
         + '<td>' + count + '</td>'
+        + '<td>' + b.barcode + '</td>'
         + '<td>' + b.brandName + '</td>'
         + '<td>' + b.brandCategory + '</td>'
         + '<td>' + b.quantity + '</td>'

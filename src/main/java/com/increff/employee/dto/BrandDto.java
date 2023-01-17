@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.increff.employee.util.ConversionUtil.*;
+import static com.increff.employee.util.ValidationUtil.isBlank;
 
 @Component
 public class BrandDto {
@@ -27,6 +28,7 @@ public class BrandDto {
          return convertToBrandData(brandPojo);
     }
     public void addBrand(BrandForm form) throws ApiException {
+        validateFormData(form);
         BrandPojo p = convertToBrandPojo(form);
         service.addBrand(p);
     }
@@ -34,6 +36,7 @@ public class BrandDto {
 
 
     public void updateBrand(int id, BrandForm form) throws ApiException  {
+        validateFormData(form);
         BrandPojo brandPojo = convertToBrandPojo(form);
         service.update(id,brandPojo);
     }
@@ -45,6 +48,14 @@ public class BrandDto {
             brandsData.add(convertToBrandData(brandPojo));
         }
         return brandsData;
+    }
+    private void validateFormData(BrandForm form) throws ApiException {
+        if(isBlank(form.getName())){
+            throw new ApiException("name cannot be empty");
+        }
+        if(isBlank(form.getCategory())){
+            throw new ApiException("category cannot be empty");
+        }
     }
 
 }

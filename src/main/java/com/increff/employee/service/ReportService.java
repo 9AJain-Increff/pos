@@ -84,10 +84,7 @@ public class ReportService {
         Map<String,Integer> barcodeToQuantityMapping = getQuantityMapping(filteredOrderItems);
 
         List<SalesData> salesData = new ArrayList<>();
-        Iterator<Map.Entry<String, ProductPojo>> itr = barcodeToProductMapping.entrySet().iterator();
-        while(itr.hasNext())
-        {
-            Map.Entry<String, ProductPojo> entry = itr.next();
+        for (Map.Entry<String, ProductPojo> entry : barcodeToProductMapping.entrySet()) {
             String barcode = entry.getKey();
             ProductPojo product = entry.getValue();
             BrandPojo brand = brandService.getAndCheckBrandById(product.getBrandId());
@@ -95,7 +92,8 @@ public class ReportService {
             saleData.setQuantity(barcodeToQuantityMapping.get(barcode));
             saleData.setBrandCategory(brand.getCategory());
             saleData.setBrandName(brand.getName());
-            saleData.setRevenue(barcodeToQuantityMapping.get(barcode)*product.getPrice());
+            saleData.setRevenue(barcodeToQuantityMapping.get(barcode) * product.getPrice());
+            saleData.setBarcode(barcode);
             salesData.add(saleData);
         }
 

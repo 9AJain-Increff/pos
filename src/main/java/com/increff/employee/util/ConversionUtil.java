@@ -121,6 +121,13 @@ public class ConversionUtil {
 
         return p;
     }
+    public static  UserPojo convertToUserPojo(UserForm d) {
+        UserPojo p = new UserPojo();
+        p.setRole(d.getRole());
+        p.setEmail(d.getEmail());
+        p.setPassword(d.getPassword());
+        return p;
+    }
 
 //        private static  OrderPojo convertToOrderPojo(OrderItemForm f) {
 //        OrderItemPojo p = new OrderPojo();

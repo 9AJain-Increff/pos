@@ -30,7 +30,7 @@ public class AdminApiController {
 	@RequestMapping(path = "/api/admin/user", method = RequestMethod.POST)
 	public void addUser(@RequestBody UserForm form) throws ApiException {
 		UserPojo p = convert(form);
-		service.add(p);
+		service.addUser(p);
 	}
 
 	@ApiOperation(value = "Deletes a user")

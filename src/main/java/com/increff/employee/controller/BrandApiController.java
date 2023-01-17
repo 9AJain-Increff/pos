@@ -49,6 +49,7 @@ public class BrandApiController {
     public void editBrand(@PathVariable int id, @RequestBody BrandForm form) throws ApiException {
         dto.updateBrand(id, form);
     }
+
 //
 //    @Scheduled(cron = "0 0 0 ? * * *")
 //    private void cron() {

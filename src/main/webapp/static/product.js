@@ -68,13 +68,15 @@ function updateProduct(event){
 }
 
 
+var productData = [];
 function getProductList(){
 	var url = getProductUrl();
 	$.ajax({
 	   url: url,
 	   type: 'GET',
 	   success: function(data) {
-	   		displayProductList(data);
+	   productData = data;
+	   displayProductList(data);
 	   },
 	   error: handleAjaxError
 	});
@@ -173,14 +175,16 @@ console.log('ankur jinfo')
 }
 
 function displayEditProduct(barcode){
-console.log('ankur jainnnnnnnnnnnnnn')
 	var url = getProductUrl() + "/" + barcode;
 	console.log(url)
 	$.ajax({
 	   url: url,
 	   type: 'GET',
-	   success: function(data) {
-	   console.log('anknknkncnc', data)
+	   success:async function(data) {
+            $('#brand-category-edit').empty();
+            $('#brand-name-edit').empty();
+            getBrandListInEdit(productData)
+
 	   		displayProduct(data);
 	   },
 	   error:
@@ -220,10 +224,16 @@ function displayUploadData(){
 
 function displayProduct(data){
     console.log(data)
+//    var selectBrand = document.getElementById('selectBrand');
 
 	$("#product-edit-form input[name=name]").val(data.name);
-	$("#product-edit-form input[name=brandCategory]").val(data.brandCategory);
-	$("#product-edit-form input[name=brandName]").val(data.brandName);
+//	selectBrand.selectedIndex = data.brandName;
+	$("#brand-name-edit").val(data.brandName);
+//	$("#brand-category-edit").val(data.brandName);
+    $(`#brand-category-edit option[value=${data.brandCategory}]`).attr('selected', 'selected')
+    $(`#brand-name-edit option[value=${data.brandName}]`).attr('selected', 'selected')
+//	$("#product-edit-form input[name=brandCategory]").val(data.brandCategory);
+//	$("#product-edit-form input[name=brandName]").val(data.brandName);
 	$("#product-edit-form input[name=price]").val(data.price);
 	$("#product-edit-form input[name=barcode]").val(data.barcode);
 	$("#product-edit-form input[name=id]").val(data.id);
@@ -234,8 +244,27 @@ function displayProduct(data){
 function openAddModel(){
 
 	$('#add-product-modal').modal('toggle');
+	getBrandList(productData);
 
 }
+
+
+
+function getBrandList(brands) {
+    const brandCategory = brands.map((brandItem) => {
+      return { brand: brandItem.brandName, category: brandItem.brandCategory };
+    });
+    setupBrandCategoryDropdown(brandCategory, '#brand-name-selection', '#brand-category-selection');
+  };
+
+function getBrandListInEdit(brands) {
+    const brandCategory = brands.map((brandItem) => {
+      return { brand: brandItem.brandName, category: brandItem.brandCategory };
+    });
+    setupBrandCategoryDropdown(brandCategory, '#brand-name-edit', '#brand-category-edit');
+  };
+
+
 
 //INITIALIZATION CODE
 function init(){
@@ -254,4 +283,5 @@ function init(){
 
 $(document).ready(init);
 $(document).ready(getProductList);
+
 
