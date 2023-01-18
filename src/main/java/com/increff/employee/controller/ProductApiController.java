@@ -42,16 +42,16 @@ public class ProductApiController {
     @ApiOperation(value = "Gets a product by ID")
     @RequestMapping(path = "/{barcode}", method = RequestMethod.GET)
     public ProductData get(@PathVariable String barcode) throws ApiException {
-        ProductData p = productDto.getProductByBarcode(barcode);
+            ProductData p = productDto.getProductByBarcode(barcode);
         return (p);
     }
 
 
 
     @ApiOperation(value = "Edit a Product")
-    @RequestMapping(path = "/{barcode}", method = RequestMethod.PUT)
-    public void editProduct(@PathVariable String barcode, @RequestBody ProductForm form) throws ApiException {
-        productDto.update(barcode,form);
+    @RequestMapping(path = "/{id}", method = RequestMethod.PUT)
+    public void editProduct(@PathVariable Integer id, @RequestBody ProductForm form) throws ApiException {
+        productDto.update(id,form);
 
     }
 

@@ -143,22 +143,23 @@ function downloadErrors(){
 function displayBrandList(data){
 	var $tbody = $('#brand-table').find('tbody');
 	$tbody.empty();
+    let count =1;
 	for(var i in data){
+
 		var e = data[i];
-		var buttonHtml = '<button onclick="deleteBrand(' + e.id + ')">delete</button>'
-		buttonHtml += ' <button onclick="displayEditBrand(' + e.id + ')">edit</button>'
+		var buttonHtml = ' <button onclick="displayEditBrand(' + e.id + ')" class="btn btn-outline-dark">edit</button>'
 		var row = '<tr>'
-		+ '<td>' + e.id + '</td>'
+		+ '<td>' + count+ '</td>'
 		+ '<td>' + e.name + '</td>'
 		+ '<td>'  + e.category + '</td>'
 		+ '<td>' + buttonHtml + '</td>'
 		+ '</tr>';
         $tbody.append(row);
+        count++;
 	}
 }
 
 function displayEditBrand(id){
-console.log('ankur jainnnnnnnnnnnnnn')
 	var url = getBrandUrl() + "/" + id;
 	console.log(url)
 	$.ajax({

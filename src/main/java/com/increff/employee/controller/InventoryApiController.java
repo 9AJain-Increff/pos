@@ -30,7 +30,7 @@ public class InventoryApiController {
 //        inventoryDto.deleting(barcode);
 //    }
 
-    @ApiOperation(value = "Gets list of all inventorys")
+    @ApiOperation(value = "Gets list of all inventory")
     @RequestMapping(path = "", method = RequestMethod.GET)
     public List<InventoryData> getAllInventory() throws ApiException {
         return inventoryDto.getAllInventory();

@@ -1,10 +1,7 @@
 package com.increff.employee.dto;
 
 
-import com.increff.employee.model.GetList;
-import com.increff.employee.model.OrderData;
-import com.increff.employee.model.OrderItemData;
-import com.increff.employee.model.OrderItemForm;
+import com.increff.employee.model.*;
 import com.increff.employee.pojo.InventoryPojo;
 import com.increff.employee.pojo.OrderItemPojo;
 import com.increff.employee.pojo.OrderPojo;
@@ -19,6 +16,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.increff.employee.util.ConversionUtil.*;
+import static com.increff.employee.util.Normalization.normalize;
+import static com.increff.employee.util.ValidationUtil.isBlank;
+import static com.increff.employee.util.ValidationUtil.isNegative;
 
 @Component
 public class OrderDto {
@@ -72,7 +72,10 @@ public class OrderDto {
 
     @Transactional(rollbackOn = ApiException.class)
     public void addOrder(List<OrderItemForm> orderItemForm) throws ApiException {
-
+        for(OrderItemForm orderItem : orderItemForm){
+            normalizeFormData(orderItem);
+            validateFormData(orderItem);
+        }
         List<String> barcodes = orderItemForm.stream()
                 .map(OrderItemForm::getBarcode)
                 .collect(Collectors.toList());
@@ -140,6 +143,11 @@ public class OrderDto {
         if (orderItemForms.isEmpty()) {
             throw new ApiException("Add a Order Item");
         }
+        for(OrderItemForm orderItem : orderItemForms){
+            normalizeFormData(orderItem);
+            validateFormData(orderItem);
+        }
+
 
         List<OrderItemPojo> updatedOrder = orderItemForms
                 .stream()
@@ -178,6 +186,24 @@ public class OrderDto {
         return ordersData;
     }
 
+    private void validateFormData(OrderItemForm form) throws ApiException {
 
+        if(isBlank(form.getBarcode())){
+            throw new ApiException("brand cannot be empty");
+        }
+
+        if(isNegative(form.getPrice())){
+            throw new ApiException("enter a valid price");
+        }
+        if(isNegative(form.getQuantity())){
+            throw new ApiException("enter a valid quantity");
+        }
+
+    }
+
+    private void normalizeFormData(OrderItemForm form){
+//        form.setName(normalize(form.getName()));
+        form.setBarcode(normalize(form.getBarcode()));
+    }
 
 }

@@ -75,7 +75,6 @@ function updateInventory(event){
 
 
 function getInventoryList(){
-console.log('get inven list')
 	var url = getInventoryUrl();
 	console.log(url)
 	$.ajax({
@@ -164,18 +163,20 @@ function displayInventoryList(data){
 	var $tbody = $('#inventory-table').find('tbody');
 	console.log('pppppppppppppp')
 	$tbody.empty();
+	let count =1;
 	for(var i in data){
 		var e = data[i];
 		console.log(e);
-		var buttonHtml = '<button onclick="deleteInventory(' + "'" + e.barcode + "'" + ')">delete</button>'
-		buttonHtml += ' <button onclick="displayEditInventory(' + "'" + e.barcode + "'" + ')">edit</button>'
+		var buttonHtml = ' <button class="btn btn-outline-dark" onclick="displayEditInventory(' + "'" + e.barcode + "'" + ')">edit</button>'
 		var row = '<tr>'
+        + '<td>' + count + '</td>'
 		+ '<td>' + e.barcode + '</td>'
 		+ '<td>' + e.productName + '</td>'
 		+ '<td>'  + e.quantity + '</td>'
 		+ '<td>' + buttonHtml + '</td>'
 		+ '</tr>';
         $tbody.append(row);
+        count++;
 	}
 }
 

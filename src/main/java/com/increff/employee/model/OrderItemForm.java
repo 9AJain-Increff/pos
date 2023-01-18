@@ -6,8 +6,8 @@ import lombok.Data;
 public class OrderItemForm {
 
     private String barcode;
-    private int quantity;
-    private String name;
+    private Integer quantity;
+    private Integer orderId;
     private  Float price;
 
 }

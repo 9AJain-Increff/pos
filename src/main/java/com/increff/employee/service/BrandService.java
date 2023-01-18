@@ -54,7 +54,7 @@ public class BrandService {
     }
 
 
-    public BrandPojo getBrandId(String brandName, String brandCategory) throws ApiException {
+    public BrandPojo getBrandIdByNameAndCategory(String brandName, String brandCategory) throws ApiException {
 
         BrandPojo brand = dao.getBrand(brandName, brandCategory);
         if(brand == null)

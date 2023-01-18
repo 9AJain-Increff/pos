@@ -3,6 +3,7 @@ package com.increff.employee.dto;
 
 import com.increff.employee.model.InventoryData;
 import com.increff.employee.model.InventoryForm;
+import com.increff.employee.model.ProductForm;
 import com.increff.employee.pojo.InventoryPojo;
 import com.increff.employee.pojo.ProductPojo;
 import com.increff.employee.service.ApiException;
@@ -16,6 +17,9 @@ import java.util.stream.Collectors;
 
 import static com.increff.employee.util.ConversionUtil.convertToInventoryData;
 import static com.increff.employee.util.ConversionUtil.convertToInventoryPojo;
+import static com.increff.employee.util.Normalization.normalize;
+import static com.increff.employee.util.ValidationUtil.isBlank;
+import static com.increff.employee.util.ValidationUtil.isNegative;
 
 @Component
 public class InventoryDto {
@@ -23,16 +27,20 @@ public class InventoryDto {
     private InventoryService inventoryService;
 
     public InventoryData getInventoryByBarcode(String barcode) throws ApiException {
+        barcode = normalize(barcode);
         InventoryPojo b = inventoryService.getAndCheckInventoryByBarcode(barcode);
         return convertToInventoryData(b);
     }
     public void addInventory(InventoryForm form) throws ApiException {
+        form.setBarcode(normalize(form.getBarcode()));
+        validateFormData(form);
         InventoryPojo p = convertToInventoryPojo(form);
         inventoryService.addInventory(p);
     }
 
     public void updateInventory(InventoryForm form) throws ApiException  {
-
+        form.setBarcode(normalize(form.getBarcode()));
+        validateFormData(form);
         InventoryPojo p = convertToInventoryPojo(form);
         ProductPojo product = inventoryService.checkProductExists(p.getBarcode());
         inventoryService.update(p);
@@ -58,5 +66,17 @@ public class InventoryDto {
 
         return inventoryDataList;
     }
+
+    private void validateFormData(InventoryForm form) throws ApiException {
+        if(isBlank(form.getBarcode())){
+            throw new ApiException("barcode cannot be empty");
+        }
+
+        if(isNegative(form.getQuantity())){
+            throw new ApiException("quantity cannot be negative");
+        }
+
+    }
+
 
 }

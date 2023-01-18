@@ -29,6 +29,7 @@ public class InventoryService {
             inventoryDao.insert(p);
         }
         else {
+            p.setQuantity(p.getQuantity()+exist.getQuantity());
             update(p);
         }
     }
@@ -43,7 +44,7 @@ public class InventoryService {
     public InventoryPojo getAndCheckInventoryByBarcode(String barcode) throws ApiException {
         InventoryPojo p = inventoryDao.select(barcode);
         if (p == null) {
-            throw new ApiException("Inventory with given ID does not exit, id: " + barcode);
+            throw new ApiException("Inventory with given barcode does not exit, id: " + barcode);
         }
         return p;
     }
@@ -59,7 +60,7 @@ public class InventoryService {
     public void update(InventoryPojo p) throws ApiException {
         normalize(p);
         InventoryPojo ex = inventoryDao.select(p.getBarcode());
-        ex.setQuantity((p.getQuantity()+ex.getQuantity()));
+        ex.setQuantity((p.getQuantity()));
         ex.setBarcode(p.getBarcode());
     }
 

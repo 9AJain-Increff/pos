@@ -6,6 +6,13 @@
 
 
 
+function getBaseUrl() {
+  return $('meta[name=baseUrl]').attr('content');
+}
+
+function getBrandUrl() {
+  return getBaseUrl() + '/api/brands';
+}
 
 
 
@@ -44,13 +51,12 @@ function addProduct(event){
 function updateProduct(event){
 	$('#edit-product-modal').modal('toggle');
 	//Get the ID
-	var barcode = $("#product-edit-form input[name=barcode]").val();
-	var url = getProductUrl() + "/" + barcode;
+	var id = $("#product-edit-form input[name=id]").val();
+	var url = getProductUrl() + "/" + id;
 
 	//Set the values to update
 	var $form = $("#product-edit-form");
 	var json = toJson($form);
-    console.log(url,barcode)
 	$.ajax({
 	   url: url,
 	   type: 'PUT',
@@ -157,26 +163,31 @@ console.log('ankur jinfo')
 
 	var $tbody = $('#product-table').find('tbody');
 	$tbody.empty();
+	let count =1;
 	for(var i in data){
-		var e = data[i];
-		console.log(e);
+		const e = data[i];
+		console.log(e.barcode);
+		const editBtnId = 'edit-product-'+e.barcode
 //		var buttonHtml = '<button onclick="deleteProduct(' + "'" + e.barcode + "'" +')">delete</button>'
-		var buttonHtml = ' <button onclick="displayEditProduct(' + "'" + e.barcode + "'" +')">edit</button>'
+		var buttonHtml = `<button class="btn btn-outline-dark" id=${editBtnId}>Edit</button>`
 		var row = '<tr>'
+        + '<td>' + count + '</td>'
+        + '<td>' + e.barcode + '</td>'
 		+ '<td>' + e.name + '</td>'
 		+ '<td>'  + e.brandName + '</td>'
 		+ '<td>' + e.brandCategory + '</td>'
 		+ '<td>' + e.price + '</td>'
-		+ '<td>' + e.barcode + '</td>'
 		+ '<td>' + buttonHtml + '</td>'
 		+ '</tr>';
         $tbody.append(row);
+        count++;
+        $('#'+editBtnId).click(() => displayEditProduct(e))
 	}
 }
 
-function displayEditProduct(barcode){
-	var url = getProductUrl() + "/" + barcode;
-	console.log(url)
+function displayEditProduct(e){
+	var url = getProductUrl() + "/" + e.barcode;
+	console.log(url, "lllllllll")
 	$.ajax({
 	   url: url,
 	   type: 'GET',
@@ -223,7 +234,7 @@ function displayUploadData(){
 }
 
 function displayProduct(data){
-    console.log(data)
+    console.log(data, "ankur pppppppppppp")
 //    var selectBrand = document.getElementById('selectBrand');
 
 	$("#product-edit-form input[name=name]").val(data.name);
@@ -244,15 +255,24 @@ function displayProduct(data){
 function openAddModel(){
 
 	$('#add-product-modal').modal('toggle');
-	getBrandList(productData);
-
+	var url = getBrandUrl() ;
+    	console.log(url)
+    	$.ajax({
+    	   url: url,
+    	   type: 'GET',
+    	   success:function(data) {
+    	   	getBrandList(data);
+    	   },
+    	   error:
+    	   handleAjaxError
+    	});
 }
 
 
 
 function getBrandList(brands) {
     const brandCategory = brands.map((brandItem) => {
-      return { brand: brandItem.brandName, category: brandItem.brandCategory };
+      return { brand: brandItem.name, category: brandItem.category };
     });
     setupBrandCategoryDropdown(brandCategory, '#brand-name-selection', '#brand-category-selection');
   };

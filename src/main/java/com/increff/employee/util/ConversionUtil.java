@@ -55,11 +55,8 @@ public class ConversionUtil {
     }
 
     public static InventoryData convertToInventoryData(InventoryPojo i,ProductPojo p) {
-        System.out.println("ankur jain");
 
         InventoryData d = new InventoryData();
-        System.out.println(p.getBarcode());
-
         d.setBarcode(p.getBarcode());
         d.setQuantity(i.getQuantity());
         d.setProductName(p.getName());

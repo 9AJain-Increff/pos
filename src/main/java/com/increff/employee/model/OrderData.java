@@ -8,9 +8,8 @@ import java.time.LocalDateTime;
 import java.util.Date;
 
 @Data
-public class OrderData extends OrderItemForm {
+public class OrderData {
 
-    private int orderId;
     private int id;
     private LocalDateTime createdOn;
 

@@ -15,10 +15,13 @@ public class ValidationUtil {
         return number != null && number > 0;
     }
 
-    public static boolean isNegative(Integer number) {
+    public static boolean isNegative(Float number) {
         return number == null || number < 0;
     }
 
+    public static boolean isNegative(Integer number) {
+        return number == null || number < 0;
+    }
     public static boolean isValidEmail(String email) {
         return email.matches(EMAIL_PATTERN);
     }
