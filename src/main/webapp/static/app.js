@@ -16,7 +16,7 @@ function toJson($form){
 function handleAjaxError(response){
 console.log('failllllllllllll')
 	var response = JSON.parse(response.responseText);
-	alert(response.message);
+	$.notify(response.message, 'error');
 }
 
 function readFileData(file, callback){
@@ -53,3 +53,29 @@ function writeFileData(arr){
     tempLink.setAttribute('download', 'download.tsv');
     tempLink.click(); 
 }
+
+function setupBrandCategoryDropdown(brands, brandSelectionId, categorySelectionId) {
+  const brandNameSet = new Set();
+  const brandCategorySet = new Set();
+
+  brands.forEach((item) => {
+    brandNameSet.add(item.brand);
+    brandCategorySet.add(item.category);
+  });
+   const sortAndAppend = (id, set) => {
+      const list = Array.from(set);
+      list.sort();
+      appendOptions(id, list);
+    };
+
+    sortAndAppend(brandSelectionId, brandNameSet);
+    sortAndAppend(categorySelectionId, brandCategorySet);
+  }
+  function appendOptions(selectElementId, options) {
+    const $selectElement = $(selectElementId);
+    $selectElement.empty();
+    options.forEach((option) => {
+      const optionHtml = `<option value="${option}">${option}</option>`;
+      $selectElement.append(optionHtml);
+    });
+  }

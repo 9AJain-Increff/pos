@@ -3,110 +3,80 @@ package com.increff.employee.dto;
 
 import com.increff.employee.model.InventoryData;
 import com.increff.employee.model.InventoryForm;
+import com.increff.employee.model.ProductForm;
 import com.increff.employee.pojo.InventoryPojo;
-import com.increff.employee.pojo.EmployeePojo;
 import com.increff.employee.pojo.ProductPojo;
 import com.increff.employee.service.ApiException;
-import com.increff.employee.service.BrandService;
 import com.increff.employee.service.InventoryService;
-import com.increff.employee.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.increff.employee.util.ConversionUtil.convertToInventoryData;
 import static com.increff.employee.util.ConversionUtil.convertToInventoryPojo;
+import static com.increff.employee.util.Normalization.normalize;
+import static com.increff.employee.util.ValidationUtil.isBlank;
+import static com.increff.employee.util.ValidationUtil.isNegative;
 
 @Component
 public class InventoryDto {
-
-
-
     @Autowired
-    private InventoryService service;
+    private InventoryService inventoryService;
 
-    @Autowired
-    private ProductService productService;
-
-
-    public InventoryData get(String barcode) throws ApiException {
-        InventoryPojo b = service.get(barcode);
+    public InventoryData getInventoryByBarcode(String barcode) throws ApiException {
+        barcode = normalize(barcode);
+        InventoryPojo b = inventoryService.getAndCheckInventoryByBarcode(barcode);
         return convertToInventoryData(b);
     }
-    public void addingInventory(InventoryForm form) throws ApiException {
+    public void addInventory(InventoryForm form) throws ApiException {
+        form.setBarcode(normalize(form.getBarcode()));
+        validateFormData(form);
         InventoryPojo p = convertToInventoryPojo(form);
-        Boolean inventoryExist = service.getCheck(p.getBarcode());
-        Boolean productExist = productService.checkProductExists(p.getBarcode());
-        if(inventoryExist && productExist){
-            service.add(p);
-
-        }
-
+        inventoryService.addInventory(p);
     }
 
-    public void deleting(String barcode) throws ApiException  {
-        service.delete(barcode);
-    }
-
-
-    public void updating(String barcode, InventoryForm form) throws ApiException  {
-
+    public void updateInventory(InventoryForm form) throws ApiException  {
+        form.setBarcode(normalize(form.getBarcode()));
+        validateFormData(form);
         InventoryPojo p = convertToInventoryPojo(form);
-//        Boolean inventoryExist = service.getCheck(p.getBarcode());
-        Boolean productExist = productService.checkProductExists(p.getBarcode());
-        if( productExist){
-            service.update(barcode,p);
-        }
+        ProductPojo product = inventoryService.checkProductExists(p.getBarcode());
+        inventoryService.update(p);
+    }
+    private List<String> getBarcodes(List<InventoryPojo> inventoryList){
+        List<String> barcodes = inventoryList.stream()
+                .map(InventoryPojo::getBarcode)
+                .collect(Collectors.toList());
+        return barcodes;
     }
 
-    public List<InventoryData> gettingAllInventory() {
-        System.out.println("anknanana");
-        List<InventoryPojo> list = service.getAll();
-
-        List<ProductPojo> productList = new ArrayList<ProductPojo>();
-
-        productList =  productService.getProductByBarcode(list);
-//        System.out.println(list);
-        List<InventoryData> list2 = new ArrayList<InventoryData>();
+    public List<InventoryData> getAllInventory() throws ApiException {
+        List<InventoryPojo> inventoryList = inventoryService.getAllInventory();
+        List<String> barcodes = getBarcodes(inventoryList);
+        List<ProductPojo> productList = inventoryService.getProductsByBarcodes(barcodes);
+        List<InventoryData> inventoryDataList = new ArrayList<InventoryData>();
 
 
         System.out.println(productList.size());
-        for (int i = 0; i < list.size(); i++) {
-            list2.add(convertToInventoryData(list.get(i), productList.get(i)));
+        for (int i = 0; i < inventoryList.size(); i++) {
+            inventoryDataList.add(convertToInventoryData(inventoryList.get(i), productList.get(i)));
         }
 
-        return list2;
+        return inventoryDataList;
     }
 
-//    private static InventoryData convert(InventoryPojo p) {
-//        InventoryData d = new InventoryData();
-//        d.setBarcode(p.getBarcode());
-//        d.setQuantity(p.getQuantity());
-//        return d;
-//    }
-//
-//    private static InventoryData convert(InventoryPojo i,ProductPojo p) {
-//        System.out.println("ankur jain");
-//
-//        InventoryData d = new InventoryData();
-//        System.out.println(p.getBarcode());
-//
-//        d.setBarcode(p.getBarcode());
-//        d.setQuantity(i.getQuantity());
-//        d.setProductName(p.getName());
-//        d.setId(p.getId());
-//        return d;
-//    }
-//
-//    private static  InventoryPojo convert(InventoryForm f) {
-//        InventoryPojo p = new InventoryPojo();
-//        p.setBarcode(f.getBarcode());
-//        p.setQuantity(f.getQuantity());
-//        return p;
-//    }
+    private void validateFormData(InventoryForm form) throws ApiException {
+        if(isBlank(form.getBarcode())){
+            throw new ApiException("barcode cannot be empty");
+        }
+
+        if(isNegative(form.getQuantity())){
+            throw new ApiException("quantity cannot be negative");
+        }
+
+    }
+
 
 }

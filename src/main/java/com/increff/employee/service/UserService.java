@@ -17,7 +17,7 @@ public class UserService {
 	private UserDao dao;
 
 	@Transactional
-	public void add(UserPojo p) throws ApiException {
+	public void addUser(UserPojo p) throws ApiException {
 		normalize(p);
 		UserPojo existing = dao.select(p.getEmail());
 		if (existing != null) {
@@ -27,9 +27,12 @@ public class UserService {
 	}
 
 	@Transactional(rollbackOn = ApiException.class)
-	public UserPojo get(String email) throws ApiException {
+	public UserPojo getUserByEmail(String email) throws ApiException {
 		return dao.select(email);
+
 	}
+
+
 
 	@Transactional
 	public List<UserPojo> getAll() {

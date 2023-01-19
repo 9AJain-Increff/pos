@@ -1,17 +1,15 @@
 package com.increff.employee.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.transaction.Transactional;
 
 import com.increff.employee.dao.BrandDao;
 import com.increff.employee.pojo.BrandPojo;
+import com.increff.employee.pojo.ProductPojo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import com.increff.employee.dao.EmployeeDao;
-import com.increff.employee.pojo.EmployeePojo;
-import com.increff.employee.util.StringUtil;
 
 @Service
 public class BrandService {
@@ -19,83 +17,61 @@ public class BrandService {
     @Autowired
     private BrandDao dao;
 
+
     @Transactional(rollbackOn = ApiException.class)
-    public void add(BrandPojo p) throws ApiException {
-        normalize(p);
-        if(StringUtil.isEmpty(p.getName())) {
-            throw new ApiException("name cannot be empty");
-        }
-        if(dao.checkBrandExists(p.getName(),p.getCategory())) {
-            dao.insert(p);
-        }
+    public void addBrand(BrandPojo brandPojo) throws ApiException {
+        BrandPojo brand = dao.getBrand(brandPojo.getName(),brandPojo.getCategory());
+        if(brand == null)
+        dao.insert(brandPojo);
         else{
-            throw new ApiException("brand name + category already exists");
+            throw new ApiException("Brand with given name and category already exist" );
         }
-
-    }
-
-    @Transactional
-    public void delete(int id) {
-        dao.delete(id);
     }
 
 
-    @Transactional(rollbackOn = ApiException.class)
-    public BrandPojo get(int id) throws ApiException {
-        BrandPojo p = dao.select(id);
-        if (p == null) {
+
+    public BrandPojo getAndCheckBrandById(int id) throws ApiException {
+        BrandPojo brandPojo = dao.getBrandById(id);
+        if (brandPojo == null) {
             throw new ApiException("Brand with given ID does not exit, id: " + id);
         }
-        return p;
+        return brandPojo;
     }
 
-    @Transactional
-    public List<BrandPojo> getAll() {
-        return dao.selectAll();
+    public List<BrandPojo> getAllBrand() {
+        return dao.getAllBrand();
     }
 
     @Transactional(rollbackOn  = ApiException.class)
     public void update(int id, BrandPojo p) throws ApiException {
-        normalize(p);
-        BrandPojo ex = dao.select(id);
-        Boolean exist = checkBrandExists(p.getName(),p.getCategory());
-        if(!exist){
-            System.out.println(p.getName());
-            System.out.println(p.getCategory());
-            ex.setName(p.getName());
-            ex.setCategory(p.getCategory());
-        }
-        else{
-            throw new ApiException("brand name + category already exists");
-        }
-
-//        dao.update(ex);
-    }
-
-    @Transactional
-    public Boolean getCheck(int id) throws ApiException {
-        BrandPojo p = dao.select(id);
-        if (p == null) {
+        BrandPojo exist = dao.getBrandById(id);
+        if(exist == null)
             throw new ApiException("Brand with given ID does not exit, id: " + id);
+        else {
+            exist.setName(p.getName());
+            exist.setCategory(p.getCategory());
         }
-        return true;
     }
 
-    public Boolean checkBrandExists(String name,String category) throws ApiException {
-        BrandPojo p = dao.select(name, category);
-        if (p == null) {
-            throw new ApiException(("Brand name + Category not exist"));
 
+    public BrandPojo getBrandIdByNameAndCategory(String brandName, String brandCategory) throws ApiException {
+
+        BrandPojo brand = dao.getBrand(brandName, brandCategory);
+        if(brand == null)
+            throw new ApiException("Brand with given name and category does not exit " );
+        return brand;
+    }
+
+    public List<BrandPojo> getBrandsByProducts(List<ProductPojo> products) throws ApiException {
+        List<BrandPojo> brands = new ArrayList<>();
+        for(ProductPojo product : products){
+            brands.add((getAndCheckBrandById(product.getBrandId())));
         }
-        return  true;
-
+        return brands;
     }
 
 
 
 
 
-    protected static void normalize(BrandPojo p) {
-        p.setName(StringUtil.toLowerCase(p.getName()));
-    }
 }

@@ -12,8 +12,6 @@ import com.increff.employee.pojo.BrandPojo;
 import com.increff.employee.service.ApiException;
 import org.springframework.stereotype.Repository;
 
-import com.increff.employee.pojo.EmployeePojo;
-
 @Repository
 public class BrandDao extends AbstractDao {
 
@@ -26,7 +24,7 @@ public class BrandDao extends AbstractDao {
     @PersistenceContext
     private EntityManager em;
 
-    @Transactional
+
     public void insert(BrandPojo p) throws ApiException {
 
             em.persist(p);
@@ -41,31 +39,21 @@ public class BrandDao extends AbstractDao {
     }
 
 
-    public Boolean checkBrandExists(String name, String category) {
-        TypedQuery<BrandPojo> query = getQuery(check, BrandPojo.class);
-        query.setParameter("name", name);
-        query.setParameter("category", category);
-        BrandPojo p = getSingle(query);
-
-        if(p==null){return true;}
-        else{
-            return false;
-        }
-    }
-    public BrandPojo select(int id) {
+    public BrandPojo getBrandById(int id) {
         TypedQuery<BrandPojo> query = getQuery(select_id, BrandPojo.class);
         query.setParameter("id", id);
-        return getSingle(query);
+        return getSingleBrand(query);
     }
 
-    public BrandPojo select(String name, String category) {
+    public BrandPojo getBrand(String name, String category) {
         TypedQuery<BrandPojo> query = getQuery(select_brand, BrandPojo.class);
         query.setParameter("name", name);
         query.setParameter("category", category);
-        return getSingle(query);
+        return getSingleBrand(query);
     }
 
-    public List<BrandPojo> selectAll() {
+
+    public List<BrandPojo> getAllBrand() {
         TypedQuery<BrandPojo> query = getQuery(select_all, BrandPojo.class);
 
         return query.getResultList();

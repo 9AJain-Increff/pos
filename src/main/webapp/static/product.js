@@ -6,19 +6,27 @@
 
 
 
+function getBaseUrl() {
+  return $('meta[name=baseUrl]').attr('content');
+}
+
+function getBrandUrl() {
+  return getBaseUrl() + '/api/brands';
+}
 
 
 
 
 function getProductUrl(){
 	var baseUrl = $("meta[name=baseUrl]").attr("content")
-	return baseUrl + "/api/product";
+	return baseUrl + "/api/products";
 }
 
 //BUTTON ACTIONS
 function addProduct(event){
 	//Set the values to update
-	var $form = $("#product-form");
+
+	var $form = $("#product-add-form");
 	var json = toJson($form);
 	var url = getProductUrl();
     console.log(url,json)
@@ -30,7 +38,9 @@ function addProduct(event){
        	'Content-Type': 'application/json'
        },
 	   success: function(response) {
+	   	$('#add-product-modal').modal('toggle');
 	   		getProductList();
+
 	   },
 	   error: handleAjaxError,
 	});
@@ -41,13 +51,12 @@ function addProduct(event){
 function updateProduct(event){
 	$('#edit-product-modal').modal('toggle');
 	//Get the ID
-	var barcode = $("#product-edit-form input[name=barcode]").val();
-	var url = getProductUrl() + "/" + barcode;
+	var id = $("#product-edit-form input[name=id]").val();
+	var url = getProductUrl() + "/" + id;
 
 	//Set the values to update
 	var $form = $("#product-edit-form");
 	var json = toJson($form);
-    console.log(url,barcode)
 	$.ajax({
 	   url: url,
 	   type: 'PUT',
@@ -65,13 +74,15 @@ function updateProduct(event){
 }
 
 
+var productData = [];
 function getProductList(){
 	var url = getProductUrl();
 	$.ajax({
 	   url: url,
 	   type: 'GET',
 	   success: function(data) {
-	   		displayProductList(data);
+	   productData = data;
+	   displayProductList(data);
 	   },
 	   error: handleAjaxError
 	});
@@ -152,33 +163,39 @@ console.log('ankur jinfo')
 
 	var $tbody = $('#product-table').find('tbody');
 	$tbody.empty();
+	let count =1;
 	for(var i in data){
-		var e = data[i];
-		console.log(e);
-		var buttonHtml = '<button onclick="deleteProduct(' + e.barcode + ')">delete</button>'
-		buttonHtml += ' <button onclick="displayEditProduct(' + e.barcode + ')">edit</button>'
+		const e = data[i];
+		console.log(e.barcode);
+		const editBtnId = 'edit-product-'+e.barcode
+//		var buttonHtml = '<button onclick="deleteProduct(' + "'" + e.barcode + "'" +')">delete</button>'
+		var buttonHtml = `<button class="btn btn-outline-dark" id=${editBtnId}>Edit</button>`
 		var row = '<tr>'
-		+ '<td>' + e.id + '</td>'
+        + '<td>' + count + '</td>'
+        + '<td>' + e.barcode + '</td>'
 		+ '<td>' + e.name + '</td>'
 		+ '<td>'  + e.brandName + '</td>'
 		+ '<td>' + e.brandCategory + '</td>'
 		+ '<td>' + e.price + '</td>'
-		+ '<td>' + e.barcode + '</td>'
 		+ '<td>' + buttonHtml + '</td>'
 		+ '</tr>';
         $tbody.append(row);
+        count++;
+        $('#'+editBtnId).click(() => displayEditProduct(e))
 	}
 }
 
-function displayEditProduct(barcode){
-console.log('ankur jainnnnnnnnnnnnnn')
-	var url = getProductUrl() + "/" + barcode;
-	console.log(url)
+function displayEditProduct(e){
+	var url = getProductUrl() + "/" + e.barcode;
+	console.log(url, "lllllllll")
 	$.ajax({
 	   url: url,
 	   type: 'GET',
-	   success: function(data) {
-	   console.log('anknknkncnc', data)
+	   success:async function(data) {
+            $('#brand-category-edit').empty();
+            $('#brand-name-edit').empty();
+            getBrandListInEdit(productData)
+
 	   		displayProduct(data);
 	   },
 	   error:
@@ -217,17 +234,56 @@ function displayUploadData(){
 }
 
 function displayProduct(data){
-    console.log(data)
-    console.log('displayProductssssssssssssssssss')
+    console.log(data, "ankur pppppppppppp")
+//    var selectBrand = document.getElementById('selectBrand');
+
 	$("#product-edit-form input[name=name]").val(data.name);
-	$("#product-edit-form input[name=brandCategory]").val(data.brandCategory);
-	$("#product-edit-form input[name=brandName]").val(data.brandName);
+//	selectBrand.selectedIndex = data.brandName;
+	$("#brand-name-edit").val(data.brandName);
+//	$("#brand-category-edit").val(data.brandName);
+    $(`#brand-category-edit option[value=${data.brandCategory}]`).attr('selected', 'selected')
+    $(`#brand-name-edit option[value=${data.brandName}]`).attr('selected', 'selected')
+//	$("#product-edit-form input[name=brandCategory]").val(data.brandCategory);
+//	$("#product-edit-form input[name=brandName]").val(data.brandName);
 	$("#product-edit-form input[name=price]").val(data.price);
 	$("#product-edit-form input[name=barcode]").val(data.barcode);
 	$("#product-edit-form input[name=id]").val(data.id);
 	$('#edit-product-modal').modal('toggle');
 
 }
+
+function openAddModel(){
+
+	$('#add-product-modal').modal('toggle');
+	var url = getBrandUrl() ;
+    	console.log(url)
+    	$.ajax({
+    	   url: url,
+    	   type: 'GET',
+    	   success:function(data) {
+    	   	getBrandList(data);
+    	   },
+    	   error:
+    	   handleAjaxError
+    	});
+}
+
+
+
+function getBrandList(brands) {
+    const brandCategory = brands.map((brandItem) => {
+      return { brand: brandItem.name, category: brandItem.category };
+    });
+    setupBrandCategoryDropdown(brandCategory, '#brand-name-selection', '#brand-category-selection');
+  };
+
+function getBrandListInEdit(brands) {
+    const brandCategory = brands.map((brandItem) => {
+      return { brand: brandItem.brandName, category: brandItem.brandCategory };
+    });
+    setupBrandCategoryDropdown(brandCategory, '#brand-name-edit', '#brand-category-edit');
+  };
+
 
 
 //INITIALIZATION CODE
@@ -238,11 +294,14 @@ function init(){
 	$('#upload-data').click(displayUploadData);
 	$('#process-data').click(processData);
 	$('#download-errors').click(downloadErrors);
-    $('#productFile').on('change', updateFileName)
-        var element = document.getElementById("product-icon");
-        element.classList.add("thick");
+    $('#productFile').on('change', updateFileName);
+    $('#create-new-product').click(openAddModel);
+
+    var element = document.getElementById("product-icon");
+    element.classList.add("thick");
 }
 
 $(document).ready(init);
 $(document).ready(getProductList);
+
 

@@ -12,62 +12,68 @@ import com.increff.employee.pojo.ProductPojo;
 import com.increff.employee.service.ApiException;
 import org.springframework.stereotype.Repository;
 
-import com.increff.employee.pojo.EmployeePojo;
-
 @Repository
 public class ProductDao extends AbstractDao {
 
     private static String delete_barcode = "delete from ProductPojo p where barcode=:barcode";
     private static String select_barcode = "select p from ProductPojo p where barcode=:barcode";
+    private static String select_product_by_id = "select p from ProductPojo p where id=:id";
 
-    private static String select_name = "select p from ProductPojo p where name=:name";
+    private static String select_name = "select p from ProductPojo p where name=:name , brandName=:brandName AND brandCategory=:brandCategory";
     private static String select_id = "select p from ProductPojo p where id=:id";
     private static String select_all = "select p from ProductPojo p";
 
     private static String select_product = "select p from ProductPojo p where name=:name AND category=:category";
     private static String check = "select p from ProductPojo p where barcode=:barcode";
+    private static String select_product_by_name = "select p from ProductPojo p where name=:name";
     @PersistenceContext
     private EntityManager em;
 
-    @Transactional
-    public void insert(ProductPojo p) throws ApiException {
-        System.out.println("ankur jain");
+    public void add(ProductPojo p) throws ApiException {
         em.persist(p);
-
-
     }
 
-    public int delete(String barcode) {
-        Query query = em.createQuery(delete_barcode);
-        query.setParameter("id", barcode);
-        return query.executeUpdate();
-    }
+//    public int delete(String barcode) {
+//        Query query = em.createQuery(delete_barcode);
+//        query.setParameter("barcode", barcode);
+//        return query.executeUpdate();
+//    }
 
 
     public ProductPojo checkProductExists(String barcode) {
         TypedQuery<ProductPojo> query = getQuery(check, ProductPojo.class);
         query.setParameter("barcode",barcode);
-        ProductPojo p = getSingle(query);
+        ProductPojo p = getSingleBrand(query);
         return p;
     }
-    public ProductPojo select(String barcode) {
-        System.out.println("anknanana");
+    public ProductPojo getProductByBarcode(String barcode) {
         TypedQuery<ProductPojo> query = getQuery(select_barcode, ProductPojo.class);
         query.setParameter("barcode", barcode);
-        return getSingle(query);
+        return getSingleBrand(query);
     }
 
-    public ProductPojo checkName(String name) {
-        System.out.println("anknanana");
+    public ProductPojo getProductById(Integer id) {
+        TypedQuery<ProductPojo> query = getQuery(select_product_by_id, ProductPojo.class);
+        query.setParameter("id", id);
+        return getSingleBrand(query);
+    }
+
+    public ProductPojo getProductByBrandName(
+            String name,
+            String brandName,
+            String brandCategory) {
         TypedQuery<ProductPojo> query = getQuery(select_name, ProductPojo.class);
         query.setParameter("name", name);
-        return getSingle(query);
+        query.setParameter("brandName", brandName);
+        query.setParameter("brandCategory", brandCategory);
+        System.out.println(query);
+        return getSingleBrand(query);
     }
 
     public ProductPojo select(int id) {
         TypedQuery<ProductPojo> query = getQuery(select_id, ProductPojo.class);
         query.setParameter("id", id);
-        return getSingle(query);
+        return getSingleBrand(query);
     }
 
 
@@ -75,14 +81,20 @@ public class ProductDao extends AbstractDao {
         TypedQuery<ProductPojo> query = getQuery(select_product, ProductPojo.class);
         query.setParameter("name", name);
         query.setParameter("category", category);
-        return getSingle(query);
+        return getSingleBrand(query);
     }
 
-    public List<ProductPojo> selectAll() {
+    public List<ProductPojo> getAllProduct() {
         TypedQuery<ProductPojo> query = getQuery(select_all, ProductPojo.class);
 
         return query.getResultList();
     }
+    public ProductPojo getProductByProductName(ProductPojo product) {
+        TypedQuery<ProductPojo> query = getQuery(select_product_by_name, ProductPojo.class);
+        query.setParameter("name", product.getName());
+        return getSingleBrand(query);
+    }
+
     @Transactional
     public void update(ProductPojo p) {
 

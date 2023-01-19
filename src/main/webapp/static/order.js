@@ -5,13 +5,19 @@ function getBaseUrl() {
 }
 
 function getOrderUrl() {
-  return getBaseUrl() + '/api/order/';
+  return getBaseUrl() + '/api/orders/';
 }
 
 function getProductUrl() {
-  return getBaseUrl() + '/api/product';
+  return getBaseUrl() + '/api/products';
 }
 
+function getInventoryUrl() {
+  return getBaseUrl() + '/api/inventory';
+}
+function getPdfUrl() {
+  return getBaseUrl() + '/api/orders';
+}
 function getOrderList() {
   var url = getOrderUrl();
   $.ajax({
@@ -67,10 +73,30 @@ function addItem(item) {
   }
 }
 
+function isInvalidInput(item) {
+  if (!item.barcode) {
+    $.notify('Please input a valid barcode!', 'error');
+    return true;
+  }
+//  if(Number.isNaN(item.quantity)){
+//    $.notify('Quantity must be a number!', 'error');
+//    return true;
+//  };
+if (item.quantity <= 0  ) {
+    $.notify('Quantity must be positve!', 'error');
+    return true;
+  }
+if (!item.quantity ) {
+    $.notify('Quantity cannot be empty!', 'error');
+    return true;
+  }
 
+  return false;
+}
 
 function addOrderItem() {
   const item = getCureentOrderItem();
+  if(isInvalidInput(item))return;
   getProductByBarcode(item.barcode, (product) => {
     addItem({
       barcode: product.barcode,
@@ -134,37 +160,6 @@ function displayCreateOrderItems(data) {
   }
 }
 
-//function displayEditOrderItems(data) {
-//  const $tbody = $('#edit-order-table').find('tbody');
-//  $tbody.empty();
-//
-//  for (let i in data) {
-//    const item = data[i];
-//    const row = `
-//      <tr>
-//        <td>${Number.parseInt(i) + 1}</td>
-//        <td class="barcodeData">${item.barcode}</td>
-//        <td>${item.name}</td>
-//        <td >${item.price}</td>
-//        <td>
-//          <input
-//            id="order-item-${item.barcode}"
-//            type="number"
-//            class="form-controll
-//            quantityData"
-//            value="${item.quantity}"
-//            onchange="onQuantityChanged('${item.barcode}')"
-//            style="width:70%" min="1">
-//        </td>
-//        <td>
-//          <button onclick="deleteOrderItem('${item.barcode}')" class="btn btn-outline-danger">Delete</button>
-//        </tb>
-//      </tr>
-//    `;
-//
-//    $tbody.append(row);
-//  }
-//}
 
 function deleteOrderItem(barcode) {
   const index = orderItems.findIndex((it) => it.barcode === barcode);
@@ -213,6 +208,51 @@ const sec = timeUTC.second;
   return dformat;
 }
 
+function callPdfGenerator(id){
+const url = getOrderUrl() + '/' + id;
+    console.log(url)
+          $.ajax({
+            url: url,
+            type: 'POST',
+            success: function (data) {
+            console.log('data from backend')
+            console.log(data);
+            },
+            error: handleAjaxError,
+          });
+}
+
+function getPdf(orderItems){
+const pdfUrl = getPdfUrl();
+
+       getData = orderItems.map((it) => {
+        return {
+          barcode: it.barcode,
+          quantity: it.quantity,
+          sellingPrice: it.price,
+          name: it.name,
+          id: it.id
+        };
+      });
+      var data= {id: 1, datetime : "2021-08-20 14:17:43",items:getData };
+//
+//    data[id]=1;
+//    data[sateTime]="29/09/2015";
+
+      const json = JSON.stringify(data);
+      console.log(json);
+      $.ajax({
+          url: pdfUrl,
+          type: 'POST',
+          data: json,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          success: function(base64){
+          console.log(base64)
+          },
+          error: handleAjaxError,
+        });}
 
 function displayOrderList(orders) {
   var $tbody = $('#order-table').find('tbody');
@@ -227,12 +267,15 @@ function displayOrderList(orders) {
             <td>${order.id}</td>
             <td>${date}</td>
             <td>
-                <button onclick="fetchOrderDetails(${order.id})">
+                <button class="btn btn-outline-dark" onclick="fetchOrderDetails(${order.id})">
                   Details
                 </button>
-                <button onclick="displayEditModal(${order.id})">
+                <button class="btn btn-outline-dark" onclick="displayEditModal(${order.id})">
                   Edit
                 </button>
+                <button class="btn btn-outline-dark" onclick="callPdfGenerator(${order.id})">
+                                  Download pdf
+                                </button>
             </td>
         </tr>
     `;
@@ -314,21 +357,6 @@ function resetEditItemForm() {
   $('#inputNewBarcode').val('');
   $('#inputNewQuantity').val('');
 }
-//
-//function deleteOrderItem() {
-//  const item = getCureentOrderItem();
-//  getProductByBarcode(item.barcode, (product) => {
-//    addItem({
-//      barcode: product.barcode,
-//      name: product.name,
-//      price: product.price,
-//      quantity: item.quantity,
-//    });
-//
-//    displayCreateOrderItems(orderItems);
-//    resetAddItemForm();
-//  });
-//}
 
 
 function deleteItem(barcode) {
@@ -356,9 +384,13 @@ console.log(orderItems)
 }
 
 
-function displayEditOrderItems(data) {
+function displayEditOrderItems( data) {
   const $tbody = $('#edit-order-table').find('tbody');
   $tbody.empty();
+
+//  $('#edit-order-btn').unbind().click(() => {
+//    // todo: call update qirh is
+//  })
 
     console.log(data);
     console.log('ppppppppppppp')
@@ -384,7 +416,7 @@ function displayEditOrderItems(data) {
             style="width:70%" min="1">
         </td>
         <td>
-          <button onclick="deleteItem('${item.barcode}')" class="btn btn-outline-danger">Delete</button>
+          <button onclick="deleteItem('${item.barcode}')" class="btn btn-outline-danger ">Delete</button>
         </tb>
       </tr>
     `;
@@ -393,6 +425,7 @@ function displayEditOrderItems(data) {
   }
 }
 function resetEditModal(id) {
+  $("#edit-item-form input[name=id]").val(id);
   resetEditItemForm();
   orderItems = [];
   getOrderData(id);
@@ -453,41 +486,66 @@ function updateOrder(json, onSuccess, id) {
 
 
 function editOrder() {
-    let updateId = 0;
-
-    console.log(orderItems)
-    console.log('ankanankankankankna');
-    if(orderItems.length>0)
-    updateId = orderItems[0].orderId;
-
+	var orderId = $("#edit-item-form input[name=id]").val();
+     if (orderItems.length == 0) {
+           $.notify('Order cannot be empty!', 'error');
+           return ;
+     }
   const data = orderItems.map((it) => {
 
     return {
       barcode: it.barcode,
       quantity: it.quantity,
       id: it.id,
-      orderId: it.orderId,
+      orderId: orderId,
       price: it.price,
     };
   });
 
   const json = JSON.stringify(data);
-  updateOrder(json, hideEditModal, updateId);
+  updateOrder(json, hideEditModal, orderId);
 }
 
 
 function editOrderItem() {
   const item = getCureentEditOrderItem();
-  getProductByBarcode(item.barcode, (product) => {
-    addItem({
-      barcode: product.barcode,
-      name: product.name,
-      price: product.price,
-      quantity: item.quantity,
-    });
+  if(!item.barcode ){
+         $.notify('barcode cannot be empty!', 'error');
+         return;
+  }
+  if(!item.quantity){
+           $.notify('quantity cannot be empty!', 'error');
+           return;
+    }
+    checkInventoryByBarcode(item);
 
-    displayEditOrderItems(orderItems);
-    resetEditItemForm();
+}
+
+function checkInventoryByBarcode(item){
+const url = getInventoryUrl() + '/' + item.barcode;
+  console.log(url);
+  $.ajax({
+    url: url,
+    type: 'GET',
+    success: function (data) {
+        if(data.quantity>=item.quantity){
+                  getProductByBarcode(item.barcode, (product) => {
+                    addItem({
+                      barcode: product.barcode,
+                      name: product.name,
+                      price: product.price,
+                      quantity: item.quantity,
+                    });
+
+                    displayEditOrderItems(orderItems);
+                    resetEditItemForm();
+        })
+        }
+        else{
+               $.notify('only '+ data.quantity+ ' pieces available in inventory', 'error');
+        }
+    },
+    error: handleAjaxError,
   });
 }
 //INITIALIZATION CODE
@@ -511,10 +569,15 @@ $(document).ready(getOrderList);
 
 // Place Order
 function placeNewOrder() {
+     if (orderItems.length == 0) {
+       $.notify('Order cannot be empty!', 'error');
+       return ;
+     }
   const data = orderItems.map((it) => {
     return {
       barcode: it.barcode,
       quantity: it.quantity,
+      price: it.price,
     };
   });
 

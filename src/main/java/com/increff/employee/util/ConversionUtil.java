@@ -27,24 +27,22 @@ public class ConversionUtil {
     }
 
 
-    public static ProductData convertToProductData(ProductPojo p) {
+    public static ProductData convertToProductData(ProductPojo p, BrandPojo b) {
         ProductData d = new ProductData();
         d.setName(p.getName());
-        d.setBrandName(p.getBrandName());
-        d.setBrandCategory(p.getBrandCategory());
+        d.setBrandName(b.getName());
+        d.setBrandCategory(b.getCategory());
         d.setBarcode(p.getBarcode());
         d.setPrice(p.getPrice());
         d.setId(p.getId());
         return d;
     }
 
-    public static  ProductPojo convertToProductPojo(ProductForm f) {
+    public static  ProductPojo convertToProductPojo(ProductForm f, int brandId) {
         ProductPojo p = new ProductPojo();
         p.setName(f.getName());
-        p.setBrandCategory(f.getBrandCategory());
+        p.setBrandId(brandId);
         p.setPrice(f.getPrice());
-        p.setBrandName(f.getBarcode());
-        p.setBrandName(f.getBrandName());
         p.setBarcode(f.getBarcode());
         return p;
     }
@@ -57,11 +55,8 @@ public class ConversionUtil {
     }
 
     public static InventoryData convertToInventoryData(InventoryPojo i,ProductPojo p) {
-        System.out.println("ankur jain");
 
         InventoryData d = new InventoryData();
-        System.out.println(p.getBarcode());
-
         d.setBarcode(p.getBarcode());
         d.setQuantity(i.getQuantity());
         d.setProductName(p.getName());
@@ -76,12 +71,7 @@ public class ConversionUtil {
         return p;
     }
 
-    public static  InventoryPojo convertToInventoryPojo(String barcode) {
-        InventoryPojo p = new InventoryPojo();
-        p.setBarcode(barcode);
-        p.setQuantity(0);
-        return p;
-    }
+
 
 
     public static OrderPojo convertToOrderPojo(LocalDateTime d) {
@@ -97,25 +87,42 @@ public class ConversionUtil {
     }
 
 
-    public static OrderItemData convertToOrderItemData(OrderItemPojo p) {
+    public static OrderItemData convertToOrderItemData(OrderItemPojo p, String productName) {
         OrderItemData d = new OrderItemData();
         d.setBarcode(p.getBarcode());
         d.setPrice(p.getPrice());
         d.setQuantity(p.getQuantity());
         d.setOrderId(p.getOrderId());
         d.setId(p.getId());
-
+        d.setName(productName);
         return d;
     }
 
 
-    public static  OrderItemPojo convertToOrderItemPojo(int price,OrderItemForm o, int id) {
+    public static  OrderItemPojo convertToOrderItemPojo(Float price,OrderItemForm o, int id) {
         OrderItemPojo p = new OrderItemPojo();
         p.setQuantity(o.getQuantity());
         p.setOrderId(id);
         p.setBarcode(o.getBarcode());
         p.setPrice(price);
 
+        return p;
+    }
+
+    public static  DailyData convertToDailyData(DailyReportPojo d) {
+        DailyData p = new DailyData();
+        p.setDate(d.getDate());
+        p.setRevenue(d.getRevenue());
+        p.setOrderItemsQuantity(d.getOrderItemsQuantity());
+        p.setOrdersQuantity(d.getOrdersQuantity());
+
+        return p;
+    }
+    public static  UserPojo convertToUserPojo(UserForm d) {
+        UserPojo p = new UserPojo();
+        p.setRole(d.getRole());
+        p.setEmail(d.getEmail());
+        p.setPassword(d.getPassword());
         return p;
     }
 

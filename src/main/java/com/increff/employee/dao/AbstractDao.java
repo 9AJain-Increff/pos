@@ -9,7 +9,7 @@ public abstract class AbstractDao {
 	@PersistenceContext
 	private EntityManager em;
 
-	protected <T> T getSingle(TypedQuery<T> query) {
+	protected <T> T getSingleBrand(TypedQuery<T> query) {
 		return query.getResultList().stream().findFirst().orElse(null);
 	}
 	

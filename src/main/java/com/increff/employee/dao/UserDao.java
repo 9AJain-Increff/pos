@@ -33,13 +33,13 @@ public class UserDao extends AbstractDao {
 	public UserPojo select(int id) {
 		TypedQuery<UserPojo> query = getQuery(select_id, UserPojo.class);
 		query.setParameter("id", id);
-		return getSingle(query);
+		return getSingleBrand(query);
 	}
 
 	public UserPojo select(String email) {
 		TypedQuery<UserPojo> query = getQuery(select_email, UserPojo.class);
 		query.setParameter("email", email);
-		return getSingle(query);
+		return getSingleBrand(query);
 	}
 
 	public List<UserPojo> selectAll() {

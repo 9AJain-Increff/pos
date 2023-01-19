@@ -12,8 +12,6 @@ import com.increff.employee.pojo.InventoryPojo;
 import com.increff.employee.service.ApiException;
 import org.springframework.stereotype.Repository;
 
-import com.increff.employee.pojo.EmployeePojo;
-
 @Repository
 public class InventoryDao extends AbstractDao {
 
@@ -28,10 +26,7 @@ public class InventoryDao extends AbstractDao {
 
     @Transactional
     public void insert(InventoryPojo p) throws ApiException {
-
         em.persist(p);
-
-
     }
 
     public int delete(String barcode) {
@@ -45,7 +40,7 @@ public class InventoryDao extends AbstractDao {
         TypedQuery<InventoryPojo> query = getQuery(check, InventoryPojo.class);
         query.setParameter("barcode", barcode);
 
-        InventoryPojo p = getSingle(query);
+        InventoryPojo p = getSingleBrand(query);
 
         if(p==null){return false;}
         else{
@@ -55,21 +50,21 @@ public class InventoryDao extends AbstractDao {
     public InventoryPojo select(String barcode) {
         TypedQuery<InventoryPojo> query = getQuery(select_inventory, InventoryPojo.class);
         query.setParameter("barcode", barcode);
-        return getSingle(query);
+        return getSingleBrand(query);
     }
 
 
     public InventoryPojo select(int id) {
         TypedQuery<InventoryPojo> query = getQuery(select_id, InventoryPojo.class);
         query.setParameter("id", id);
-        return getSingle(query);
+        return getSingleBrand(query);
     }
 
     public InventoryPojo select(String name, String category) {
         TypedQuery<InventoryPojo> query = getQuery(select_inventory, InventoryPojo.class);
         query.setParameter("name", name);
         query.setParameter("category", category);
-        return getSingle(query);
+        return getSingleBrand(query);
     }
 
     public List<InventoryPojo> selectAll() {

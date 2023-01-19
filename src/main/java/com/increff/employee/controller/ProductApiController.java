@@ -1,65 +1,57 @@
 package com.increff.employee.controller;
 
 import com.increff.employee.dto.ProductDto;
-import com.increff.employee.dto.ProductDto;
 import com.increff.employee.model.*;
-import com.increff.employee.pojo.ProductPojo;
-import com.increff.employee.pojo.EmployeePojo;
-import com.increff.employee.pojo.UserPojo;
 import com.increff.employee.service.ApiException;
-import com.increff.employee.service.ProductService;
-import com.increff.employee.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 @Api
 @RestController
+@RequestMapping(path = "/api/products")
 public class ProductApiController {
 
 
     @Autowired
-    private ProductDto dto;
+    private ProductDto productDto;
 
     @ApiOperation(value = "Adds a product")
-    @RequestMapping(path = "/api/product", method = RequestMethod.POST)
+    @RequestMapping(path = "", method = RequestMethod.POST)
     public void addProduct(@RequestBody ProductForm form) throws ApiException {
-        System.out.println("ankur jainnnnnnnnnnn");
-        dto.addingProduct(form);
+
+        productDto.addProduct(form);
     }
 
-    @ApiOperation(value = "Deletes a product")
-    @RequestMapping(path = "/api/product/{barcode}", method = RequestMethod.DELETE)
-    public void deleteProduct(@PathVariable String barcode) throws ApiException {
-        dto.deleting(barcode);
-    }
+//    @ApiOperation(value = "Deletes a product")
+//    @RequestMapping(path = "/{barcode}", method = RequestMethod.DELETE)
+//    public void deleteProduct(@PathVariable String barcode) throws ApiException {
+//        dto.delete(barcode);
+//    }
 
     @ApiOperation(value = "Gets list of all products")
-    @RequestMapping(path = "/api/product", method = RequestMethod.GET)
-    public List<ProductData> getAllProduct() {
+    @RequestMapping(path = "", method = RequestMethod.GET)
+    public List<ProductData> getAllProduct() throws ApiException {
 
-        return dto.gettingAllProduct();
+        return productDto.getAllProduct();
     }
 
 
     @ApiOperation(value = "Gets a product by ID")
-    @RequestMapping(path = "/api/product/{barcode}", method = RequestMethod.GET)
+    @RequestMapping(path = "/{barcode}", method = RequestMethod.GET)
     public ProductData get(@PathVariable String barcode) throws ApiException {
-        System.out.println("get by id");
-        ProductData p = dto.get(barcode);
-        System.out.println("ankur jainiiiiiiiiiinini      "+p.getBarcode());
+            ProductData p = productDto.getProductByBarcode(barcode);
         return (p);
     }
 
 
 
     @ApiOperation(value = "Edit a Product")
-    @RequestMapping(path = "/api/product/{barcode}", method = RequestMethod.PUT)
-    public void editProduct(@PathVariable String barcode, @RequestBody ProductForm form) throws ApiException {
-        dto.updating(barcode,form);
+    @RequestMapping(path = "/{id}", method = RequestMethod.PUT)
+    public void editProduct(@PathVariable Integer id, @RequestBody ProductForm form) throws ApiException {
+        productDto.update(id,form);
 
     }
 
