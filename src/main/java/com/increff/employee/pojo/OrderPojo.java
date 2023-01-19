@@ -15,6 +15,6 @@ public class OrderPojo {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private int id;
-
+    private String orderURL;
 
 }

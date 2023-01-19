@@ -209,17 +209,24 @@ const sec = timeUTC.second;
 }
 
 function callPdfGenerator(id){
-const url = getOrderUrl() + '/' + id;
-    console.log(url)
-          $.ajax({
-            url: url,
-            type: 'POST',
-            success: function (data) {
-            console.log('data from backend')
-            console.log(data);
-            },
-            error: handleAjaxError,
-          });
+const url = getOrderUrl() +'getPdf/'+ id;
+  $.ajax({
+    url: url,
+    type: 'GET',
+    xhrFields: {
+      responseType: 'blob',
+    },
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    success: (pdfBlob) => {
+      const link = document.createElement('a');
+      link.href = window.URL.createObjectURL(pdfBlob);
+      link.download = 'invoice_' + id + '_' + new Date().getTime() + '.pdf';
+      link.click();
+    },
+    error: handleAjaxError,
+  });
 }
 
 function getPdf(orderItems){
@@ -499,6 +506,7 @@ function editOrder() {
       id: it.id,
       orderId: orderId,
       price: it.price,
+      name: it.name,
     };
   });
 
@@ -578,6 +586,7 @@ function placeNewOrder() {
       barcode: it.barcode,
       quantity: it.quantity,
       price: it.price,
+      name:it.name
     };
   });
 

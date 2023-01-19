@@ -1,6 +1,5 @@
 package com.increff.employee.service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
@@ -16,7 +15,6 @@ import com.increff.employee.pojo.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static com.increff.employee.util.ConversionUtil.convertToBrandData;
 import static com.increff.employee.util.ConversionUtil.convertToOrderPojo;
 
 @Service
@@ -53,6 +51,11 @@ public class OrderService {
         return orderDao.insert(newOrder);
     }
 
+    @Transactional(rollbackOn  = ApiException.class)
+    public void addPdfURL(Integer id){
+        OrderPojo order = orderDao.getOrderById(id);
+        order.setOrderURL("/home/ankurjain/Downloads/employee-spring-full-master/order"+id+".pdf");
+    }
     public List<InventoryPojo> getInventoryPojo(List<String> barcode) throws ApiException {
         List<InventoryPojo> inventoryPojoList = new ArrayList<>();
         for (String temp : barcode) {
@@ -91,6 +94,10 @@ public class OrderService {
         }
     }
 
+    public String getPdfUrl(Integer id) throws ApiException {
+        OrderPojo order = orderDao.getOrderById(id);
+        return order.getOrderURL();
+    }
     public List<ProductPojo> getProductList(List<String> barcode) throws ApiException {
         List<ProductPojo> productPojoList = new ArrayList<>();
         for (String orderItemBarcode : barcode) {

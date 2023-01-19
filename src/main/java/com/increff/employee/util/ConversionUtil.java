@@ -2,6 +2,7 @@ package com.increff.employee.util;
 
 import com.increff.employee.model.*;
 import com.increff.employee.pojo.*;
+import com.sun.xml.bind.v2.model.core.ID;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -95,6 +96,25 @@ public class ConversionUtil {
         d.setOrderId(p.getOrderId());
         d.setId(p.getId());
         d.setName(productName);
+        return d;
+    }
+    public static InvoiceData convertToInvoiceData(OrderItemForm p, Integer id) {
+        InvoiceData d = new InvoiceData();
+        d.setBarcode(p.getBarcode());
+        d.setPrice(p.getPrice());
+        d.setQuantity(p.getQuantity());
+        d.setName(p.getName());
+        d.setOrderId(id);
+        return d;
+    }
+    public static OrderItemData convertToOrderItemData(OrderItemForm p, Integer id) {
+        OrderItemData d = new OrderItemData();
+        d.setBarcode(p.getBarcode());
+        d.setPrice(p.getPrice());
+        d.setQuantity(p.getQuantity());
+        d.setOrderId(p.getOrderId());
+        d.setName(p.getName());
+        d.setId(id);
         return d;
     }
 

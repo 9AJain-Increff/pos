@@ -79,3 +79,4 @@ function setupBrandCategoryDropdown(brands, brandSelectionId, categorySelectionI
       $selectElement.append(optionHtml);
     });
   }
+

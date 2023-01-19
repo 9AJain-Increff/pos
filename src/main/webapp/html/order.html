@@ -42,7 +42,7 @@
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Add Items</h5>
+                    <h5 class="modal-title">Add Order</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -50,10 +50,10 @@
 
                 <div class="modal-body">
                     <!-- Add Item From -->
-                    <form class="form-inline justify-content-between" id="add-item-form">
+                    <form class="justify-content-between" id="add-item-form">
                         <div class="form-group p-1">
                             <label for="inputBarcode" class="col-sm-2 col-form-label">Barcode</label>
-                            <div class="col-sm-1">
+                            <div class="col-sm-12">
                                 <input
                                         type="text"
                                         class="form-control"
@@ -67,7 +67,7 @@
 
                         <div class="form-group">
                             <label for="inputQuantity" class="col-sm-2 col-form-label">Quantity</label>
-                            <div class="col-sm-1">
+                            <div class="col-sm-12">
                                 <input
                                         type="number"
                                         class="form-control"
@@ -78,8 +78,9 @@
                                 />
                             </div>
                         </div>
+                        <input type="hidden" name="id">
+                        <div class="col-sm-12" style="text-align:right;"><button class="btn btn-outline-primary px-4" type="button" id="add-order-item">Add</button></div>
 
-                        <button class="btn btn-outline-primary px-4" type="button" id="add-order-item">Add</button>
                     </form>
 
                     <div class="row">&nbsp;</div>
@@ -103,15 +104,12 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-primary" id="place-order-btn">Place Order</button>
+                        <button type="button" class="btn btn-primary" id="place-order-btn">Update Order</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
-
-
     <!-- Edit Creation Modal -->
     <div class="modal" tabindex="-1" role="dialog" id="edit-order-modal">
         <div class="modal-dialog modal-lg" role="document">
@@ -125,10 +123,10 @@
 
                 <div class="modal-body">
                     <!-- Add Item From -->
-                    <form class="form-inline justify-content-between" id="edit-item-form">
+                    <form class="justify-content-between" id="edit-item-form">
                         <div class="form-group p-1">
                             <label for="inputNewBarcode" class="col-sm-2 col-form-label">Barcode</label>
-                            <div class="col-sm-1">
+                            <div class="col-sm-12">
                                 <input
                                         type="text"
                                         class="form-control"
@@ -142,7 +140,7 @@
 
                         <div class="form-group">
                             <label for="inputNewQuantity" class="col-sm-2 col-form-label">Quantity</label>
-                            <div class="col-sm-1">
+                            <div class="col-sm-12">
                                 <input
                                         type="number"
                                         class="form-control"
@@ -154,7 +152,8 @@
                             </div>
                         </div>
                         <input type="hidden" name="id">
-                        <button class="btn btn-outline-primary px-4" type="button" id="edit-order-item">Add</button>
+                        <div class="col-sm-12" style="text-align:right;"><button class="btn btn-outline-primary px-4" type="button" id="edit-order-item">Add</button></div>
+
                     </form>
 
                     <div class="row">&nbsp;</div>
@@ -186,9 +185,7 @@
     </div>
 
 
-
-
-    <!-- Order Creation Modal -->
+    <!-- Order Details Modal -->
     <div class="modal" tabindex="-1" role="dialog" id="show-order-modal">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">

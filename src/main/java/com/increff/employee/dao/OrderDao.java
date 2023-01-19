@@ -11,6 +11,7 @@ import javax.transaction.Transactional;
 
 import com.increff.employee.pojo.OrderPojo;
 import com.increff.employee.service.ApiException;
+import org.hibernate.secure.spi.IntegrationException;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -55,6 +56,12 @@ public class OrderDao extends AbstractDao {
         System.out.println("anknanana");
         TypedQuery<OrderPojo> query = getQuery(select_barcode, OrderPojo.class);
         query.setParameter("barcode", barcode);
+        return getSingleBrand(query);
+    }
+
+    public OrderPojo getOrderById(Integer id) {
+        TypedQuery<OrderPojo> query = getQuery(select_id, OrderPojo.class);
+        query.setParameter("id", id);
         return getSingleBrand(query);
     }
 

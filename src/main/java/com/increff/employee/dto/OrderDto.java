@@ -41,7 +41,9 @@ public class OrderDto {
         return (orderItemDataList);
     }
 
-
+    public String getOrderPdf(Integer id) throws ApiException {
+        return orderService.getPdfUrl(id);
+    }
 
     private void validateInventory(
             List<InventoryPojo> inventoryPojoList,
@@ -61,9 +63,6 @@ public class OrderDto {
     }
 
 
-
-
-
     public List<String> getBarcodes(List<OrderItemPojo> orderItemPojos) {
 
         return orderItemPojos.stream()
@@ -72,8 +71,8 @@ public class OrderDto {
     }
 
     @Transactional(rollbackOn = ApiException.class)
-    public void addOrder(List<OrderItemForm> orderItemForm) throws ApiException {
-        for(OrderItemForm orderItem : orderItemForm){
+    public List<InvoiceData> addOrder(List<OrderItemForm> orderItemForm) throws ApiException {
+        for (OrderItemForm orderItem : orderItemForm) {
             normalizeFormData(orderItem);
             validateFormData(orderItem);
         }
@@ -98,8 +97,15 @@ public class OrderDto {
         validateInventory(inventoryPojoList, orderItemPojoList);
         orderService.updateInventory(inventoryPojoList);
         orderService.addOrderItems(orderItemPojoList);
-
-
+        List<InvoiceData> invoiceData = new ArrayList<>();
+        for (int i = 0; i < orderItemForm.size(); i++) {
+            InvoiceData data = convertToInvoiceData(
+                    orderItemForm.get(i),
+                    newOrder.getId()
+            );
+            invoiceData.add(data);
+        }
+        return invoiceData;
     }
 
 //    public void deleting(int id) throws ApiException {
@@ -123,7 +129,7 @@ public class OrderDto {
         List<ProductPojo> productPojoList = orderService.getProductList(barcodes);
         validateInventory(inventoryPojoList, updatedOrderItems);
         orderService.updateInventory(inventoryPojoList);
-        orderService.updateOrderItems(updatedOrderItems,barcodeToOrderItemMapping);
+        orderService.updateOrderItems(updatedOrderItems, barcodeToOrderItemMapping);
 
     }
 
@@ -140,11 +146,11 @@ public class OrderDto {
     }
 
     @Transactional(rollbackOn = ApiException.class)
-    public void updateOrder(int id, @NotNull List<OrderItemForm> orderItemForms) throws ApiException {
+    public List<InvoiceData> updateOrder(int id, @NotNull List<OrderItemForm> orderItemForms) throws ApiException {
         if (orderItemForms.isEmpty()) {
             throw new ApiException("Add a Order Item");
         }
-        for(OrderItemForm orderItem : orderItemForms){
+        for (OrderItemForm orderItem : orderItemForms) {
             normalizeFormData(orderItem);
             validateFormData(orderItem);
         }
@@ -173,8 +179,12 @@ public class OrderDto {
         addNewlyUpdatedOrderItems(addedOrderItems);
         updateOrderItems(updatedOrderItems, barcodeToOrderItemMapping);
         deleteOrderItems(deletedOrderItems, barcodeToOrderItemMapping);
-
-
+        List<InvoiceData> invoiceData = new ArrayList<>();
+        for (OrderItemForm orderItemForm : orderItemForms) {
+            InvoiceData invoice = convertToInvoiceData(orderItemForm, id);
+            invoiceData.add(invoice);
+        }
+        return invoiceData;
     }
 
 
@@ -187,22 +197,25 @@ public class OrderDto {
         return ordersData;
     }
 
+    public void  addPdfURL(Integer id){
+        orderService.addPdfURL(id);
+    }
     private void validateFormData(OrderItemForm form) throws ApiException {
 
-        if(isBlank(form.getBarcode())){
+        if (isBlank(form.getBarcode())) {
             throw new ApiException("brand cannot be empty");
         }
 
-        if(isNegative(form.getPrice())){
+        if (isNegative(form.getPrice())) {
             throw new ApiException("enter a valid price");
         }
-        if(isNegative(form.getQuantity())){
+        if (isNegative(form.getQuantity())) {
             throw new ApiException("enter a valid quantity");
         }
 
     }
 
-    private void normalizeFormData(OrderItemForm form){
+    private void normalizeFormData(OrderItemForm form) {
 //        form.setName(normalize(form.getName()));
         form.setBarcode(normalize(form.getBarcode()));
     }

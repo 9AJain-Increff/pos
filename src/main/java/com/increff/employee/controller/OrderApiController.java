@@ -5,13 +5,17 @@ import com.increff.employee.model.*;
 import com.increff.employee.service.ApiException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Base64;
 import java.util.List;
 
@@ -28,7 +32,28 @@ public class OrderApiController {
     // todo change path
     @RequestMapping(path = "", method = RequestMethod.POST)
     public void addOrder(@RequestBody List<OrderItemForm> form) throws ApiException {
-        orderDto.addOrder(form);
+        List<InvoiceData> invoiceData = orderDto.addOrder(form);
+        getEncodedPdf(invoiceData);
+        int orderId = invoiceData.get(0).getOrderId();
+        orderDto.addPdfURL(orderId);
+    }
+
+    @ApiOperation(value = "Get a Pdf Url")
+    // todo change path
+    @RequestMapping(path = "/getPdf/{id}", method = RequestMethod.GET)
+    public void getPdf(@PathVariable Integer id, HttpServletResponse response) throws ApiException {
+        String filePath = orderDto.getOrderPdf(id);
+        response.setContentType("application/pdf");
+        response.addHeader("Content-disposition:", "attachment; filename=invoice-" + id);
+
+        try {
+            FileInputStream fileInputStream = new FileInputStream(filePath);
+            IOUtils.copy(fileInputStream, response.getOutputStream());
+            fileInputStream.close();
+            response.flushBuffer();
+        } catch (IOException e) {
+            throw new ApiException("Error occured while downloading invoice!");
+        }
     }
 
 //    @ApiOperation(value = "Deletes a order")
@@ -55,21 +80,23 @@ public class OrderApiController {
     // todo replace with logger
     @RequestMapping(path = "/{id}", method = RequestMethod.PUT)
     public void editOrder(@PathVariable int id, @RequestBody List<OrderItemForm> form) throws ApiException {
-        orderDto.updateOrder(id, form);
-
+//        orderDto.updateOrder(id, form);
+        List<InvoiceData> invoiceData = orderDto.updateOrder(id,form);
+        getEncodedPdf(invoiceData);
+        orderDto.addPdfURL(id);
     }
 
     @ApiOperation(value = "Download a pdf")
     // todo replace with logger
     @RequestMapping(path = "/{id}", method = RequestMethod.POST)
 
-    public void downloadPdf(@PathVariable int id) throws ApiException {
-        List<OrderItemData> orderItemDataList = orderDto.getOrderById(id);
-        getEncodedPdf(orderItemDataList);
-    }
+//    public void downloadPdf(@PathVariable int id) throws ApiException {
+//        List<OrderItemData> orderItemDataList = orderDto.getOrderById(id);
+//        getEncodedPdf(orderItemDataList);
+//    }
 
     @ResponseBody
-    private String getEncodedPdf(List<OrderItemData> invoiceDetails) throws RestClientException {
+    private String getEncodedPdf(List<InvoiceData> invoiceDetails) throws RestClientException {
         String INVOICE_API_URL = "http://localhost:8000/invoice/api/generate";
         RestTemplate restTemplate = new RestTemplate();
         String s = restTemplate.postForObject(INVOICE_API_URL, invoiceDetails, String.class);

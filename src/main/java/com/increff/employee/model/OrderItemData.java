@@ -7,6 +7,6 @@ public class OrderItemData extends OrderItemForm{
 
 
     private int id;
-    private String name;
+
 
 }
