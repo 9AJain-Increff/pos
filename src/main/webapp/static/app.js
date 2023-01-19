@@ -73,6 +73,7 @@ function setupBrandCategoryDropdown(brands, brandSelectionId, categorySelectionI
   }
   function appendOptions(selectElementId, options) {
     const $selectElement = $(selectElementId);
+    $selectElement.empty();
     options.forEach((option) => {
       const optionHtml = `<option value="${option}">${option}</option>`;
       $selectElement.append(optionHtml);

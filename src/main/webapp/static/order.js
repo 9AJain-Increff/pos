@@ -15,7 +15,9 @@ function getProductUrl() {
 function getInventoryUrl() {
   return getBaseUrl() + '/api/inventory';
 }
-
+function getPdfUrl() {
+  return getBaseUrl() + '/api/orders';
+}
 function getOrderList() {
   var url = getOrderUrl();
   $.ajax({
@@ -207,23 +209,21 @@ const sec = timeUTC.second;
 }
 
 function callPdfGenerator(id){
-    var url = getOrderUrl()+id;
+const url = getOrderUrl() + '/' + id;
+    console.log(url)
           $.ajax({
             url: url,
-            type: 'GET',
+            type: 'POST',
             success: function (data) {
             console.log('data from backend')
-              console.log(data);
-              orderItems = data;
-               getPdf(orderItems)
-    //          return data;
+            console.log(data);
             },
             error: handleAjaxError,
           });
 }
 
 function getPdf(orderItems){
-const pdfUrl = 'http://localhost:8000/invoice/api/generate';
+const pdfUrl = getPdfUrl();
 
        getData = orderItems.map((it) => {
         return {

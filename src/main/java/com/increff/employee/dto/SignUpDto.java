@@ -4,6 +4,7 @@ import com.increff.employee.model.UserForm;
 import com.increff.employee.pojo.UserPojo;
 import com.increff.employee.service.ApiException;
 import com.increff.employee.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -16,6 +17,7 @@ import static com.increff.employee.util.ConversionUtil.convertToUserPojo;
 
 @Component
 public class SignUpDto {
+    @Autowired
     private UserService userService;
 
     @Value("${admins}")
