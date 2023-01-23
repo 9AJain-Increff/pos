@@ -20,8 +20,8 @@ public class InventoryService {
 
 
     @Transactional(rollbackOn = ApiException.class)
-    public void addInventory(InventoryPojo p) throws ApiException {
-        InventoryPojo exist = inventoryDao.select(p.getBarcode());
+    public void addInventory(InventoryPojo p, ProductPojo product) throws ApiException {
+        InventoryPojo exist = inventoryDao.selectInventoryByProductId(product.getId());
         if(exist == null){
             inventoryDao.insert(p);
         }
@@ -37,11 +37,11 @@ public class InventoryService {
 ////    }
 
 
-    @Transactional(rollbackOn = ApiException.class)
-    public InventoryPojo getAndCheckInventoryByBarcode(String barcode) throws ApiException {
-        InventoryPojo p = inventoryDao.select(barcode);
+
+    public InventoryPojo getAndCheckInventoryByProductId(Integer productId) throws ApiException {
+        InventoryPojo p = inventoryDao.selectInventoryByProductId(productId);
         if (p == null) {
-            throw new ApiException("Inventory with given barcode does not exit, id: " + barcode);
+            throw new ApiException("Inventory with given barcode does not exit, id: " + productId);
         }
         return p;
     }
@@ -55,14 +55,10 @@ public class InventoryService {
 
     @Transactional(rollbackOn  = ApiException.class)
     public void update(InventoryPojo p) throws ApiException {
-        normalize(p);
-        InventoryPojo ex = inventoryDao.select(p.getBarcode());
+
+        InventoryPojo ex = inventoryDao.selectInventoryByProductId(p.getProductId());
         ex.setQuantity((p.getQuantity()));
-        ex.setBarcode(p.getBarcode());
     }
 
 
-    protected static void normalize(InventoryPojo p) {
-        p.setBarcode(StringUtil.toLowerCase(p.getBarcode()));
-    }
 }

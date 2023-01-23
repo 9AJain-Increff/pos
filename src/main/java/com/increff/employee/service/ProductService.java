@@ -9,7 +9,6 @@ import javax.transaction.Transactional;
 
 import com.increff.employee.dao.ProductDao;
 import com.increff.employee.pojo.BrandPojo;
-import com.increff.employee.pojo.InventoryPojo;
 import com.increff.employee.pojo.ProductPojo;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +52,13 @@ public class ProductService {
         }
         return p;
     }
+    public ProductPojo getProductById(Integer productId) throws ApiException {
+        ProductPojo p = dao.getProductById(productId);
+        if (p == null) {
+            throw new ApiException("Product with given barcode does not exit, id: " + productId);
+        }
+        return p;
+    }
 
     public ProductPojo getProductById(Integer id, String barcode) throws ApiException {
         ProductPojo p = dao.getProductById(id);
@@ -87,13 +93,14 @@ public class ProductService {
 
 
 
-    public Map<String, ProductPojo> getProductsBybarcodes(List<String> barcodes ) {
-        Map<String, ProductPojo> mapping = new HashMap<>();
-        for(String barcode: barcodes){
-            mapping.put(barcode,dao.getProductByBarcode(barcode));
+    public Map<Integer, ProductPojo> getProductsByProductIds(List<Integer> productIds ) {
+        Map<Integer, ProductPojo> mapping = new HashMap<>();
+        for(Integer productId: productIds){
+            mapping.put(productId,dao.getProductById(productId));
         }
         return mapping;
     }
+
 
     public List<ProductPojo> getProducts(List<String> barcodes ) {
         List<ProductPojo> products = new ArrayList<>();

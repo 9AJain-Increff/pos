@@ -181,7 +181,6 @@ function displayInventoryList(data){
 }
 
 function displayEditInventory(barcode){
-console.log('ankur jainnnnnnnnnnnnnn')
 	var url = getInventoryUrl() + "/" + barcode;
 	console.log(url)
 	$.ajax({

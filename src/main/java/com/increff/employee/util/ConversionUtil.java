@@ -48,9 +48,9 @@ public class ConversionUtil {
         return p;
     }
 
-    public static InventoryData convertToInventoryData(InventoryPojo p) {
+    public static InventoryData convertToInventoryData(InventoryPojo p, String barcode) {
         InventoryData d = new InventoryData();
-        d.setBarcode(p.getBarcode());
+        d.setBarcode(barcode);
         d.setQuantity(p.getQuantity());
         return d;
     }
@@ -65,9 +65,9 @@ public class ConversionUtil {
         return d;
     }
 
-    public static  InventoryPojo convertToInventoryPojo(InventoryForm f) {
+    public static  InventoryPojo convertToInventoryPojo(InventoryForm f, Integer productId) {
         InventoryPojo p = new InventoryPojo();
-        p.setBarcode(f.getBarcode());
+        p.setProductId(productId);
         p.setQuantity(f.getQuantity());
         return p;
     }
@@ -88,14 +88,14 @@ public class ConversionUtil {
     }
 
 
-    public static OrderItemData convertToOrderItemData(OrderItemPojo p, String productName) {
+    public static OrderItemData convertToOrderItemData(OrderItemPojo p, ProductPojo product) {
         OrderItemData d = new OrderItemData();
-        d.setBarcode(p.getBarcode());
         d.setPrice(p.getPrice());
         d.setQuantity(p.getQuantity());
         d.setOrderId(p.getOrderId());
         d.setId(p.getId());
-        d.setName(productName);
+        d.setName(product.getName());
+        d.setBarcode(product.getBarcode());
         return d;
     }
     public static InvoiceData convertToInvoiceData(OrderItemForm p, Integer id) {
@@ -119,13 +119,12 @@ public class ConversionUtil {
     }
 
 
-    public static  OrderItemPojo convertToOrderItemPojo(Float price,OrderItemForm o, int id) {
+    public static  OrderItemPojo convertToOrderItemPojo(Float price,OrderItemForm o, int id, int productId) {
         OrderItemPojo p = new OrderItemPojo();
         p.setQuantity(o.getQuantity());
         p.setOrderId(id);
-        p.setBarcode(o.getBarcode());
         p.setPrice(price);
-
+        p.setProductId(productId);
         return p;
     }
 

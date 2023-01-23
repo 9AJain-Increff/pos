@@ -8,6 +8,6 @@ public class SalesData {
     private String brandCategory;
     private Integer quantity;
     private Float revenue;
-    private String barcode;
+    private Integer productId;
 
 }

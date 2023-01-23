@@ -3,6 +3,7 @@ package com.increff.employee.service;
 import com.increff.employee.dao.DailyReportDao;
 import com.increff.employee.model.*;
 import com.increff.employee.pojo.*;
+import io.swagger.models.auth.In;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,15 +29,16 @@ public class ReportService {
     private BrandService brandService;
     @Autowired
     private ProductService productService;
-    private Map<String,Integer> getQuantityMapping(List<OrderItemPojo> orderItems){
-        Map<String, Integer> mapping = new HashMap<>();
+    private Map<Integer,Integer> getQuantityMapping(List<OrderItemPojo> orderItems){
+        Map<Integer, Integer> mapping = new HashMap<>();
         for(OrderItemPojo orderItem : orderItems){
-            String barcode =orderItem.getBarcode();
-            if(mapping.containsKey(barcode)){
-                mapping.put(barcode, mapping.get(barcode)+orderItem.getQuantity());
+
+            Integer productId =orderItem.getProductId();
+            if(mapping.containsKey(productId)){
+                mapping.put(productId, mapping.get(productId)+orderItem.getQuantity());
             }
             else{
-                mapping.put(barcode,orderItem.getQuantity());
+                mapping.put(productId,orderItem.getQuantity());
             }
         }
         return mapping;
@@ -58,11 +60,11 @@ public class ReportService {
     }
     private List<OrderItemPojo> filterOrderItems(List<OrderItemPojo> orderItems , String brandName, String brandCategory) throws ApiException {
         List<OrderItemPojo> filteredOrderItems = new ArrayList<>();
-        for(OrderItemPojo order: orderItems){
-            ProductPojo product = productService.getAndCheckProductByBarcode(order.getBarcode());
+        for(OrderItemPojo orderItem: orderItems){
+            ProductPojo product = productService.getProductById(orderItem.getProductId());
             BrandPojo brand = brandService.getAndCheckBrandById(product.getBrandId());
             if(checkValidity(brand, brandName, brandCategory)){
-                filteredOrderItems.add(order);
+                filteredOrderItems.add(orderItem);
             }
         }
         return filteredOrderItems;
@@ -76,24 +78,24 @@ public class ReportService {
         List<OrderPojo> orders = orderService.getOrdersBetweenTime(startTime, endTime);
         List<OrderItemPojo> orderItems = orderItemService.getOrderItemByOrders(orders);
         List<OrderItemPojo> filteredOrderItems= filterOrderItems(orderItems,brandName, brandCategory);
-        List<String> barcodes =    filteredOrderItems.stream()
-                .map(OrderItemPojo::getBarcode)
+        List<Integer> productIds =    filteredOrderItems.stream()
+                .map(OrderItemPojo::getProductId)
                 .collect(Collectors.toList());
 
-        Map<String, ProductPojo> barcodeToProductMapping =  productService.getProductsBybarcodes(barcodes);
-        Map<String,Integer> barcodeToQuantityMapping = getQuantityMapping(filteredOrderItems);
+        Map<Integer, ProductPojo> barcodeToProductMapping =  productService.getProductsByProductIds(productIds);
+        Map<Integer,Integer> barcodeToQuantityMapping = getQuantityMapping(filteredOrderItems);
 
         List<SalesData> salesData = new ArrayList<>();
-        for (Map.Entry<String, ProductPojo> entry : barcodeToProductMapping.entrySet()) {
-            String barcode = entry.getKey();
+        for (Map.Entry<Integer, ProductPojo> entry : barcodeToProductMapping.entrySet()) {
+            Integer productId = entry.getKey();
             ProductPojo product = entry.getValue();
             BrandPojo brand = brandService.getAndCheckBrandById(product.getBrandId());
             SalesData saleData = new SalesData();
-            saleData.setQuantity(barcodeToQuantityMapping.get(barcode));
+            saleData.setQuantity(barcodeToQuantityMapping.get(productId));
             saleData.setBrandCategory(brand.getCategory());
             saleData.setBrandName(brand.getName());
-            saleData.setRevenue(barcodeToQuantityMapping.get(barcode) * product.getPrice());
-            saleData.setBarcode(barcode);
+            saleData.setRevenue(barcodeToQuantityMapping.get(productId) * product.getPrice());
+            saleData.setProductId(productId);
             salesData.add(saleData);
         }
 
@@ -104,16 +106,17 @@ public class ReportService {
     public List<InventoryReportData> getInventoryReport() throws ApiException {
 
        List<InventoryPojo> inventoryPojoList = inventoryService.getAllInventory();
-       List<String> barcodes =    inventoryPojoList.stream()
-                .map(InventoryPojo::getBarcode)
-                .collect(Collectors.toList());
-       Map<String, ProductPojo> barcodeToProductMapping =  productService.getProductsBybarcodes(barcodes);
+       List<Integer> productIds =  new ArrayList<>();
+       for(InventoryPojo inventory: inventoryPojoList){
+           productIds.add(inventory.getProductId());
+       }
+       Map<Integer, ProductPojo> productIdToProductMapping =  productService.getProductsByProductIds(productIds);
        List<InventoryReportData> inventoriesReportData = new ArrayList<>();
 
        for(InventoryPojo inventory : inventoryPojoList){
            InventoryReportData inventoryReportData = new InventoryReportData();
            inventoryReportData.setQuantity(inventory.getQuantity());
-           ProductPojo product = barcodeToProductMapping.get(inventory.getBarcode());
+           ProductPojo product = productIdToProductMapping.get(inventory.getProductId());
            BrandPojo brand = brandService.getAndCheckBrandById(product.getBrandId());
            inventoryReportData.setBrandCategory(brand.getCategory());
            inventoryReportData.setBrandName(brand.getName());

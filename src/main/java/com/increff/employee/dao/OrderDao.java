@@ -11,83 +11,75 @@ import javax.transaction.Transactional;
 
 import com.increff.employee.pojo.OrderPojo;
 import com.increff.employee.service.ApiException;
-import org.hibernate.secure.spi.IntegrationException;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public class OrderDao extends AbstractDao {
 
-    private static String delete_id = "delete from OrderPojo p where id=:id";
-    private static String select_barcode = "select p from OrderPojo p where barcode=:barcode";
+    private static String delete_order_by_id = "delete from OrderPojo p where id=:id";
+    private static String select_order_by_barcode = "select p from OrderPojo p where barcode=:barcode";
 
-    private static String select_name = "select p from OrderPojo p where name=:name";
-    private static String select_id = "select p from OrderPojo p where id=:id";
-    private static String select_all = "select p from OrderPojo p";
+    private static String select_order_by_name = "select p from OrderPojo p where name=:name";
+    private static String select_order_by_id = "select p from OrderPojo p where id=:id";
+    private static String select_all_orders = "select p from OrderPojo p";
 
-    private static String select_order = "select p from OrderPojo p where name=:name AND category=:category";
-    private static String check = "select p from OrderPojo p where barcode=:barcode";
+    private static String select_order_by_name_and_category = "select p from OrderPojo p where name=:name AND category=:category";
     private static String get_between_date = "select p from OrderPojo p where p.createdOn  BETWEEN :start and :end";
 
 
-    @PersistenceContext
-    private EntityManager em;
 
-    @Transactional
     public OrderPojo insert(OrderPojo p) throws ApiException {
-        System.out.println("ankur jain");
-        em.persist(p);
+        em().persist(p);
         return p;
     }
 
     public int delete(int id) {
-        Query query = em.createQuery(delete_id);
+        Query query = em().createQuery(delete_order_by_id);
         query.setParameter("id", id);
         return query.executeUpdate();
     }
 
 
     public OrderPojo checkOrderExists(String barcode) {
-        TypedQuery<OrderPojo> query = getQuery(check, OrderPojo.class);
+        TypedQuery<OrderPojo> query = getQuery(select_order_by_barcode, OrderPojo.class);
         query.setParameter("barcode",barcode);
         OrderPojo p = getSingleBrand(query);
         return p;
     }
     public OrderPojo select(String barcode) {
-        System.out.println("anknanana");
-        TypedQuery<OrderPojo> query = getQuery(select_barcode, OrderPojo.class);
+        TypedQuery<OrderPojo> query = getQuery(select_order_by_barcode, OrderPojo.class);
         query.setParameter("barcode", barcode);
         return getSingleBrand(query);
     }
 
     public OrderPojo getOrderById(Integer id) {
-        TypedQuery<OrderPojo> query = getQuery(select_id, OrderPojo.class);
+        TypedQuery<OrderPojo> query = getQuery(select_order_by_id, OrderPojo.class);
         query.setParameter("id", id);
         return getSingleBrand(query);
     }
 
     public OrderPojo checkName(String name) {
-        System.out.println("anknanana");
-        TypedQuery<OrderPojo> query = getQuery(select_name, OrderPojo.class);
+        TypedQuery<OrderPojo> query = getQuery(select_order_by_name, OrderPojo.class);
         query.setParameter("name", name);
         return getSingleBrand(query);
     }
 
     public OrderPojo select(int id) {
-        TypedQuery<OrderPojo> query = getQuery(select_id, OrderPojo.class);
+        TypedQuery<OrderPojo> query = getQuery(select_order_by_id, OrderPojo.class);
         query.setParameter("id", id);
         return getSingleBrand(query);
     }
 
 
     public OrderPojo select(String name, String category) {
-        TypedQuery<OrderPojo> query = getQuery(select_order, OrderPojo.class);
+        TypedQuery<OrderPojo> query = getQuery(select_order_by_name_and_category, OrderPojo.class);
         query.setParameter("name", name);
         query.setParameter("category", category);
         return getSingleBrand(query);
     }
 
     public List<OrderPojo> selectAll() {
-        TypedQuery<OrderPojo> query = getQuery(select_all, OrderPojo.class);
+        TypedQuery<OrderPojo> query = getQuery(select_all_orders, OrderPojo.class);
 
         return query.getResultList();
     }
@@ -100,11 +92,6 @@ public class OrderDao extends AbstractDao {
         return query.getResultList();
 
     }
-    @Transactional
-    public void update(OrderPojo p) {
-
-    }
-
 
 
 }

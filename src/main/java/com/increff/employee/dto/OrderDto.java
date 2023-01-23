@@ -40,9 +40,10 @@ public class OrderDto {
         List<OrderItemData> orderItemDataList = new ArrayList<>();
 
         for (int index = 0; index < orderItemPojoList.size(); index++) {
-            String productName = productPojoList.get(index).getName();
-            OrderItemPojo pojo = orderItemPojoList.get(index);
-            orderItemDataList.add(convertToOrderItemData(pojo, productName));
+            ProductPojo product= productPojoList.get(index);
+
+            OrderItemPojo orderItem = orderItemPojoList.get(index);
+            orderItemDataList.add(convertToOrderItemData(orderItem, product));
         }
         return (orderItemDataList);
     }
@@ -58,10 +59,10 @@ public class OrderDto {
         for (int index = 0; index < inventoryPojoList.size(); index++) {
             int inventoryQuantity = inventoryPojoList.get(index).getQuantity();
             int requiredQuantity = orderItemPojoList.get(index).getQuantity();
-            String barcode = orderItemPojoList.get(index).getBarcode();
-
+            Integer productId = orderItemPojoList.get(index).getProductId();
+            ProductPojo product = productService.getProductById(productId);
             if (requiredQuantity > inventoryQuantity) {
-                throw new ApiException("Only " + inventoryQuantity + " pieces of the product with barcode = " + barcode + " exists");
+                throw new ApiException("Only " + inventoryQuantity + " pieces of the product with barcode = " + product.getBarcode() + " exists");
             } else {
                 inventoryPojoList.get(index).setQuantity(inventoryQuantity - requiredQuantity);
             }
@@ -69,16 +70,20 @@ public class OrderDto {
     }
 
 
-    public List<String> getBarcodes(List<OrderItemPojo> orderItemPojos) {
+    public List<String> getBarcodes(List<OrderItemPojo> orderItemPojos) throws ApiException {
 
-        return orderItemPojos.stream()
-                .map(OrderItemPojo::getBarcode)
-                .collect(Collectors.toList());
+        List<String> barcodes = new ArrayList<>();
+        for(OrderItemPojo orderItem : orderItemPojos){
+            ProductPojo product = productService.getProductById(orderItem.getProductId());
+            barcodes.add(product.getBarcode());
+        }
+        return barcodes;
     }
-    public List<InventoryPojo> getInventoryPojo(List<String> barcode) throws ApiException {
+    public List<InventoryPojo> getInventoryPojo(List<String> barcodes) throws ApiException {
         List<InventoryPojo> inventoryPojoList = new ArrayList<>();
-        for (String temp : barcode) {
-            InventoryPojo inventoryPojo = inventoryService.getAndCheckInventoryByBarcode(temp);
+        for (String barcode : barcodes) {
+            ProductPojo product = productService.getProductByBarcode(barcode);
+            InventoryPojo inventoryPojo = inventoryService.getAndCheckInventoryByProductId(product.getId());
             inventoryPojoList.add(inventoryPojo);
         }
         return inventoryPojoList;
@@ -99,6 +104,8 @@ public class OrderDto {
     }
     public void addOrderItems(List<OrderItemPojo> addedOrderItems) throws ApiException {
         for (OrderItemPojo orderItemPojo : addedOrderItems) {
+            ProductPojo product = productService.getProductById(orderItemPojo.getProductId());
+            orderItemPojo.setProductId(product.getId());
             orderItemService.addOrderItem(orderItemPojo);
         }
     }
@@ -118,10 +125,12 @@ public class OrderDto {
 
         List<OrderItemPojo> orderItemPojoList = new ArrayList<>();
         for (int i = 0; i < orderItemForm.size(); i++) {
+            ProductPojo product = productService.getProductByBarcode(orderItemForm.get(i).getBarcode());
             OrderItemPojo pojo = convertToOrderItemPojo(
                     productPojoList.get(i).getPrice(),
                     orderItemForm.get(i),
-                    newOrder.getId()
+                    newOrder.getId(),
+                    product.getId()
             );
             orderItemPojoList.add(pojo);
         }
@@ -154,15 +163,23 @@ public class OrderDto {
     }
 
     public void updateOrderItems(List<OrderItemPojo> updatedOrderItems,
-                                 Map<String, OrderItemPojo> barcodeToOrderItemMapping) throws ApiException {
+                                 Map<Integer, OrderItemPojo> productIdToOrderItemMapping) throws ApiException {
         List<String> barcodes = getBarcodes(updatedOrderItems);
 
         List<InventoryPojo> inventoryPojoList = getInventoryPojo(barcodes);
         List<ProductPojo> productPojoList = getProductList(barcodes);
         validateInventory(inventoryPojoList, updatedOrderItems);
         updateInventory(inventoryPojoList);
-        updateOrderItems(updatedOrderItems, barcodeToOrderItemMapping);
+        updateOrderItemList(updatedOrderItems, productIdToOrderItemMapping);
 
+    }
+    public void updateOrderItemList(List<OrderItemPojo> updatedOrderItems,
+                                 Map<Integer, OrderItemPojo> barcodeToOrderItemMapping) throws ApiException {
+        for (OrderItemPojo orderItemPojo : updatedOrderItems) {
+            int newQuantity = barcodeToOrderItemMapping.get(orderItemPojo.getProductId()).getQuantity();
+            orderItemPojo.setQuantity(newQuantity);
+            orderItemService.updateOrderItem(orderItemPojo);
+        }
     }
     public void deleteUpdatedOrderItems(List<OrderItemPojo> deletedOrderItems) throws ApiException {
         for (OrderItemPojo orderItemPojo : deletedOrderItems) {
@@ -171,8 +188,7 @@ public class OrderDto {
     }
 
 
-    public void deleteOrderItems(List<OrderItemPojo> deletedOrderItems,
-                                 Map<String, OrderItemPojo> copyMapping) throws ApiException {
+    public void deleteOrderItems(List<OrderItemPojo> deletedOrderItems) throws ApiException {
         List<String> barcodes = getBarcodes(deletedOrderItems);
 
         List<InventoryPojo> inventoryPojoList = getInventoryPojo(barcodes);
@@ -193,24 +209,23 @@ public class OrderDto {
         if (orderItemForms.isEmpty()) {
             throw new ApiException("Add a Order Item");
         }
+        List<OrderItemPojo> updatedOrder = new ArrayList<>();
         for (OrderItemForm orderItem : orderItemForms) {
             normalizeFormData(orderItem);
             validateFormData(orderItem);
+            ProductPojo product =productService.getProductByBarcode(orderItem.getBarcode());
+            updatedOrder.add(convertToOrderItemPojo(orderItem.getPrice(), orderItem, id, product.getId()));
         }
 
 
-        List<OrderItemPojo> updatedOrder = orderItemForms
-                .stream()
-                .map(orderItemForm -> convertToOrderItemPojo(orderItemForm.getPrice(), orderItemForm, id))
-                .collect(Collectors.toList());
-
-        Map<String, OrderItemPojo> mappingFormData = new HashMap<>();
+        Map<Integer, OrderItemPojo> mappingFormData = new HashMap<>();
 
         List<OrderItemPojo> oldOrder = orderItemService.getOrderItemsById(id);
-        Map<String, OrderItemPojo> barcodeToOrderItemMapping = new HashMap<>();
+        Map<Integer, OrderItemPojo> productToToOrderItemMapping = new HashMap<>();
         for (OrderItemPojo temp : updatedOrder) {
-            barcodeToOrderItemMapping.put(temp.getBarcode(), temp);
-            mappingFormData.put(temp.getBarcode(), temp);
+            ProductPojo product = productService.getProductById(temp.getProductId());
+            productToToOrderItemMapping.put(product.getId(), temp);
+            mappingFormData.put(product.getId(), temp);
         }
 
         GetList getlist = new GetList();
@@ -220,8 +235,8 @@ public class OrderDto {
         List<OrderItemPojo> addedOrderItems = getlist.getToAdd();
 
         addNewlyUpdatedOrderItems(addedOrderItems);
-        updateOrderItems(updatedOrderItems, barcodeToOrderItemMapping);
-        deleteOrderItems(deletedOrderItems, barcodeToOrderItemMapping);
+        updateOrderItems(updatedOrderItems, productToToOrderItemMapping);
+        deleteOrderItems(deletedOrderItems);
         List<InvoiceData> invoiceData = new ArrayList<>();
         for (OrderItemForm orderItemForm : orderItemForms) {
             InvoiceData invoice = convertToInvoiceData(orderItemForm, id);

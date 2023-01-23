@@ -21,14 +21,9 @@ public class OrderItemService {
 
     @Transactional(rollbackOn = ApiException.class)
     public void addOrderItem(OrderItemPojo p) throws ApiException {
-        normalize(p);
 
-        System.out.println("ankur jainnnnnnnnnnn");
-        OrderItemPojo check = dao.checkOrderItemExists(p.getBarcode());
-
+        OrderItemPojo check = dao.checkOrderItemExists(p.getProductId());
         dao.insert(p);
-
-
     }
 
     @Transactional
@@ -50,7 +45,7 @@ public class OrderItemService {
 
     @Transactional(rollbackOn  = ApiException.class)
     public void updateOrderItem( OrderItemPojo p) throws ApiException {
-        normalize(p);
+
         OrderItemPojo ex = getOrderItem(p.getId());
         System.out.println(p.getQuantity());
 
@@ -76,9 +71,6 @@ public class OrderItemService {
         return orderItems;
     }
 
-    protected static void normalize(OrderItemPojo p) {
-        p.setBarcode(StringUtil.toLowerCase(p.getBarcode()));
-    }
 
 
 }

@@ -22,7 +22,7 @@ public class ProductApiController {
     @RequestMapping(path = "", method = RequestMethod.POST)
     public void addProduct(@RequestBody ProductForm form) throws ApiException {
 
-        productDto.addProduct(form);
+            productDto.addProduct(form);
     }
 
 //    @ApiOperation(value = "Deletes a product")

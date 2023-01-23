@@ -14,6 +14,7 @@ import com.increff.employee.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.transaction.Transactional;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -34,6 +35,7 @@ public class ProductDto {
     private ProductService productService;
     @Autowired
     private BrandService brandService;
+    @Autowired
     private InventoryService inventoryService;
 
 
@@ -60,16 +62,18 @@ public class ProductDto {
         return convertToProductData(product, brand);
     }
 
+    @Transactional(rollbackOn = ApiException.class)
     public void addProduct(ProductForm form) throws ApiException {
         validateFormData(form);
         normalizeFormData(form);
         BrandPojo brand =  brandService.getBrandIdByNameAndCategory(form.getBrandName(), form.getBrandCategory());
         ProductPojo productPojo = convertToProductPojo(form, brand.getId());
         InventoryPojo inventoryPojo = new InventoryPojo();
-        inventoryPojo.setBarcode(productPojo.getBarcode());
-        inventoryPojo.setQuantity(0);
+
         productService.addProduct(productPojo);
-        inventoryService.addInventory(inventoryPojo);
+        inventoryPojo.setProductId(productPojo.getId());
+        inventoryPojo.setQuantity(0);
+        inventoryService.addInventory(inventoryPojo, productPojo);
     }
 
 //    public void delete(String barcode) throws ApiException  {

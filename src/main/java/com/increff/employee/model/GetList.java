@@ -31,14 +31,14 @@ public  class GetList {
 
 
     public void updatesList(List<OrderItemPojo> orderBeforeUpdate,
-                            Map<String, OrderItemPojo> mapping, int orderId) {
+                            Map<Integer, OrderItemPojo> mapping, int orderId) {
 
         for (OrderItemPojo data : orderBeforeUpdate) {
-            if (mapping.containsKey(data.getBarcode())) {
-                int requiredQuantity = mapping.get(data.getBarcode()).getQuantity();
+            if (mapping.containsKey(data.getProductId())) {
+                int requiredQuantity = mapping.get(data.getProductId()).getQuantity();
                 data.setQuantity(requiredQuantity - data.getQuantity());
                 toUpdate.add(data);
-                mapping.remove(data.getBarcode());
+                mapping.remove(data.getProductId());
             } else {
                 int requiredQuantity = data.getQuantity();
                 data.setQuantity(-1 * data.getQuantity());
@@ -46,7 +46,7 @@ public  class GetList {
             }
         }
 
-        for (Map.Entry<String, OrderItemPojo> entry : mapping.entrySet()) {
+        for (Map.Entry<Integer, OrderItemPojo> entry : mapping.entrySet()) {
             OrderItemPojo updatedOrderItemPojo = entry.getValue();
             updatedOrderItemPojo.setOrderId(orderId);
             toAdd.add(updatedOrderItemPojo);

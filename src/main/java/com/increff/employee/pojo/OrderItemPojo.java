@@ -12,10 +12,10 @@ import javax.persistence.Id;
 public class OrderItemPojo {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
-    private int id;
-    private String barcode;
-    private int quantity;
-    private int orderId;
+    private Integer id;
+    private Integer productId;
+    private Integer quantity;
+    private Integer orderId;
     private Float price;
 
 }

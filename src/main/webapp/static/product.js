@@ -241,8 +241,10 @@ function displayProduct(data){
 //	selectBrand.selectedIndex = data.brandName;
 	$("#brand-name-edit").val(data.brandName);
 //	$("#brand-category-edit").val(data.brandName);
-    $(`#brand-category-edit option[value=${data.brandCategory}]`).attr('selected', 'selected')
-    $(`#brand-name-edit option[value=${data.brandName}]`).attr('selected', 'selected')
+  $('#brand-name-edit').val(data.brandName).change();
+  $('#brand-category-edit').val(data.brandCategory).change();
+//    $(`#brand-category-edit option[value=${data.brandCategory}]`).attr('selected', 'selected')
+//    $(`#brand-name-edit option[value=${data.brandName}]`).attr('selected', 'selected')
 //	$("#product-edit-form input[name=brandCategory]").val(data.brandCategory);
 //	$("#product-edit-form input[name=brandName]").val(data.brandName);
 	$("#product-edit-form input[name=price]").val(data.price);

@@ -22,7 +22,7 @@ public class BrandService {
     public void addBrand(BrandPojo brandPojo) throws ApiException {
         BrandPojo brand = dao.getBrand(brandPojo.getName(),brandPojo.getCategory());
         if(brand == null)
-        dao.insert(brandPojo);
+        dao.addBrand(brandPojo);
         else{
             throw new ApiException("Brand with given name and category already exist" );
         }

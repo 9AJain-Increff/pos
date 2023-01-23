@@ -31,7 +31,7 @@ public class SignUpDto {
         return set;
 
     }
-    public void addUser(UserForm form) throws ApiException {
+    public UserPojo addUser(UserForm form) throws ApiException {
         UserPojo user = convertToUserPojo(form);
         Set<String > set = getAdmins();
         if(set.contains(user.getEmail())){
@@ -40,7 +40,7 @@ public class SignUpDto {
         else{
             user.setRole("operator");
         }
-        userService.addUser(user);
+        return userService.addUser(user);
     }
 
 }

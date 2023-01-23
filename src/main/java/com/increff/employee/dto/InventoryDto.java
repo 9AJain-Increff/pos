@@ -5,6 +5,7 @@ import com.increff.employee.model.InventoryData;
 import com.increff.employee.model.InventoryForm;
 import com.increff.employee.model.ProductForm;
 import com.increff.employee.pojo.InventoryPojo;
+import com.increff.employee.pojo.OrderItemPojo;
 import com.increff.employee.pojo.ProductPojo;
 import com.increff.employee.service.ApiException;
 import com.increff.employee.service.InventoryService;
@@ -31,31 +32,36 @@ public class InventoryDto {
 
     public InventoryData getInventoryByBarcode(String barcode) throws ApiException {
         barcode = normalize(barcode);
-        InventoryPojo b = inventoryService.getAndCheckInventoryByBarcode(barcode);
-        return convertToInventoryData(b);
+        ProductPojo product = productService.getProductByBarcode(barcode);
+        InventoryPojo b = inventoryService.getAndCheckInventoryByProductId(product.getId());
+        return convertToInventoryData(b, product.getBarcode());
     }
     public void addInventory(InventoryForm form) throws ApiException {
         form.setBarcode(normalize(form.getBarcode()));
         validateFormData(form);
-        InventoryPojo p = convertToInventoryPojo(form);
-        ProductPojo product = productService.getAndCheckProductByBarcode(p.getBarcode());
-        inventoryService.addInventory(p);
+        ProductPojo product = productService.getAndCheckProductByBarcode(form.getBarcode());
+        InventoryPojo p = convertToInventoryPojo(form, product.getId());
+        inventoryService.addInventory(p, product);
     }
 
     public void updateInventory(InventoryForm form) throws ApiException  {
         form.setBarcode(normalize(form.getBarcode()));
         validateFormData(form);
-        InventoryPojo p = convertToInventoryPojo(form);
-        ProductPojo product = productService.getProductByBarcode(p.getBarcode());
+        ProductPojo product = productService.getProductByBarcode(form.getBarcode());
+        InventoryPojo p = convertToInventoryPojo(form, product.getId());
+
         inventoryService.update(p);
     }
-    private List<String> getBarcodes(List<InventoryPojo> inventoryList){
-        List<String> barcodes = inventoryList.stream()
-                .map(InventoryPojo::getBarcode)
-                .collect(Collectors.toList());
+
+    public List<String> getBarcodes(List<InventoryPojo> inventoryPojoList) throws ApiException {
+
+        List<String> barcodes = new ArrayList<>();
+        for(InventoryPojo orderItem : inventoryPojoList){
+            ProductPojo product = productService.getProductById(orderItem.getProductId());
+            barcodes.add(product.getBarcode());
+        }
         return barcodes;
     }
-
     public List<InventoryData> getAllInventory() throws ApiException {
         List<InventoryPojo> inventoryList = inventoryService.getAllInventory();
         List<String> barcodes = getBarcodes(inventoryList);
