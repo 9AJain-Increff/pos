@@ -24,13 +24,19 @@ import static com.increff.employee.util.ValidationUtil.isNegative;
 public class OrderDto {
     @Autowired
     private OrderService orderService;
+    @Autowired
+    private InventoryService inventoryService;
+    @Autowired
+    private ProductService productService;
+    @Autowired
+    private OrderItemService orderItemService;
 
     public List<OrderItemData> getOrderById(int id) throws ApiException {
 
         orderService.checkOrderExist(id);
-        List<OrderItemPojo> orderItemPojoList = orderService.getOrderItemsById(id);
+        List<OrderItemPojo> orderItemPojoList = orderItemService.getOrderItemsById(id);
         List<String> barcodes = getBarcodes(orderItemPojoList);
-        List<ProductPojo> productPojoList = orderService.getProductList(barcodes);
+        List<ProductPojo> productPojoList = getProductList(barcodes);
         List<OrderItemData> orderItemDataList = new ArrayList<>();
 
         for (int index = 0; index < orderItemPojoList.size(); index++) {
@@ -69,7 +75,33 @@ public class OrderDto {
                 .map(OrderItemPojo::getBarcode)
                 .collect(Collectors.toList());
     }
+    public List<InventoryPojo> getInventoryPojo(List<String> barcode) throws ApiException {
+        List<InventoryPojo> inventoryPojoList = new ArrayList<>();
+        for (String temp : barcode) {
+            InventoryPojo inventoryPojo = inventoryService.getAndCheckInventoryByBarcode(temp);
+            inventoryPojoList.add(inventoryPojo);
+        }
+        return inventoryPojoList;
+    }
 
+    public List<ProductPojo> getProductList(List<String> barcode) throws ApiException {
+        List<ProductPojo> productPojoList = new ArrayList<>();
+        for (String orderItemBarcode : barcode) {
+            ProductPojo productPojo = productService.getAndCheckProductByBarcode(orderItemBarcode);
+            productPojoList.add(productPojo);
+        }
+        return productPojoList;
+    }
+    public void updateInventory(List<InventoryPojo> inventoryPojoList) throws ApiException {
+        for (InventoryPojo inventoryPojo : inventoryPojoList) {
+            inventoryService.update(inventoryPojo);
+        }
+    }
+    public void addOrderItems(List<OrderItemPojo> addedOrderItems) throws ApiException {
+        for (OrderItemPojo orderItemPojo : addedOrderItems) {
+            orderItemService.addOrderItem(orderItemPojo);
+        }
+    }
     @Transactional(rollbackOn = ApiException.class)
     public List<InvoiceData> addOrder(List<OrderItemForm> orderItemForm) throws ApiException {
         for (OrderItemForm orderItem : orderItemForm) {
@@ -80,8 +112,8 @@ public class OrderDto {
                 .map(OrderItemForm::getBarcode)
                 .collect(Collectors.toList());
 
-        List<InventoryPojo> inventoryPojoList = orderService.getInventoryPojo(barcodes);
-        List<ProductPojo> productPojoList = orderService.getProductList(barcodes);
+        List<InventoryPojo> inventoryPojoList = getInventoryPojo(barcodes);
+        List<ProductPojo> productPojoList = getProductList(barcodes);
         OrderPojo newOrder = orderService.createNewOrder();
 
         List<OrderItemPojo> orderItemPojoList = new ArrayList<>();
@@ -95,8 +127,8 @@ public class OrderDto {
         }
 
         validateInventory(inventoryPojoList, orderItemPojoList);
-        orderService.updateInventory(inventoryPojoList);
-        orderService.addOrderItems(orderItemPojoList);
+        updateInventory(inventoryPojoList);
+        addOrderItems(orderItemPojoList);
         List<InvoiceData> invoiceData = new ArrayList<>();
         for (int i = 0; i < orderItemForm.size(); i++) {
             InvoiceData data = convertToInvoiceData(
@@ -115,34 +147,45 @@ public class OrderDto {
     public void addNewlyUpdatedOrderItems(List<OrderItemPojo> addedOrderItems) throws ApiException {
         List<String> barcodes = getBarcodes(addedOrderItems);
 
-        List<InventoryPojo> inventoryPojoList = orderService.getInventoryPojo(barcodes);
+        List<InventoryPojo> inventoryPojoList = getInventoryPojo(barcodes);
         validateInventory(inventoryPojoList, addedOrderItems);
-        orderService.updateInventory(inventoryPojoList);
-        orderService.addOrderItems(addedOrderItems);
+        updateInventory(inventoryPojoList);
+        addOrderItems(addedOrderItems);
     }
 
     public void updateOrderItems(List<OrderItemPojo> updatedOrderItems,
                                  Map<String, OrderItemPojo> barcodeToOrderItemMapping) throws ApiException {
         List<String> barcodes = getBarcodes(updatedOrderItems);
 
-        List<InventoryPojo> inventoryPojoList = orderService.getInventoryPojo(barcodes);
-        List<ProductPojo> productPojoList = orderService.getProductList(barcodes);
+        List<InventoryPojo> inventoryPojoList = getInventoryPojo(barcodes);
+        List<ProductPojo> productPojoList = getProductList(barcodes);
         validateInventory(inventoryPojoList, updatedOrderItems);
-        orderService.updateInventory(inventoryPojoList);
-        orderService.updateOrderItems(updatedOrderItems, barcodeToOrderItemMapping);
+        updateInventory(inventoryPojoList);
+        updateOrderItems(updatedOrderItems, barcodeToOrderItemMapping);
 
     }
+    public void deleteUpdatedOrderItems(List<OrderItemPojo> deletedOrderItems) throws ApiException {
+        for (OrderItemPojo orderItemPojo : deletedOrderItems) {
+            orderItemService.delete(orderItemPojo.getId());
+        }
+    }
+
 
     public void deleteOrderItems(List<OrderItemPojo> deletedOrderItems,
                                  Map<String, OrderItemPojo> copyMapping) throws ApiException {
         List<String> barcodes = getBarcodes(deletedOrderItems);
 
-        List<InventoryPojo> inventoryPojoList = orderService.getInventoryPojo(barcodes);
+        List<InventoryPojo> inventoryPojoList = getInventoryPojo(barcodes);
 
         validateInventory(inventoryPojoList, deletedOrderItems);
-        orderService.deleteInventory(inventoryPojoList);
-        orderService.deleteOrderItems(deletedOrderItems);
+        deleteInventory(inventoryPojoList);
+        deleteUpdatedOrderItems(deletedOrderItems);
 
+    }
+    public void deleteInventory(List<InventoryPojo> inventoryPojoList) throws ApiException {
+        for (InventoryPojo inventoryPojo : inventoryPojoList) {
+            inventoryService.update(inventoryPojo);
+        }
     }
 
     @Transactional(rollbackOn = ApiException.class)
@@ -163,7 +206,7 @@ public class OrderDto {
 
         Map<String, OrderItemPojo> mappingFormData = new HashMap<>();
 
-        List<OrderItemPojo> oldOrder = orderService.getOrderItemsById(id);
+        List<OrderItemPojo> oldOrder = orderItemService.getOrderItemsById(id);
         Map<String, OrderItemPojo> barcodeToOrderItemMapping = new HashMap<>();
         for (OrderItemPojo temp : updatedOrder) {
             barcodeToOrderItemMapping.put(temp.getBarcode(), temp);
@@ -188,8 +231,8 @@ public class OrderDto {
     }
 
 
-    public List<OrderData> gettingAllOrder() {
-        List<OrderPojo> orders = orderService.getAll();
+    public List<OrderData> getAllOrder() {
+        List<OrderPojo> orders = orderService.getAllOrders();
         List<OrderData> ordersData = new ArrayList<OrderData>();
         for (OrderPojo p : orders) {
             ordersData.add(convertToOrderData(p));

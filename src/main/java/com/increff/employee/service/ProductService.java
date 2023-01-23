@@ -26,21 +26,12 @@ public class ProductService {
     @Autowired
     private BrandService brandService;
 
-    @Autowired
-    private InventoryService inventoryService;
     @Transactional(rollbackOn = ApiException.class)
-    public void addProduct(@NotNull ProductPojo product, InventoryPojo inventoryPojo, BrandPojo brand) throws ApiException {
+    public void addProduct(@NotNull ProductPojo product) throws ApiException {
         checkBarcode(product.getBarcode());
         dao.add(product);
-        inventoryService.addInventory(inventoryPojo);
     }
 
-    public List<BrandPojo> getBrandsByProducts(List<ProductPojo> products) throws ApiException {
-        return brandService.getBrandsByProducts(products);
-    }
-    public BrandPojo getBrandByProduct(ProductPojo product) throws ApiException {
-        return brandService.getAndCheckBrandById(product.getBrandId());
-    }
 
     public List<ProductPojo> getAllProduct() throws ApiException {
         return dao.getAllProduct();
@@ -74,7 +65,7 @@ public class ProductService {
         return p;
     }
 
-    public ProductPojo getAndCheckProductByBarcode(String barcode) throws ApiException {
+    public ProductPojo  getAndCheckProductByBarcode(String barcode) throws ApiException {
         ProductPojo p = dao.getProductByBarcode(barcode);
         if (p == null) {
             throw new ApiException("Product with given barcode does not exit, barcode: " + barcode);
@@ -94,10 +85,6 @@ public class ProductService {
     }
 
 
-    public BrandPojo checkBrandNameAndCategory( String brandName, String brandCategory) throws ApiException {
-        BrandPojo brand = brandService.getBrandIdByNameAndCategory(brandName, brandCategory);
-            return brand;
-    }
 
 
     public Map<String, ProductPojo> getProductsBybarcodes(List<String> barcodes ) {
@@ -116,11 +103,6 @@ public class ProductService {
         return products;
     }
 
-
-    public  BrandPojo getAndCheckBrandId(String brandName, String brandCategory) throws ApiException {
-
-        return brandService.getBrandIdByNameAndCategory(brandName, brandCategory);
-    }
 
 
     protected static void normalize(ProductPojo p) {

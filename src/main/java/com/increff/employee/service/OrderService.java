@@ -22,12 +22,7 @@ public class OrderService {
 
     @Autowired
     private OrderDao orderDao;
-    @Autowired
-    private InventoryService inventoryService;
-    @Autowired
-    private ProductService productService;
-    @Autowired
-    private OrderItemService orderItemService;
+
     @Transactional(rollbackOn = ApiException.class)
     public OrderPojo addOrder(OrderPojo p) throws ApiException {
         normalize(p);
@@ -42,7 +37,7 @@ public class OrderService {
 
 
     @Transactional
-    public List<OrderPojo> getAll() {
+    public List<OrderPojo> getAllOrders() {
         return orderDao.selectAll();
     }
     public OrderPojo createNewOrder() throws ApiException {
@@ -56,59 +51,15 @@ public class OrderService {
         OrderPojo order = orderDao.getOrderById(id);
         order.setOrderURL("/home/ankurjain/Downloads/employee-spring-full-master/order"+id+".pdf");
     }
-    public List<InventoryPojo> getInventoryPojo(List<String> barcode) throws ApiException {
-        List<InventoryPojo> inventoryPojoList = new ArrayList<>();
-        for (String temp : barcode) {
-            InventoryPojo inventoryPojo = inventoryService.getAndCheckInventoryByBarcode(temp);
-            inventoryPojoList.add(inventoryPojo);
-        }
-        return inventoryPojoList;
-    }
 
-    public void updateInventory(List<InventoryPojo> inventoryPojoList) throws ApiException {
-        for (InventoryPojo inventoryPojo : inventoryPojoList) {
-            inventoryService.update(inventoryPojo);
-        }
-    }
-    public void addOrderItems(List<OrderItemPojo> addedOrderItems) throws ApiException {
-        for (OrderItemPojo orderItemPojo : addedOrderItems) {
-            orderItemService.addOrderItem(orderItemPojo);
-        }
-    }
-    public void deleteInventory(List<InventoryPojo> inventoryPojoList) throws ApiException {
-        for (InventoryPojo inventoryPojo : inventoryPojoList) {
-            inventoryService.update(inventoryPojo);
-        }
-    }
-    public void updateOrderItems(List<OrderItemPojo> updatedOrderItems,
-                                 Map<String, OrderItemPojo> barcodeToOrderItemMapping) throws ApiException {
-        for (OrderItemPojo orderItemPojo : updatedOrderItems) {
-            int newQuantity = barcodeToOrderItemMapping.get(orderItemPojo.getBarcode()).getQuantity();
-            orderItemPojo.setQuantity(newQuantity);
-            orderItemService.updateOrderItem(orderItemPojo);
-        }
-    }
-    public void deleteOrderItems(List<OrderItemPojo> deletedOrderItems) throws ApiException {
-        for (OrderItemPojo orderItemPojo : deletedOrderItems) {
-            orderItemService.delete(orderItemPojo.getId());
-        }
-    }
+
+
 
     public String getPdfUrl(Integer id) throws ApiException {
         OrderPojo order = orderDao.getOrderById(id);
         return order.getOrderURL();
     }
-    public List<ProductPojo> getProductList(List<String> barcode) throws ApiException {
-        List<ProductPojo> productPojoList = new ArrayList<>();
-        for (String orderItemBarcode : barcode) {
-            ProductPojo productPojo = productService.getAndCheckProductByBarcode(orderItemBarcode);
-            productPojoList.add(productPojo);
-        }
-        return productPojoList;
-    }
-    public List<OrderItemPojo> getOrderItemsById(int id) throws ApiException {
-        return orderItemService.getOrderItemsById(id);
-    }
+
 
 
     @Transactional

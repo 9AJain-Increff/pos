@@ -8,6 +8,7 @@ import com.increff.employee.pojo.InventoryPojo;
 import com.increff.employee.pojo.ProductPojo;
 import com.increff.employee.service.ApiException;
 import com.increff.employee.service.InventoryService;
+import com.increff.employee.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -25,6 +26,8 @@ import static com.increff.employee.util.ValidationUtil.isNegative;
 public class InventoryDto {
     @Autowired
     private InventoryService inventoryService;
+    @Autowired
+    private ProductService productService;
 
     public InventoryData getInventoryByBarcode(String barcode) throws ApiException {
         barcode = normalize(barcode);
@@ -35,6 +38,7 @@ public class InventoryDto {
         form.setBarcode(normalize(form.getBarcode()));
         validateFormData(form);
         InventoryPojo p = convertToInventoryPojo(form);
+        ProductPojo product = productService.getAndCheckProductByBarcode(p.getBarcode());
         inventoryService.addInventory(p);
     }
 
@@ -42,7 +46,7 @@ public class InventoryDto {
         form.setBarcode(normalize(form.getBarcode()));
         validateFormData(form);
         InventoryPojo p = convertToInventoryPojo(form);
-        ProductPojo product = inventoryService.checkProductExists(p.getBarcode());
+        ProductPojo product = productService.getProductByBarcode(p.getBarcode());
         inventoryService.update(p);
     }
     private List<String> getBarcodes(List<InventoryPojo> inventoryList){
@@ -55,11 +59,8 @@ public class InventoryDto {
     public List<InventoryData> getAllInventory() throws ApiException {
         List<InventoryPojo> inventoryList = inventoryService.getAllInventory();
         List<String> barcodes = getBarcodes(inventoryList);
-        List<ProductPojo> productList = inventoryService.getProductsByBarcodes(barcodes);
+        List<ProductPojo> productList = productService.getProducts(barcodes);
         List<InventoryData> inventoryDataList = new ArrayList<InventoryData>();
-
-
-        System.out.println(productList.size());
         for (int i = 0; i < inventoryList.size(); i++) {
             inventoryDataList.add(convertToInventoryData(inventoryList.get(i), productList.get(i)));
         }

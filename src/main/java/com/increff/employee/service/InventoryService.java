@@ -17,13 +17,10 @@ public class InventoryService {
 
     @Autowired
     private InventoryDao inventoryDao;
-    @Autowired
-    private ProductService productService;
 
 
     @Transactional(rollbackOn = ApiException.class)
     public void addInventory(InventoryPojo p) throws ApiException {
-        ProductPojo product = productService.getAndCheckProductByBarcode(p.getBarcode());
         InventoryPojo exist = inventoryDao.select(p.getBarcode());
         if(exist == null){
             inventoryDao.insert(p);
@@ -64,14 +61,6 @@ public class InventoryService {
         ex.setBarcode(p.getBarcode());
     }
 
-    public List<ProductPojo> getProductsByBarcodes(List<String> barcodes) throws ApiException {
-       List<ProductPojo> productList =  productService.getProducts(barcodes);
-       return productList;
-    }
-
-    public ProductPojo checkProductExists(String barcode) throws ApiException {
-        return productService.getProductByBarcode(barcode);
-    }
 
     protected static void normalize(InventoryPojo p) {
         p.setBarcode(StringUtil.toLowerCase(p.getBarcode()));

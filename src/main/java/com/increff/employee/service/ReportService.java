@@ -155,7 +155,7 @@ public class ReportService {
     }
     @Transactional
     public List<DailyReportPojo> getDailyReport() throws ApiException {
-        List<OrderPojo> orders = orderService.getAll();
+        List<OrderPojo> orders = orderService.getAllOrders();
         Map<LocalDate, Integer> dateToOrdersQuantity = new HashMap<>();
         Map<LocalDate, Integer> dateToOrderItemsQuantity = new HashMap<>();
         Map<LocalDate, Float> dateToRevenue = new HashMap<>();

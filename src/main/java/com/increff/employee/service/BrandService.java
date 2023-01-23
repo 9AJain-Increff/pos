@@ -70,6 +70,14 @@ public class BrandService {
         return brands;
     }
 
+    public List<BrandPojo> getBrandsByBrandId(List<Integer> braneIdList) throws ApiException {
+        List<BrandPojo> brands = new ArrayList<>();
+        for(int brandId : braneIdList){
+            brands.add((getAndCheckBrandById(brandId)));
+        }
+        return brands;
+    }
+
 
 
 

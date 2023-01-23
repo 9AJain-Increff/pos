@@ -65,7 +65,7 @@ public class OrderApiController {
     @ApiOperation(value = "Gets list of all orders")
     @RequestMapping(path = "", method = RequestMethod.GET)
     public List<OrderData> getAllOrder() {
-        return orderDto.gettingAllOrder();
+        return orderDto.getAllOrder();
     }
 
 
