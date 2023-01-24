@@ -3,6 +3,15 @@ function getSalesReportUrl(){
    return baseUrl + "/api/report/sales";
 }
 
+function getBaseUrl() {
+  return $('meta[name=baseUrl]').attr('content');
+}
+
+function getBrandUrl() {
+  return getBaseUrl() + '/api/brands';
+}
+
+
 function filterSalesReport() {
     var $form = $("#sales-form");
     var json = toJson($form);
@@ -18,6 +27,7 @@ function filterSalesReport() {
        },
        success: function(response) {
             console.log(response);
+            $('#filter-modal').modal('toggle');
             displaySalesReport(response);
        },
        error: handleAjaxError
@@ -34,7 +44,6 @@ function displaySalesReport(data) {
         count++;
         var row = '<tr>'
         + '<td>' + count + '</td>'
-        + '<td>' + b.barcode + '</td>'
         + '<td>' + b.brandName + '</td>'
         + '<td>' + b.brandCategory + '</td>'
         + '<td>' + b.quantity + '</td>'
@@ -43,10 +52,46 @@ function displaySalesReport(data) {
         $tbody.append(row);
     }
 }
+  function prependOptions(selectElementId, displayName) {
+    const $selectElement = $(selectElementId);
+    const optionHtml = `<option value="" selected >${displayName}</option>`;
+    $selectElement.prepend(optionHtml);
+  }
 
+function getBrandListInFilter() {
+const url = getBrandUrl();
+$.ajax({
+	   url: url,
+	   type: 'GET',
+	   success:async function(brands) {
+	       const brandCategory = brands.map((brandItem) => {
+             return { brand: brandItem.name, category: brandItem.category };
+           });
+           brandCategory.push()
+          await setupBrandCategoryDropdown(brandCategory, '#brand-name-selection', '#brand-category-selection');
+          prependOptions('#brand-name-selection',"All Brands");
+          prependOptions('#brand-category-selection',"All Category");
+          displayProduct();
+	   },
+	   error:
+	   handleAjaxError
+	});
+
+  };
+
+
+function displayProduct(){
+
+	$('#filter-modal').modal('toggle');
+}
+function showFilterModal(){
+    getBrandListInFilter();
+}
 //INITIALIZATION CODE
 function init(){
+
    $('#filter-sales-report').click(filterSalesReport);
+   $('#display-filter-btn').click(showFilterModal);
 //       var element = document.getElementById("sales-icon");
 //       element.classList.add("thick");
 }

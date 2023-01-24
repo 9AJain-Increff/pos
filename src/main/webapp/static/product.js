@@ -1,11 +1,4 @@
 
-
-
-
-
-
-
-
 function getBaseUrl() {
   return $('meta[name=baseUrl]').attr('content');
 }
@@ -187,16 +180,13 @@ console.log('ankur jinfo')
 
 function displayEditProduct(e){
 	var url = getProductUrl() + "/" + e.barcode;
-	console.log(url, "lllllllll")
 	$.ajax({
 	   url: url,
 	   type: 'GET',
 	   success:async function(data) {
             $('#brand-category-edit').empty();
             $('#brand-name-edit').empty();
-            getBrandListInEdit(productData)
-
-	   		displayProduct(data);
+            getBrandListInEdit(data)
 	   },
 	   error:
 	   handleAjaxError
@@ -279,11 +269,22 @@ function getBrandList(brands) {
     setupBrandCategoryDropdown(brandCategory, '#brand-name-selection', '#brand-category-selection');
   };
 
-function getBrandListInEdit(brands) {
-    const brandCategory = brands.map((brandItem) => {
-      return { brand: brandItem.brandName, category: brandItem.brandCategory };
-    });
-    setupBrandCategoryDropdown(brandCategory, '#brand-name-edit', '#brand-category-edit');
+function getBrandListInEdit(data) {
+const url = getBrandUrl();
+$.ajax({
+	   url: url,
+	   type: 'GET',
+	   success:async function(brands) {
+	       const brandCategory = brands.map((brandItem) => {
+             return { brand: brandItem.name, category: brandItem.category };
+           });
+          await setupBrandCategoryDropdown(brandCategory, '#brand-name-edit', '#brand-category-edit');
+          displayProduct(data);
+	   },
+	   error:
+	   handleAjaxError
+	});
+
   };
 
 

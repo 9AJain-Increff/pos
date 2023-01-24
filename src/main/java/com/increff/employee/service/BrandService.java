@@ -33,7 +33,7 @@ public class BrandService {
     public BrandPojo getAndCheckBrandById(int id) throws ApiException {
         BrandPojo brandPojo = dao.getBrandById(id);
         if (brandPojo == null) {
-            throw new ApiException("Brand with given ID does not exit, id: " + id);
+            throw new ApiException("Brand witFh given ID does not exit, id: " + id);
         }
         return brandPojo;
     }

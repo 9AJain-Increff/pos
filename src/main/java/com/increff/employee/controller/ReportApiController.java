@@ -13,7 +13,7 @@ import java.util.List;
 
 @Api
 @RestController
-public class ReportApiController {
+public class    ReportApiController {
 
 
     @Autowired
@@ -31,6 +31,7 @@ public class ReportApiController {
     public List<InventoryReportData> getInventoryReport() throws ApiException {
         return reportDto.getInventoryReport();
     }
+
     @ApiOperation(value = "Get Brand report")
     // todo change path
     @RequestMapping(path = "/api/report/brand", method = RequestMethod.GET)

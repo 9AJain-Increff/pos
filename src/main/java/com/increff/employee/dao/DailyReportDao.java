@@ -13,6 +13,7 @@ import javax.transaction.Transactional;
 public class DailyReportDao {
     @PersistenceContext
     private EntityManager em;
+
     public void insert(DailyReportPojo p) throws ApiException {
         em.persist(p);
     }
