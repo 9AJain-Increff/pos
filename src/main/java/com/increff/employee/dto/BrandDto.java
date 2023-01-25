@@ -27,10 +27,10 @@ public class BrandDto {
          BrandPojo brandPojo = service.getAndCheckBrandById(id);
          return convertToBrandData(brandPojo);
     }
-    public void addBrand(BrandForm form) throws ApiException {
+    public BrandPojo addBrand(BrandForm form) throws ApiException {
         validateFormData(form);
         BrandPojo p = convertToBrandPojo(form);
-        service.addBrand(p);
+        return service.addBrand(p);
     }
 
 

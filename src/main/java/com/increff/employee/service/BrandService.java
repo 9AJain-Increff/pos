@@ -19,10 +19,12 @@ public class BrandService {
 
 
     @Transactional(rollbackOn = ApiException.class)
-    public void addBrand(BrandPojo brandPojo) throws ApiException {
+    public BrandPojo addBrand(BrandPojo brandPojo) throws ApiException {
         BrandPojo brand = dao.getBrand(brandPojo.getName(),brandPojo.getCategory());
-        if(brand == null)
-        dao.addBrand(brandPojo);
+        if(brand == null) {
+            dao.addBrand(brandPojo);
+            return brandPojo;
+        }
         else{
             throw new ApiException("Brand with given name and category already exist" );
         }
