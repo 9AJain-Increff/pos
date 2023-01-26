@@ -1,5 +1,6 @@
 package com.increff.employee.pojo;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import javax.persistence.Entity;
@@ -9,6 +10,7 @@ import javax.persistence.Id;
 
 @Data
 @Entity
+//@AllArgsConstructor
 public class BrandPojo {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)

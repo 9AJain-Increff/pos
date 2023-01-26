@@ -11,10 +11,10 @@
 <div class="container pt-3">
     <!-- Top row with form-->
     <div class="row align-content-between">
-        <div class="col-8">
+        <div class="col-10">
             <h3>Orders</h3>
         </div>
-        <div class="col-3">
+        <div class="col-2 justify-content-end p-0 row">
             <button type="button" class="btn btn-primary" id="create-order">Create New</button>
         </div>
     </div>
@@ -78,6 +78,19 @@
                                 />
                             </div>
                         </div>
+                        <div class="form-group">
+                            <label for="inputSellingPrice" class="col-sm-2 col-form-label">Selling Price</label>
+                            <div class="col-sm-12">
+                                <input
+                                        type="number"
+                                        class="form-control"
+                                        name="price"
+                                        id="inputSellingPrice"
+                                        min="1"
+                                        placeholder="Enter Selling Price"
+                                />
+                            </div>
+                        </div>
                         <input type="hidden" name="id">
                         <div class="col-sm-12" style="text-align:right;"><button class="btn btn-outline-primary px-4" type="button" id="add-order-item">Add</button></div>
 
@@ -104,7 +117,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-primary" id="place-order-btn">Update Order</button>
+                        <button type="button" class="btn btn-primary" id="place-order-btn">Add Order</button>
                     </div>
                 </div>
             </div>
@@ -148,6 +161,19 @@
                                         id="inputNewQuantity"
                                         min="1"
                                         placeholder="Enter Quantity"
+                                />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="inputNewSellingPrice" class="col-sm-2 col-form-label">Selling Price</label>
+                            <div class="col-sm-12">
+                                <input
+                                        type="number"
+                                        class="form-control"
+                                        name="price"
+                                        id="inputNewSellingPrice"
+                                        min="1"
+                                        placeholder="Enter Selling Price"
                                 />
                             </div>
                         </div>

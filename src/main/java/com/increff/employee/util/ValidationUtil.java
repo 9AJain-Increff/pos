@@ -16,7 +16,7 @@ public class ValidationUtil {
     }
 
     public static boolean isNegative(Float number) {
-        return number == null || number < 0;
+        return number == null || number <= 0;
     }
 
     public static boolean isNegative(Integer number) {

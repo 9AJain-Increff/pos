@@ -54,12 +54,12 @@
     <!--        </div>-->
     <!--    </div>-->
     <div class="row align-content-between">
-        <div class="col-8">
+        <div class="col-10">
             <h3>Products</h3>
         </div>
-        <div class="col-3">
+        <div class="col-2 justify-content-end p-0 row">
+            <button type="button" class="btn px-3 btn-primary mr-2" id="upload-data" th:if="${info.getRole() == 'supervisor'}">Upload</button>
             <button type="button" class="btn btn-primary" id="create-new-product">Add</button>
-            <button type="button" class="btn btn-primary" id="upload-data">Upload</button>
 <!--            <button type="button" class="btn btn-primary" id="refresh-data">Refresh</button>-->
         </div>
     </div>
@@ -107,6 +107,15 @@
                     <form id="product-add-form">
                         <div class="form-group row">
                             <div class="col-sm-3">
+                                <label for="editBarcode" class="col-sm-2 col-form-label">Barcode</label>
+                            </div>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" name="barcode" id="addBarcode"
+                                       placeholder="enter Barcode">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-sm-3">
                                 <label for="editName" class="col-sm-2 col-form-label">Name</label>
                             </div>
                             <div class="col-sm-9">
@@ -145,15 +154,6 @@
                             <div class="col-sm-9">
                                 <input type="text" class="form-control" name="price" id="addPrice"
                                        placeholder="enter price">
-                            </div>
-                        </div>
-                        <div class="form-group row">
-                            <div class="col-sm-3">
-                                <label for="editBarcode" class="col-sm-2 col-form-label">Barcode</label>
-                            </div>
-                            <div class="col-sm-9">
-                                <input type="text" class="form-control" name="barcode" id="addBarcode"
-                                       placeholder="enter Barcode">
                             </div>
                         </div>
                         <input type="hidden" name="id">

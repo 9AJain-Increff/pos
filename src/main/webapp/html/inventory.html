@@ -43,8 +43,8 @@
         </div>
 
         <div class="col-2 justify-content-end p-0 row">
-            <button type="button" class="btn px-3 btn-primary mr-2" id="create-new-inventory">Add</button>
-            <button type="button" class="btn btn-primary" id="upload-data">Upload</button>
+            <button type="button" class="btn px-3 btn-primary mr-2" id="upload-data" th:if="${info.getRole() == 'supervisor'}">Upload</button>
+            <button type="button" class="btn btn-primary" id="create-new-inventory">Add</button>
             <!--            <button type="button" class="btn btn-primary" id="refresh-data">Refresh</button>-->
         </div>
 <!--        <div class="col-3">-->

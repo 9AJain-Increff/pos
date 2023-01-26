@@ -128,7 +128,7 @@ public class OrderDto {
         for (int i = 0; i < orderItemForm.size(); i++) {
             ProductPojo product = productService.getProductByBarcode(orderItemForm.get(i).getBarcode());
             OrderItemPojo pojo = convertToOrderItemPojo(
-                    productPojoList.get(i).getPrice(),
+                    orderItemForm.get(i).getPrice(),
                     orderItemForm.get(i),
                     newOrder.getId(),
                     product.getId()

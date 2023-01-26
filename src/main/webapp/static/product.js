@@ -160,7 +160,7 @@ console.log('ankur jinfo')
 	for(var i in data){
 		const e = data[i];
 		console.log(e.barcode);
-		const editBtnId = 'edit-product-'+e.barcode
+		const editBtnId = 'edit-product-'+e.id
 //		var buttonHtml = '<button onclick="deleteProduct(' + "'" + e.barcode + "'" +')">delete</button>'
 		var buttonHtml = `<button class="btn btn-outline-dark" id=${editBtnId}>Edit</button>`
 		var row = '<tr>'

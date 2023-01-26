@@ -55,12 +55,14 @@ function getCureentOrderItem() {
   return {
     barcode: $('#inputBarcode').val(),
     quantity: Number.parseInt($('#inputQuantity').val()),
+    price: Number.parseInt($('#inputSellingPrice').val()),
   };
 }
 function getCureentEditOrderItem() {
   return {
     barcode: $('#inputNewBarcode').val(),
     quantity: Number.parseInt($('#inputNewQuantity').val()),
+    price: Number.parseInt($('#inputNewSellingPrice').val()),
   };
 }
 
@@ -86,7 +88,11 @@ if (item.quantity <= 0  ) {
     $.notify('Quantity must be positve!', 'error');
     return true;
   }
-if (!item.quantity ) {
+  if (item.price < 0  ) {
+      $.notify('Selling Price must be positve!', 'error');
+      return true;
+    }
+if (!item.quantity ||  !item.price) {
     $.notify('Quantity cannot be empty!', 'error');
     return true;
   }
@@ -97,17 +103,8 @@ if (!item.quantity ) {
 function addOrderItem() {
   const item = getCureentOrderItem();
   if(isInvalidInput(item))return;
-  getProductByBarcode(item.barcode, (product) => {
-    addItem({
-      barcode: product.barcode,
-      name: product.name,
-      price: product.price,
-      quantity: item.quantity,
-    });
-    console.log('ankur jiannnnnn', orderItems);
-    displayCreateOrderItems(orderItems);
-    resetAddItemForm();
-  });
+  checkInventoryByBarcode(item, displayCreateOrderItems,resetAddItemForm);
+
 }
 
 function onQuantityChanged(barcode) {
@@ -517,19 +514,11 @@ function editOrder() {
 
 function editOrderItem() {
   const item = getCureentEditOrderItem();
-  if(!item.barcode ){
-         $.notify('barcode cannot be empty!', 'error');
-         return;
-  }
-  if(!item.quantity){
-           $.notify('quantity cannot be empty!', 'error');
-           return;
-    }
-    checkInventoryByBarcode(item);
-
+  if(isInvalidInput(item))return;
+  checkInventoryByBarcode(item, displayEditOrderItems,resetEditItemForm);
 }
 
-function checkInventoryByBarcode(item){
+function checkInventoryByBarcode(item, displayCallBack, resetCallBack){
 const url = getInventoryUrl() + '/' + item.barcode;
   console.log(url);
   $.ajax({
@@ -541,12 +530,12 @@ const url = getInventoryUrl() + '/' + item.barcode;
                     addItem({
                       barcode: product.barcode,
                       name: product.name,
-                      price: product.price,
+                      price: item.price,
                       quantity: item.quantity,
                     });
 
-                    displayEditOrderItems(orderItems);
-                    resetEditItemForm();
+                    displayCallBack(orderItems);
+                    resetCallBack();
         })
         }
         else{

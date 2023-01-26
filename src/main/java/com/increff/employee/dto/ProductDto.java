@@ -1,7 +1,6 @@
 package com.increff.employee.dto;
 
 
-import com.increff.employee.model.BrandForm;
 import com.increff.employee.model.ProductData;
 import com.increff.employee.model.ProductForm;
 import com.increff.employee.pojo.BrandPojo;
@@ -15,9 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.transaction.Transactional;
-import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -66,7 +63,7 @@ public class ProductDto {
     public void addProduct(ProductForm form) throws ApiException {
         validateFormData(form);
         normalizeFormData(form);
-        BrandPojo brand =  brandService.getBrandIdByNameAndCategory(form.getBrandName(), form.getBrandCategory());
+        BrandPojo brand =  brandService.checkBrandExist(form.getBrandName(), form.getBrandCategory());
         ProductPojo productPojo = convertToProductPojo(form, brand.getId());
         InventoryPojo inventoryPojo = new InventoryPojo();
 
@@ -84,7 +81,7 @@ public class ProductDto {
     public void update(Integer id, ProductForm form) throws ApiException  {
         validateFormData(form);
         normalizeFormData(form);
-        BrandPojo brand =  brandService.getBrandIdByNameAndCategory(form.getBrandName(), form.getBrandCategory());
+        BrandPojo brand =  brandService.checkBrandExist(form.getBrandName(), form.getBrandCategory());
         ProductPojo product = productService.getProductById(id, form.getBarcode());
         ProductPojo productPojo = convertToProductPojo(form, brand.getId());
         productService.update(productPojo,  id, brand);

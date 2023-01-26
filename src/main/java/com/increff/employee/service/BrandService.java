@@ -7,7 +7,6 @@ import javax.transaction.Transactional;
 
 import com.increff.employee.dao.BrandDao;
 import com.increff.employee.pojo.BrandPojo;
-import com.increff.employee.pojo.ProductPojo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -53,6 +52,10 @@ public class BrandService {
         BrandPojo exist = dao.getBrandById(id);
         if(exist == null)
             throw new ApiException("Brand with given ID does not exit, id: " + id);
+        BrandPojo brand = getBrandByNameAndCategory(p.getName(), p.getCategory());
+        if(brand != null && !brand.getId().equals(exist.getId())){
+            throw new ApiException("Brand with given name and category already exist");
+        }
         else {
             exist.setName(p.getName());
             exist.setCategory(p.getCategory());
@@ -60,7 +63,7 @@ public class BrandService {
     }
 
 
-    public BrandPojo getBrandIdByNameAndCategory(String brandName, String brandCategory) throws ApiException {
+    public BrandPojo checkBrandExist(String brandName, String brandCategory) throws ApiException {
         normalize(brandName);
         normalize(brandCategory);
         BrandPojo brand = dao.getBrand(brandName, brandCategory);
@@ -68,6 +71,11 @@ public class BrandService {
             throw new ApiException("Brand with given name and category does not exit " );
         return brand;
     }
+    public BrandPojo getBrandByNameAndCategory(String brandName, String brandCategory) throws ApiException {
+        BrandPojo brand = dao.getBrand(brandName, brandCategory);
+        return brand;
+    }
+
 
 
     public List<BrandPojo> getBrandsByBrandId(List<Integer> braneIdList) throws ApiException {
