@@ -11,6 +11,8 @@ import com.increff.employee.pojo.ProductPojo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import static com.increff.employee.util.Normalization.normalize;
+
 @Service
 public class BrandService {
 
@@ -20,6 +22,7 @@ public class BrandService {
 
     @Transactional(rollbackOn = ApiException.class)
     public BrandPojo addBrand(BrandPojo brandPojo) throws ApiException {
+        normalization(brandPojo);
         BrandPojo brand = dao.getBrand(brandPojo.getName(),brandPojo.getCategory());
         if(brand == null) {
             dao.addBrand(brandPojo);
@@ -46,6 +49,7 @@ public class BrandService {
 
     @Transactional(rollbackOn  = ApiException.class)
     public void update(int id, BrandPojo p) throws ApiException {
+        normalization(p);
         BrandPojo exist = dao.getBrandById(id);
         if(exist == null)
             throw new ApiException("Brand with given ID does not exit, id: " + id);
@@ -57,20 +61,14 @@ public class BrandService {
 
 
     public BrandPojo getBrandIdByNameAndCategory(String brandName, String brandCategory) throws ApiException {
-
+        normalize(brandName);
+        normalize(brandCategory);
         BrandPojo brand = dao.getBrand(brandName, brandCategory);
         if(brand == null)
             throw new ApiException("Brand with given name and category does not exit " );
         return brand;
     }
 
-    public List<BrandPojo> getBrandsByProducts(List<ProductPojo> products) throws ApiException {
-        List<BrandPojo> brands = new ArrayList<>();
-        for(ProductPojo product : products){
-            brands.add((getAndCheckBrandById(product.getBrandId())));
-        }
-        return brands;
-    }
 
     public List<BrandPojo> getBrandsByBrandId(List<Integer> braneIdList) throws ApiException {
         List<BrandPojo> brands = new ArrayList<>();
@@ -80,8 +78,10 @@ public class BrandService {
         return brands;
     }
 
-
-
+    private void normalization(BrandPojo brand){
+        normalize(brand.getName());
+        normalize(brand.getCategory());
+    }
 
 
 }

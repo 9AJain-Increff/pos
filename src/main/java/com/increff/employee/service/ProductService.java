@@ -10,11 +10,14 @@ import javax.transaction.Transactional;
 import com.increff.employee.dao.ProductDao;
 import com.increff.employee.pojo.BrandPojo;
 import com.increff.employee.pojo.ProductPojo;
-import org.jetbrains.annotations.NotNull;
+
+import com.sun.istack.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.increff.employee.util.StringUtil;
+
+import static com.increff.employee.util.Normalization.normalize;
 
 @Service
 public class ProductService {
@@ -27,6 +30,7 @@ public class ProductService {
 
     @Transactional(rollbackOn = ApiException.class)
     public void addProduct(@NotNull ProductPojo product) throws ApiException {
+        normalization(product);
         checkBarcode(product.getBarcode());
         dao.add(product);
     }
@@ -38,6 +42,7 @@ public class ProductService {
 
     @Transactional(rollbackOn  = ApiException.class)
     public void update(ProductPojo product,  Integer id, BrandPojo brand) throws ApiException {
+        normalization(product);
         ProductPojo exist = getProductById(id, product.getBarcode());
         exist.setName(product.getName());
         exist.setPrice(product.getPrice());
@@ -46,6 +51,7 @@ public class ProductService {
 
 
     public ProductPojo getProductByBarcode(String barcode) throws ApiException {
+        normalize(barcode);
         ProductPojo p = dao.getProductByBarcode(barcode);
         if (p == null) {
             throw new ApiException("Product with given barcode does not exit, id: " + barcode);
@@ -61,6 +67,7 @@ public class ProductService {
     }
 
     public ProductPojo getProductById(Integer id, String barcode) throws ApiException {
+        normalize(barcode);
         ProductPojo p = dao.getProductById(id);
         if (p == null) {
             throw new ApiException("Product with given id does not exit, id: " + id);
@@ -72,6 +79,7 @@ public class ProductService {
     }
 
     public ProductPojo  getAndCheckProductByBarcode(String barcode) throws ApiException {
+        normalize(barcode);
         ProductPojo p = dao.getProductByBarcode(barcode);
         if (p == null) {
             throw new ApiException("Product with given barcode does not exit, barcode: " + barcode);
@@ -81,7 +89,7 @@ public class ProductService {
 
 
     public ProductPojo checkBarcode(String barcode) throws ApiException {
-
+        normalize(barcode);
         ProductPojo p = dao.getProductByBarcode(barcode);
         if(p != null){
             throw new ApiException(("barcode already exist "));
@@ -102,7 +110,11 @@ public class ProductService {
     }
 
 
-    public List<ProductPojo> getProducts(List<String> barcodes ) {
+    public List<ProductPojo> getProducts(List<String> b) {
+        List<String> barcodes = new ArrayList<>();
+        for (String barcode: b){
+            barcodes.add(normalize(barcode));
+        }
         List<ProductPojo> products = new ArrayList<>();
         for(String barcode: barcodes){
             products.add(dao.getProductByBarcode(barcode));
@@ -112,8 +124,10 @@ public class ProductService {
 
 
 
-    protected static void normalize(ProductPojo p) {
-        p.setName(StringUtil.toLowerCase(p.getName()));
+    private  void normalization(ProductPojo p) {
+        normalize(p.getBarcode());
+        normalize(p.getName());
+        normalize(p.getPrice());
     }
 
 
