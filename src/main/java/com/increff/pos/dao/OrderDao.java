@@ -32,44 +32,24 @@ public class OrderDao extends AbstractDao {
     private static String select_order_by_name = "select p from OrderPojo p where name=:name";
     private static String select_order_by_id = "select p from OrderPojo p where id=:id";
     private static String select_all_orders = "select p from OrderPojo p";
-
-    // TODO: 29/01/23 is this a valid sql ?
-    private static String select_order_by_name_and_category = "select p from OrderPojo p where name=:name AND category=:category";
     private static String get_between_date = "select p from OrderPojo p where p.createdOn  BETWEEN :start and :end";
 
-
-    // TODO: 29/01/23 unnecessary throwing of an exception
-    public OrderPojo insert(OrderPojo p) throws ApiException {
+    public OrderPojo insert(OrderPojo p)  {
         em().persist(p);
         return p;
     }
 
-    // TODO: 29/01/23 remove
-    public int delete(int id) {
-        Query query = em().createQuery(delete_order_by_id);
-        query.setParameter("id", id);
-        return query.executeUpdate();
-    }
-
-    // TODO: 29/01/23 remove
-    public OrderPojo checkOrderExists(String barcode) {
-        TypedQuery<OrderPojo> query = getQuery(select_order_by_barcode, OrderPojo.class);
-        query.setParameter("barcode",barcode);
-        OrderPojo p = getSingleBrand(query);
-        return p;
-    }
-
-    // TODO: 29/01/23 is this a valid method and is it working?
-    public OrderPojo select(String barcode) {
-        TypedQuery<OrderPojo> query = getQuery(select_order_by_barcode, OrderPojo.class);
-        query.setParameter("barcode", barcode);
+    public OrderPojo selectOrderById(Integer orderId) {
+        TypedQuery<OrderPojo> query = getQuery(select_order_by_id, OrderPojo.class);
+        query.setParameter("id", orderId);
         return getSingleBrand(query);
     }
 
     public OrderPojo getOrderById(Integer id) {
         TypedQuery<OrderPojo> query = getQuery(select_order_by_id, OrderPojo.class);
         query.setParameter("id", id);
-        // TODO: 29/01/23 why are you calling getSingleBrand?
+        OrderPojo o = getSingleBrand(query);
+        return o;
         return getSingleBrand(query);
     }
 
@@ -89,29 +69,16 @@ public class OrderDao extends AbstractDao {
     }
 
 
-    // TODO: 29/01/23 is this a valid method and is it working?
-    public OrderPojo select(String name, String category) {
-        TypedQuery<OrderPojo> query = getQuery(select_order_by_name_and_category, OrderPojo.class);
-        query.setParameter("name", name);
-        query.setParameter("category", category);
-        // TODO: 29/01/23 why are you calling getSingleBrand?
-        return getSingleBrand(query);
-    }
-
     public List<OrderPojo> selectAll() {
         TypedQuery<OrderPojo> query = getQuery(select_all_orders, OrderPojo.class);
-
         return query.getResultList();
     }
 
     public List<OrderPojo> getOrdersForReport(LocalDateTime start, LocalDateTime end){
-
         TypedQuery<OrderPojo> query = getQuery(get_between_date, OrderPojo.class);
         query.setParameter("start", start);
         query.setParameter("end", end);
         return query.getResultList();
-
     }
-
 
 }

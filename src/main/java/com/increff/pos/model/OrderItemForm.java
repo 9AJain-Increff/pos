@@ -1,14 +1,17 @@
 package com.increff.pos.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class OrderItemForm {
 
     private String barcode;
     private Integer quantity;
-    private Integer orderId;
-    private  Float price;
-    private String name;
+    private  Float sellingPrice;
+
 
 }

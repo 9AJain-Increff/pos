@@ -59,10 +59,6 @@ public class BrandDao extends AbstractDao {
 
         return query.getResultList();
     }
-    @Transactional
-    public void update(BrandPojo p) {
-
-    }
 
 
 

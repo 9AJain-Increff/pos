@@ -30,18 +30,10 @@ public class InventoryService {
         }
     }
 
-    // TODO: 29/01/23 remove
-//    @Transactional
-////    public void delete(String barcode) {
-////        dao.delete(barcode);
-////    }
-
-
-
     public InventoryPojo getAndCheckInventoryByProductId(Integer productId) throws ApiException {
         InventoryPojo p = inventoryDao.selectInventoryByProductId(productId);
         if (p == null) {
-            throw new ApiException("Inventory with given barcode does not exist, id: " + productId);
+            throw new ApiException("Inventory with given barcode does not exit, id: " + productId);
         }
         return p;
     }

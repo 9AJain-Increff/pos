@@ -51,7 +51,7 @@ public class InventoryApiController {
     // TODO: 29/01/23 use id instead of barcode in the path
     @ApiOperation(value = "Edit a Inventory")
     @RequestMapping(path = "/{barcode}", method = RequestMethod.PUT)
-    public void editInventory(@PathVariable String barcode, @RequestBody InventoryForm form) throws ApiException {
+    public void updateInventory(@PathVariable String barcode, @RequestBody InventoryForm form) throws ApiException {
         inventoryDto.updateInventory(form);
     }
 

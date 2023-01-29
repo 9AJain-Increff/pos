@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.transaction.Transactional;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -32,11 +34,11 @@ public class OrderDto {
     @Autowired
     private OrderItemService orderItemService;
 
-    // TODO: 29/01/23 dont depend on index 
-    public List<OrderItemData> getOrderById(int id) throws ApiException {
+    // TODO: 29/01/23 dont depend on index
+    public List<OrderItemData> getOrderItemsById(Integer orderId) throws ApiException {
 
-        orderService.checkOrderExist(id);
-        List<OrderItemPojo> orderItemPojoList = orderItemService.getOrderItemsById(id);
+        orderService.checkOrderExist(orderId);
+        List<OrderItemPojo> orderItemPojoList = orderItemService.getOrderItemsById(orderId);
         List<String> barcodes = getBarcodes(orderItemPojoList);
         List<ProductPojo> productPojoList = getProductList(barcodes);
         List<OrderItemData> orderItemDataList = new ArrayList<>();
@@ -45,12 +47,12 @@ public class OrderDto {
             ProductPojo product= productPojoList.get(index);
 
             OrderItemPojo orderItem = orderItemPojoList.get(index);
-            orderItemDataList.add(convertToOrderItemData(orderItem, product));
+            orderItemDataList.add(convertToOrderItemData(orderItem, product, orderId));
         }
         return (orderItemDataList);
     }
 
-    // TODO: 29/01/23 can use get by order id method instead of having a sep method 
+    // TODO: 29/01/23 can use get by order id method instead of having a sep method
     public String getOrderPdf(Integer id) throws ApiException {
         return orderService.getPdfUrl(id);
     }
@@ -83,7 +85,7 @@ public class OrderDto {
         }
         return barcodes;
     }
-    
+
     // TODO: 29/01/23 can be placed inside inventory api and use ids
     public List<InventoryPojo> getInventoryPojo(List<String> barcodes) throws ApiException {
         List<InventoryPojo> inventoryPojoList = new ArrayList<>();
@@ -104,7 +106,7 @@ public class OrderDto {
         return productPojoList;
     }
 
-    // TODO: 29/01/23 can be placed inside inventory api 
+    // TODO: 29/01/23 can be placed inside inventory api
     public void updateInventory(List<InventoryPojo> inventoryPojoList) throws ApiException {
         for (InventoryPojo inventoryPojo : inventoryPojoList) {
             inventoryService.update(inventoryPojo);
@@ -114,16 +116,17 @@ public class OrderDto {
         for (OrderItemPojo orderItemPojo : addedOrderItems) {
             ProductPojo product = productService.getProductById(orderItemPojo.getProductId());
             orderItemPojo.setProductId(product.getId());
-            orderItemService.addOrderItem(orderItemPojo);
         }
+            orderItemService.addOrderItem(addedOrderItems);
+
     }
 
     // TODO: 29/01/23 remove unused variables
-    // TODO: 29/01/23 try to reduce the DB calls 
+    // TODO: 29/01/23 try to reduce the DB calls
     @Transactional(rollbackOn = ApiException.class)
-    public List<InvoiceData> addOrder(List<OrderItemForm> orderItemForm) throws ApiException {
+    public OrderPojo addOrder(List<OrderItemForm> orderItemForm) throws ApiException {
         for (OrderItemForm orderItem : orderItemForm) {
-            // TODO: 29/01/23 normlise should be in service 
+            // TODO: 29/01/23 normlise should be in service
             normalizeFormData(orderItem);
             validateFormData(orderItem);
         }
@@ -132,16 +135,16 @@ public class OrderDto {
                 .collect(Collectors.toList());
 
         List<InventoryPojo> inventoryPojoList = getInventoryPojo(barcodes);
-        // TODO: 29/01/23 why? 
+        // TODO: 29/01/23 why?
         List<ProductPojo> productPojoList = getProductList(barcodes);
-        OrderPojo newOrder = orderService.createNewOrder();
-
+        LocalDateTime date = LocalDateTime.now(ZoneOffset.UTC);
+        OrderPojo newOrder = orderService.createNewOrder(convertToOrderPojo(date));
         List<OrderItemPojo> orderItemPojoList = new ArrayList<>();
         for (int i = 0; i < orderItemForm.size(); i++) {
             ProductPojo product = productService.getProductByBarcode(orderItemForm.get(i).getBarcode());
             // TODO: 29/01/23 where are you validating selling price? Place it in productService
             OrderItemPojo pojo = convertToOrderItemPojo(
-                    orderItemForm.get(i).getPrice(),
+                    orderItemForm.get(i).getSellingPrice(),
                     orderItemForm.get(i),
                     newOrder.getId(),
                     product.getId()
@@ -152,20 +155,9 @@ public class OrderDto {
         validateInventory(inventoryPojoList, orderItemPojoList);
         updateInventory(inventoryPojoList);
         addOrderItems(orderItemPojoList);
-        List<InvoiceData> invoiceData = new ArrayList<>();
-        for (int i = 0; i < orderItemForm.size(); i++) {
-            InvoiceData data = convertToInvoiceData(
-                    orderItemForm.get(i),
-                    newOrder.getId()
-            );
-            invoiceData.add(data);
-        }
-        return invoiceData;
-    }
+        return newOrder;
 
-//    public void deleting(int id) throws ApiException {
-//        orderItemService.delete(id);
-//    }
+    }
 
     public void addNewlyUpdatedOrderItems(List<OrderItemPojo> addedOrderItems) throws ApiException {
         List<String> barcodes = getBarcodes(addedOrderItems);
@@ -221,51 +213,46 @@ public class OrderDto {
 
     @Transactional(rollbackOn = ApiException.class)
     // TODO: 29/01/23 reduce db calls
-    public List<InvoiceData> updateOrder(int id, @NotNull List<OrderItemForm> orderItemForms) throws ApiException {
+    public OrderPojo updateOrder(Integer orderId, @NotNull List<OrderItemForm> orderItemForms) throws ApiException {
         if (orderItemForms.isEmpty()) {
             throw new ApiException("Add a Order Item");
         }
         List<OrderItemPojo> updatedOrder = new ArrayList<>();
         for (OrderItemForm orderItem : orderItemForms) {
-            // TODO: 29/01/23 remove normalise 
+            // TODO: 29/01/23 remove normalise
             normalizeFormData(orderItem);
             validateFormData(orderItem);
             ProductPojo product =productService.getProductByBarcode(orderItem.getBarcode());
-            updatedOrder.add(convertToOrderItemPojo(orderItem.getPrice(), orderItem, id, product.getId()));
+            updatedOrder.add(convertToOrderItemPojo(orderItem.getSellingPrice(), orderItem, orderId, product.getId()));
         }
 
 
         Map<Integer, OrderItemPojo> mappingFormData = new HashMap<>();
 
-        List<OrderItemPojo> oldOrder = orderItemService.getOrderItemsById(id);
-        Map<Integer, OrderItemPojo> productToToOrderItemMapping = new HashMap<>();
+        List<OrderItemPojo> oldOrder = orderItemService.getOrderItemsById(orderId);
+        Map<Integer, OrderItemPojo> productIdToOrderItemMapping = new HashMap<>();
         // TODO: 29/01/23 rename variables properly
         for (OrderItemPojo temp : updatedOrder) {
             ProductPojo product = productService.getProductById(temp.getProductId());
-            productToToOrderItemMapping.put(product.getId(), temp);
+            productIdToOrderItemMapping.put(product.getId(), temp);
             mappingFormData.put(product.getId(), temp);
         }
 
         // TODO: 29/01/23 rename classes and variables properly
         GetList getlist = new GetList();
-        getlist.updatesList(oldOrder, mappingFormData, id);
+        getlist.updatesList(oldOrder, mappingFormData, orderId);
         List<OrderItemPojo> updatedOrderItems = getlist.getToUpdate();
         List<OrderItemPojo> deletedOrderItems = getlist.getToDelete();
         List<OrderItemPojo> addedOrderItems = getlist.getToAdd();
 
         addNewlyUpdatedOrderItems(addedOrderItems);
-        updateOrderItems(updatedOrderItems, productToToOrderItemMapping);
+        updateOrderItems(updatedOrderItems, productIdToOrderItemMapping);
         deleteOrderItems(deletedOrderItems);
-        List<InvoiceData> invoiceData = new ArrayList<>();
-        for (OrderItemForm orderItemForm : orderItemForms) {
-            InvoiceData invoice = convertToInvoiceData(orderItemForm, id);
-            invoiceData.add(invoice);
-        }
-        return invoiceData;
+        return orderService.getOrderByOrderId(orderId);
     }
 
 
-    public List<OrderData> getAllOrder() {
+    public List<OrderData> getAllOrders() {
         List<OrderPojo> orders = orderService.getAllOrders();
         List<OrderData> ordersData = new ArrayList<OrderData>();
         for (OrderPojo p : orders) {
@@ -275,6 +262,20 @@ public class OrderDto {
     }
 
     // TODO: 29/01/23 why sep method? you can directly call this one liner from the invocation place
+    public List<InvoiceData> getInvoiceData(List<OrderItemForm> form, OrderPojo order) throws ApiException {
+        List<InvoiceData> invoiceData = new ArrayList<>();
+        for (int i = 0; i < form.size(); i++) {
+            ProductPojo product = productService.getProductByBarcode(form.get(i).getBarcode());
+            InvoiceData data = convertToInvoiceData(
+                    form.get(i),
+                    product,
+                    order.getId()
+            );
+            invoiceData.add(data);
+        }
+        return invoiceData;
+    }
+
     public void  addPdfURL(Integer id){
         orderService.addPdfURL(id);
     }
@@ -286,7 +287,7 @@ public class OrderDto {
             throw new ApiException("brand cannot be empty");
         }
 
-        if (isNegative(form.getPrice())) {
+        if (isNegative(form.getSellingPrice())) {
             throw new ApiException("enter a valid price");
         }
         if (isNegative(form.getQuantity())) {
@@ -296,7 +297,6 @@ public class OrderDto {
     }
 
     private void normalizeFormData(OrderItemForm form) {
-//        form.setName(normalize(form.getName()));
         form.setBarcode(normalize(form.getBarcode()));
     }
 

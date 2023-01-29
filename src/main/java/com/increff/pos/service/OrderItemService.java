@@ -18,11 +18,13 @@ public class OrderItemService {
     private OrderItemDao dao;
 
     @Transactional(rollbackOn = ApiException.class)
-    public void addOrderItem(OrderItemPojo p) throws ApiException {
+    public void addOrderItem(List<OrderItemPojo> p) throws ApiException {
+        for (OrderItemPojo orderItemPojo : p) {
+            // TODO: 29/01/23 what is the use of this check? If yes, how are you checking?
+            OrderItemPojo check = dao.checkOrderItemExists(orderItemPojo.getProductId());
+            dao.insert(orderItemPojo);
+        }
 
-        // TODO: 29/01/23 what is the use of this check? If yes, how are you checking?
-        OrderItemPojo check = dao.checkOrderItemExists(p.getProductId());
-        dao.insert(p);
     }
 
     @Transactional
@@ -33,9 +35,8 @@ public class OrderItemService {
     }
 
 
-    @Transactional(rollbackOn = ApiException.class)
     // TODO: 29/01/23 why apiException?
-    public List<OrderItemPojo> getOrderItemsById(int id) throws ApiException {
+    public List<OrderItemPojo> getOrderItemsById(int id)  {
         return dao.select(id);
     }
 
@@ -50,14 +51,14 @@ public class OrderItemService {
         // TODO: 29/01/23 remove system.out.println
         OrderItemPojo ex = getOrderItem(p.getId());
         System.out.println(p.getQuantity());
-
+        ex.setSellingPrice(p.getSellingPrice());
         ex.setQuantity(p.getQuantity());
 
     }
 
     // TODO: 29/01/23 why apiException?
     public OrderItemPojo getOrderItem(int id) throws ApiException {
-        OrderItemPojo p = dao.orderItem(id);
+        OrderItemPojo p = dao.getOrderItem(id);
 
         return p;
     }

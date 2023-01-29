@@ -1,12 +1,17 @@
 package com.increff.pos.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
-// TODO: 29/01/23 remove the comments
-//@AllArgsConstructor
-public class InventoryData extends InventoryForm{
+@AllArgsConstructor
+@NoArgsConstructor
+public class InventoryData {
+    private Integer id;
+    private String barcode;
     private String productName;
-    private int id;
+    private Integer quantity;
+
 
 }

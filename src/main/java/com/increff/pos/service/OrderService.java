@@ -25,32 +25,36 @@ public class OrderService {
     public OrderPojo addOrder(OrderPojo p) throws ApiException {
         return orderDao.insert(p);
     }
-//    @Transactional
-//    public void delete(int id) {
-//        dao.delete(id);
-//    }
+
+    public OrderPojo getOrderByOrderId(Integer orderId) {
+        return orderDao.selectOrderById(orderId);
+    }
 
 
-
-
-    @Transactional
     public List<OrderPojo> getAllOrders() {
         return orderDao.selectAll();
     }
 
-    // TODO: 29/01/23 what is the diff between addOrder and  createNewOrder?
-    public OrderPojo createNewOrder() throws ApiException {
-        LocalDateTime date = LocalDateTime.now(ZoneOffset.UTC);
-        // TODO: 29/01/23 why convert is there in service? It should be there in Dto
-        OrderPojo newOrder = convertToOrderPojo(date);
+    public OrderPojo createNewOrder(OrderPojo newOrder) throws ApiException {
+
         return orderDao.insert(newOrder);
     }
 
-    @Transactional(rollbackOn  = ApiException.class)
-    public void addPdfURL(Integer id){
-        OrderPojo order = orderDao.getOrderById(id);
+    @Transactional(rollbackOn = ApiException.class)
+    public OrderPojo updateOrder(OrderPojo order) throws ApiException {
+        OrderPojo o = orderDao.getOrderById(order.getId());
+        if (o == null)
+            throw new ApiException("order id doesn't exist");
+        o.setCreatedOn(order.getCreatedOn());
+        o.setOrderURL(order.getOrderURL());
+        return o;
+    }
+
+    @Transactional(rollbackOn = ApiException.class)
+    public void addPdfURL(Integer id) {
+        OrderPojo order = orderDao. getOrderById(id);
         // TODO: 29/01/23 move this to properties file
-        order.setOrderURL("/home/ankurjain/Downloads/employee-spring-full-master/order"+id+".pdf");
+        order.setOrderURL("/home/ankurjain/Downloads/employee-spring-full-master/order" + id + ".pdf");
     }
 
 
@@ -61,10 +65,9 @@ public class OrderService {
     }
 
 
-
     @Transactional
     public OrderPojo checkOrderExist(int id) throws ApiException {
-        OrderPojo p = orderDao.select(id);
+        OrderPojo p = orderDao.getOrderById(id);
         if (p == null) {
             throw new ApiException("Order with given ID does not exit, id: " + id);
         }
@@ -80,29 +83,21 @@ public class OrderService {
     }
 
 
-    public List<OrderPojo> getOrdersBetweenTime(Date start, Date end){
+    public List<OrderPojo> getOrdersBetweenTime(Date start, Date end) {
         // TODO: 29/01/23 rename s,e
-        LocalDateTime s,e;
-        if(start == null) {
+        LocalDateTime s, e;
+        if (start == null) {
             s = LocalDateTime.MIN;
-        }
-        else{
+        } else {
             s = convertToLocalDateViaInstant(start);
         }
-        if(end == null){
+        if (end == null) {
             e = LocalDateTime.now(ZoneOffset.UTC);
-        }
-        else {
+        } else {
             e = convertToLocalDateViaInstant(end);
         }
         return orderDao.getOrdersForReport(s, e);
     }
-
-
-
-
-
-
 
 
 }
