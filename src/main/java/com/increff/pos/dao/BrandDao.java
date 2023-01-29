@@ -11,8 +11,15 @@ import com.increff.pos.service.ApiException;
 import org.springframework.stereotype.Repository;
 
 @Repository
+/**
+ * Todo Missed follwoing points which are mentioned in the document
+ * https://increff.atlassian.net/wiki/spaces/TB/pages/312377489/Java+Class+layering+and+Structure#Purpose.7
+ * No checked exception should be thrown from DAO Layer
+ * At the class level, one should have '@Transactional' instead of the method level
+ */
 public class BrandDao extends AbstractDao {
 
+    // TODO: 29/01/23 make them final and also constants should be declared in uppercase
     private static String delete_brand_by_id = "delete from BrandPojo p where id=:id";
     private static String select_brand_by_id = "select p from BrandPojo p where id=:id";
     private static String select_all_brands = "select p from BrandPojo p";
@@ -20,11 +27,12 @@ public class BrandDao extends AbstractDao {
     private static String select_brand_by_name_and_category = "select p from BrandPojo p where name=:name AND category=:category";
 
 
-
+    // TODO: 29/01/23 remove unnecessary throwing of an Exception
     public void addBrand(BrandPojo p) throws ApiException {
             em().persist(p);
     }
 
+    // TODO: 29/01/23 remove unnecessary methods
     public int delete(int id) {
         Query query = em().createQuery(delete_brand_by_id);
         query.setParameter("id", id);

@@ -1,5 +1,6 @@
 package com.increff.pos.model;
 
+// TODO: 29/01/23 use lombok annotations
 public class InventoryReportData {
     private String brandName;
     private String brandCategory;

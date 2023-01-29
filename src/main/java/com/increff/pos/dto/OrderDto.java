@@ -32,6 +32,7 @@ public class OrderDto {
     @Autowired
     private OrderItemService orderItemService;
 
+    // TODO: 29/01/23 dont depend on index 
     public List<OrderItemData> getOrderById(int id) throws ApiException {
 
         orderService.checkOrderExist(id);
@@ -49,10 +50,12 @@ public class OrderDto {
         return (orderItemDataList);
     }
 
+    // TODO: 29/01/23 can use get by order id method instead of having a sep method 
     public String getOrderPdf(Integer id) throws ApiException {
         return orderService.getPdfUrl(id);
     }
 
+    // TODO: 29/01/23 dont depend on list index. Iterate over the items and do the required things
     private void validateInventory(
             List<InventoryPojo> inventoryPojoList,
             List<OrderItemPojo> orderItemPojoList) throws ApiException {
@@ -80,6 +83,8 @@ public class OrderDto {
         }
         return barcodes;
     }
+    
+    // TODO: 29/01/23 can be placed inside inventory api and use ids
     public List<InventoryPojo> getInventoryPojo(List<String> barcodes) throws ApiException {
         List<InventoryPojo> inventoryPojoList = new ArrayList<>();
         for (String barcode : barcodes) {
@@ -98,6 +103,8 @@ public class OrderDto {
         }
         return productPojoList;
     }
+
+    // TODO: 29/01/23 can be placed inside inventory api 
     public void updateInventory(List<InventoryPojo> inventoryPojoList) throws ApiException {
         for (InventoryPojo inventoryPojo : inventoryPojoList) {
             inventoryService.update(inventoryPojo);
@@ -110,9 +117,13 @@ public class OrderDto {
             orderItemService.addOrderItem(orderItemPojo);
         }
     }
+
+    // TODO: 29/01/23 remove unused variables
+    // TODO: 29/01/23 try to reduce the DB calls 
     @Transactional(rollbackOn = ApiException.class)
     public List<InvoiceData> addOrder(List<OrderItemForm> orderItemForm) throws ApiException {
         for (OrderItemForm orderItem : orderItemForm) {
+            // TODO: 29/01/23 normlise should be in service 
             normalizeFormData(orderItem);
             validateFormData(orderItem);
         }
@@ -121,12 +132,14 @@ public class OrderDto {
                 .collect(Collectors.toList());
 
         List<InventoryPojo> inventoryPojoList = getInventoryPojo(barcodes);
+        // TODO: 29/01/23 why? 
         List<ProductPojo> productPojoList = getProductList(barcodes);
         OrderPojo newOrder = orderService.createNewOrder();
 
         List<OrderItemPojo> orderItemPojoList = new ArrayList<>();
         for (int i = 0; i < orderItemForm.size(); i++) {
             ProductPojo product = productService.getProductByBarcode(orderItemForm.get(i).getBarcode());
+            // TODO: 29/01/23 where are you validating selling price? Place it in productService
             OrderItemPojo pojo = convertToOrderItemPojo(
                     orderItemForm.get(i).getPrice(),
                     orderItemForm.get(i),
@@ -194,6 +207,7 @@ public class OrderDto {
 
         List<InventoryPojo> inventoryPojoList = getInventoryPojo(barcodes);
 
+        // TODO: 29/01/23 why to validate the inventory while deleting?
         validateInventory(inventoryPojoList, deletedOrderItems);
         deleteInventory(inventoryPojoList);
         deleteUpdatedOrderItems(deletedOrderItems);
@@ -206,12 +220,14 @@ public class OrderDto {
     }
 
     @Transactional(rollbackOn = ApiException.class)
+    // TODO: 29/01/23 reduce db calls
     public List<InvoiceData> updateOrder(int id, @NotNull List<OrderItemForm> orderItemForms) throws ApiException {
         if (orderItemForms.isEmpty()) {
             throw new ApiException("Add a Order Item");
         }
         List<OrderItemPojo> updatedOrder = new ArrayList<>();
         for (OrderItemForm orderItem : orderItemForms) {
+            // TODO: 29/01/23 remove normalise 
             normalizeFormData(orderItem);
             validateFormData(orderItem);
             ProductPojo product =productService.getProductByBarcode(orderItem.getBarcode());
@@ -223,12 +239,14 @@ public class OrderDto {
 
         List<OrderItemPojo> oldOrder = orderItemService.getOrderItemsById(id);
         Map<Integer, OrderItemPojo> productToToOrderItemMapping = new HashMap<>();
+        // TODO: 29/01/23 rename variables properly
         for (OrderItemPojo temp : updatedOrder) {
             ProductPojo product = productService.getProductById(temp.getProductId());
             productToToOrderItemMapping.put(product.getId(), temp);
             mappingFormData.put(product.getId(), temp);
         }
 
+        // TODO: 29/01/23 rename classes and variables properly
         GetList getlist = new GetList();
         getlist.updatesList(oldOrder, mappingFormData, id);
         List<OrderItemPojo> updatedOrderItems = getlist.getToUpdate();
@@ -256,12 +274,15 @@ public class OrderDto {
         return ordersData;
     }
 
+    // TODO: 29/01/23 why sep method? you can directly call this one liner from the invocation place
     public void  addPdfURL(Integer id){
         orderService.addPdfURL(id);
     }
+
     private void validateFormData(OrderItemForm form) throws ApiException {
 
         if (isBlank(form.getBarcode())) {
+            // TODO: 29/01/23 brand?
             throw new ApiException("brand cannot be empty");
         }
 

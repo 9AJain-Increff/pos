@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+// TODO: 29/01/23 rename it
 public  class GetList {
 
     public GetList() {
@@ -40,6 +41,7 @@ public  class GetList {
                 toUpdate.add(data);
                 mapping.remove(data.getProductId());
             } else {
+                // TODO: 29/01/23 remove if not used
                 int requiredQuantity = data.getQuantity();
                 data.setQuantity(-1 * data.getQuantity());
                 toDelete.add(data);

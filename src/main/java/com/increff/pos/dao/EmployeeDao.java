@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 
 import com.increff.pos.pojo.EmployeePojo;
 
+// TODO: 29/01/23 remove
 @Repository
 public class EmployeeDao extends AbstractDao {
 

@@ -114,6 +114,7 @@ public class ReportDto {
                 .map(OrderItemPojo::getProductId)
                 .collect(Collectors.toList());
 
+        // TODO: 29/01/23 try call productService and brandService only once and make maps
         Map<Integer, Integer> brandIdToQuantityMapping = getQuantityMapping(productIds,filteredOrderItems);
         Map<Integer,Float> brandIdToRevenueMapping = getRevenueMapping(filteredOrderItems);
         Iterator<Map.Entry<Integer, Integer>> iterator = brandIdToQuantityMapping.entrySet().iterator();
@@ -122,6 +123,7 @@ public class ReportDto {
             Map.Entry<Integer, Integer> entry = iterator.next();
             Integer brandId = entry.getKey();
             SalesData sales = new SalesData();
+            // TODO: 29/01/23 why do you have check again that map keys are formed by using brand?
             BrandPojo brand = brandService.getAndCheckBrandById(brandId);
             sales.setRevenue(brandIdToRevenueMapping.get(brandId));
             sales.setQuantity(brandIdToQuantityMapping.get(brandId));
@@ -161,7 +163,7 @@ public class ReportDto {
     }
 
 
-
+    // TODO: 29/01/23 remove throws
     public List<BrandData> getBrandReport() throws ApiException {
         List<BrandPojo> brands = brandService.getAllBrand();
         List<BrandData> brandsData = new ArrayList<BrandData>();
@@ -193,8 +195,12 @@ public class ReportDto {
         }
         return dailyReportPojoList;
     }
+
+    // TODO: 29/01/23
+    //  add a scheduler and no need to get all the orders, populate the orders only once a day
     public List<DailyData> getDailyReport() throws ApiException {
         List<OrderPojo> orders = orderService.getAllOrders();
+        // TODO: 29/01/23 you can populate all 3 maps at a time
         Map<LocalDate, Integer> dateToOrdersQuantity = new HashMap<>();
         Map<LocalDate, Integer> dateToOrderItemsQuantity = new HashMap<>();
         Map<LocalDate, Float> dateToRevenue = new HashMap<>();

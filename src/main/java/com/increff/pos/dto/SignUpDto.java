@@ -35,6 +35,7 @@ public class SignUpDto {
         UserPojo user = convertToUserPojo(form);
         Set<String > set = getAdmins();
         if(set.contains(user.getEmail())){
+            // TODO: 29/01/23 use enums for rolw
             user.setRole("supervisor");
         }
         else{

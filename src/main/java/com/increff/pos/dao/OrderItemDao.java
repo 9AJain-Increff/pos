@@ -13,8 +13,15 @@ import com.increff.pos.service.ApiException;
 import org.springframework.stereotype.Repository;
 
 @Repository
+/**
+ * Todo
+ * Missed follwoing points which are mentioned in the document
+ * https://increff.atlassian.net/wiki/spaces/TB/pages/312377489/Java+Class+layering+and+Structure#Purpose.7
+ * No checked exception should be thrown from DAO Layer
+ * At the class level, one should have '@Transactional' instead of the method level
+ */
+// TODO: 29/01/23 validate all the queries and methods that should be there in this dao
 public class OrderItemDao extends AbstractDao {
-
     private static String delete_order_item_by_id = "delete from OrderItemPojo p where id=:id";
     private static String select_order_item_by_barcode = "select p from OrderItemPojo p where barcode=:barcode";
 
@@ -51,6 +58,7 @@ public class OrderItemDao extends AbstractDao {
         return getSingleBrand(query);
     }
 
+    // TODO: 29/01/23 remove unused methods
     public OrderItemPojo checkName(String name) {
         System.out.println("anknanana");
         TypedQuery<OrderItemPojo> query = getQuery(select_order_by_name, OrderItemPojo.class);
@@ -71,6 +79,7 @@ public class OrderItemDao extends AbstractDao {
         return getSingleBrand(query);
     }
 
+    // TODO: 29/01/23 remove unused methods
     public OrderItemPojo orderItem(int orderId, String barcode) {
         TypedQuery<OrderItemPojo> query = getQuery(select_by_order_id_and_barcode, OrderItemPojo.class);
         query.setParameter("orderId", orderId);
@@ -83,6 +92,8 @@ public class OrderItemDao extends AbstractDao {
 
         return query.getResultList();
     }
+
+    // TODO: 29/01/23 remove unused methods
     public List<OrderPojo> getOrdersForReport(LocalDateTime start, LocalDateTime end){
 
         TypedQuery<OrderPojo> query = getQuery(get_between_date, OrderPojo.class);

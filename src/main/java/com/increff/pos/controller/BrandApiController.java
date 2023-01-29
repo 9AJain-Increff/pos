@@ -1,11 +1,11 @@
 package com.increff.pos.controller;
 
 import com.increff.pos.dto.BrandDto;
-import com.increff.pos.model.*;
+import com.increff.pos.model.BrandData;
+import com.increff.pos.model.BrandForm;
 import com.increff.pos.service.ApiException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -49,6 +49,7 @@ public class BrandApiController {
         dto.updateBrand(id, form);
     }
 
+    // TODO: 29/01/23 remove
 //
 //    @Scheduled(cron = "0 0 0 ? * * *")
 //    private void cron() {

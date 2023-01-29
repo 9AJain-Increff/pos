@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 @Api
 @RestController
+// TODO: 29/01/23 every add/edit method should return corresponding data
+// TODO: 29/01/23 format the lines properly
 @RequestMapping(path = "/api/products")
 public class ProductApiController {
 
@@ -33,6 +35,7 @@ public class ProductApiController {
 
     @ApiOperation(value = "Gets list of all products")
     @RequestMapping(path = "", method = RequestMethod.GET)
+    // TODO: 29/01/23 why getAll is throwing ApiException?
     public List<ProductData> getAllProduct() throws ApiException {
 
         return productDto.getAllProduct();
@@ -41,6 +44,7 @@ public class ProductApiController {
 
     @ApiOperation(value = "Gets a product by ID")
     @RequestMapping(path = "/{barcode}", method = RequestMethod.GET)
+    // TODO: 29/01/23 use id instead of barcode
     public ProductData get(@PathVariable String barcode) throws ApiException {
             ProductData p = productDto.getProductByBarcode(barcode);
         return (p);

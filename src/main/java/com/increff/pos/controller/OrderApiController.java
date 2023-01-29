@@ -21,6 +21,8 @@ import java.util.List;
 
 @Api
 @RestController
+// TODO: 29/01/23 remove commented code
+// TODO: 29/01/23 every add/edit method should return corresponding data
 @RequestMapping(path = "/api/orders")
 public class OrderApiController {
 
@@ -29,12 +31,14 @@ public class OrderApiController {
     private OrderDto orderDto;
 
     @ApiOperation(value = "Adds a order")
-    // todo change path
+    // todo make it orderData
     @RequestMapping(path = "", method = RequestMethod.POST)
     public void addOrder(@RequestBody List<OrderItemForm> form) throws ApiException {
         List<InvoiceData> invoiceData = orderDto.addOrder(form);
         getEncodedPdf(invoiceData);
+        // TODO: 29/01/23 if there are no orderitems will this work?
         int orderId = invoiceData.get(0).getOrderId();
+        // TODO: 29/01/23 create pdf inside DTO
         orderDto.addPdfURL(orderId);
     }
 
@@ -62,6 +66,7 @@ public class OrderApiController {
 //        orderDto.deleting(id);
 //    }
 
+    // TODO: 29/01/23 getAllOrders
     @ApiOperation(value = "Gets list of all orders")
     @RequestMapping(path = "", method = RequestMethod.GET)
     public List<OrderData> getAllOrder() {
@@ -77,7 +82,7 @@ public class OrderApiController {
 
 
     @ApiOperation(value = "Edit a Order")
-    // todo replace with logger
+    // TODO: 29/01/23 move pdf gen to dto
     @RequestMapping(path = "/{id}", method = RequestMethod.PUT)
     public void editOrder(@PathVariable int id, @RequestBody List<OrderItemForm> form) throws ApiException {
 //        orderDto.updateOrder(id, form);
@@ -97,6 +102,7 @@ public class OrderApiController {
 
     @ResponseBody
     private String getEncodedPdf(List<InvoiceData> invoiceDetails) throws RestClientException {
+        // TODO: 29/01/23 Create a sep class Constants and declare this there
         String INVOICE_API_URL = "http://localhost:8000/invoice/api/generate";
         RestTemplate restTemplate = new RestTemplate();
         String s = restTemplate.postForObject(INVOICE_API_URL, invoiceDetails, String.class);
@@ -105,6 +111,7 @@ public class OrderApiController {
         return s;
     }
 
+    // TODO: 29/01/23 replace system.out with logger
     private void generatePdf(String b64, Integer orderId) {
         File file = new File("./order"+orderId+".pdf");
 

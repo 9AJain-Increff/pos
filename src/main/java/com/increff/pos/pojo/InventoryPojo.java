@@ -12,7 +12,7 @@ import javax.persistence.Id;
 public class InventoryPojo {
 
 
-
+    // TODO: 29/01/23 there is no need of sep id
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Integer id;

@@ -24,6 +24,7 @@ public class ProductService {
     private ProductDao dao;
 
     @Autowired
+    // TODO: 29/01/23 remove
     private BrandService brandService;
 
     @Transactional(rollbackOn = ApiException.class)
@@ -34,6 +35,7 @@ public class ProductService {
     }
 
 
+    // TODO: 29/01/23 remove ApiException
     public List<ProductPojo> getAllProduct() throws ApiException {
         return dao.getAllProduct();
     }
@@ -51,6 +53,7 @@ public class ProductService {
     public ProductPojo getProductByBarcode(String barcode) throws ApiException {
         normalize(barcode);
         ProductPojo p = dao.getProductByBarcode(barcode);
+        /// TODO: 29/01/23 below code can be combined with getProductById method
         if (p == null) {
             throw new ApiException("Product with given barcode does not exit, id: " + barcode);
         }
@@ -66,16 +69,19 @@ public class ProductService {
 
     public ProductPojo getProductById(Integer id, String barcode) throws ApiException {
         normalize(barcode);
+        // TODO: 29/01/23 cant we use getProductById?
         ProductPojo p = dao.getProductById(id);
         if (p == null) {
             throw new ApiException("Product with given id does not exit, id: " + id);
         }
+        // TODO: 29/01/23 barcode can be changed but not to an existing one
         if(!barcode.equals(p.getBarcode())){
             throw new ApiException("product's barcode is "+p.getBarcode()+" , can't be changed");
         }
         return p;
     }
 
+    // TODO: 29/01/23 what is difference betweeen getProductByBarcode and this method?
     public ProductPojo  getAndCheckProductByBarcode(String barcode) throws ApiException {
         normalize(barcode);
         ProductPojo p = dao.getProductByBarcode(barcode);
@@ -86,6 +92,7 @@ public class ProductService {
     }
 
 
+    // TODO: 29/01/23 public is needed?
     public ProductPojo checkBarcode(String barcode) throws ApiException {
         normalize(barcode);
         ProductPojo p = dao.getProductByBarcode(barcode);
@@ -121,7 +128,7 @@ public class ProductService {
     }
 
 
-
+    // TODO: 29/01/23 move to sep class
     private  void normalization(ProductPojo p) {
         normalize(p.getBarcode());
         normalize(p.getName());

@@ -13,6 +13,7 @@ import javax.persistence.Id;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+// TODO: 29/01/23 used?
 public class EmployeePojo {
 
 	@Id

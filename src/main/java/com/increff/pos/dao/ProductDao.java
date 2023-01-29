@@ -12,6 +12,15 @@ import com.increff.pos.service.ApiException;
 import org.springframework.stereotype.Repository;
 
 @Repository
+/**
+ * Todo
+ * Missed follwoing 2 points which are mentioned in the document
+ * https://increff.atlassian.net/wiki/spaces/TB/pages/312377489/Java+Class+layering+and+Structure#Purpose.7
+ * No checked exception should be thrown from DAO Layer
+ * At the class level, one should have '@Transactional' instead of the method level
+ *
+ * todo Validate the queries and remove unnecessary methods
+ */
 public class ProductDao extends AbstractDao {
 
     private static String delete_barcode = "delete from ProductPojo p where barcode=:barcode";
@@ -25,6 +34,8 @@ public class ProductDao extends AbstractDao {
     private static String select_product = "select p from ProductPojo p where name=:name AND category=:category";
     private static String check = "select p from ProductPojo p where barcode=:barcode";
     private static String select_product_by_name = "select p from ProductPojo p where name=:name";
+
+    // TODO: 29/01/23 why?
     @PersistenceContext
     private EntityManager em;
 

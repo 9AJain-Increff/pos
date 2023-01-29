@@ -24,6 +24,7 @@ public class InventoryApiController {
         inventoryDto.addInventory(form);
     }
 
+    // TODO: 29/01/23 remove
 //    @ApiOperation(value = "Deletes a inventory")
 //    @RequestMapping(path = "/{barcode}", method = RequestMethod.DELETE)
 //    public void deleteInventory(@PathVariable String barcode) throws ApiException {
@@ -32,11 +33,13 @@ public class InventoryApiController {
 
     @ApiOperation(value = "Gets list of all inventory")
     @RequestMapping(path = "", method = RequestMethod.GET)
+    // TODO: 29/01/23 why getAll is throwing ApiException?
     public List<InventoryData> getAllInventory() throws ApiException {
         return inventoryDto.getAllInventory();
     }
 
 
+    // TODO: 29/01/23 use id instead of barcode in the path
     @ApiOperation(value = "Gets a inventory by barode")
     @RequestMapping(path = "/{barcode}", method = RequestMethod.GET)
     public InventoryData get(@PathVariable String barcode) throws ApiException {
@@ -45,7 +48,7 @@ public class InventoryApiController {
     }
 
 
-
+    // TODO: 29/01/23 use id instead of barcode in the path
     @ApiOperation(value = "Edit a Inventory")
     @RequestMapping(path = "/{barcode}", method = RequestMethod.PUT)
     public void editInventory(@PathVariable String barcode, @RequestBody InventoryForm form) throws ApiException {

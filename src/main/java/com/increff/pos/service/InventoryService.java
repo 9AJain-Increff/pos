@@ -20,6 +20,7 @@ public class InventoryService {
     @Transactional(rollbackOn = ApiException.class)
     public void addInventory(InventoryPojo p, ProductPojo product) throws ApiException {
         InventoryPojo exist = inventoryDao.selectInventoryByProductId(product.getId());
+        // TODO: 29/01/23 use a sep method to check the duplicate
         if(exist == null){
             inventoryDao.insert(p);
         }
@@ -29,6 +30,7 @@ public class InventoryService {
         }
     }
 
+    // TODO: 29/01/23 remove
 //    @Transactional
 ////    public void delete(String barcode) {
 ////        dao.delete(barcode);
@@ -39,7 +41,7 @@ public class InventoryService {
     public InventoryPojo getAndCheckInventoryByProductId(Integer productId) throws ApiException {
         InventoryPojo p = inventoryDao.selectInventoryByProductId(productId);
         if (p == null) {
-            throw new ApiException("Inventory with given barcode does not exit, id: " + productId);
+            throw new ApiException("Inventory with given barcode does not exist, id: " + productId);
         }
         return p;
     }

@@ -1,5 +1,6 @@
 package com.increff.pos.model;
 
+// TODO: 29/01/23 remove the unused classes
 public class DailyReportData {
     private Integer ordersCount;
     private Integer orderItemsCount;

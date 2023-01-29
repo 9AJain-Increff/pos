@@ -36,23 +36,27 @@ public class ProductDto {
     private InventoryService inventoryService;
 
 
-
+    // TODO: 29/01/23 remove
     private List<String> getBarcodes(List<ProductPojo> products){
         List<String> barcodes = products.stream()
                 .map(ProductPojo::getBarcode)
                 .collect(Collectors.toList());
         return barcodes;
     }
+
+    // TODO: 29/01/23 instead of this call brandApi from calling place only
     private List<Integer> getBrandIdList(List<ProductPojo> products){
         List<Integer> barcodes = products.stream()
                 .map(ProductPojo::getBrandId)
                 .collect(Collectors.toList());
         return barcodes;
     }
+
     public ProductData getProductByBarcode(String barcode) throws ApiException {
         if(isBlank(barcode)){
             throw new ApiException("barcode cannot be empty");
         }
+        // TODO: 29/01/23 move normalise to service
         barcode = normalize(barcode);
         ProductPojo product = productService.getAndCheckProductByBarcode(barcode);
         BrandPojo brand = brandService.getAndCheckBrandById(product.getBrandId());
@@ -62,6 +66,7 @@ public class ProductDto {
     @Transactional(rollbackOn = ApiException.class)
     public void addProduct(ProductForm form) throws ApiException {
         validateFormData(form);
+        // TODO: 29/01/23 move to service
         normalizeFormData(form);
         BrandPojo brand =  brandService.checkBrandExistByNameAndCategory(form.getBrandName(), form.getBrandCategory());
         ProductPojo productPojo = convertToProductPojo(form, brand.getId());
@@ -70,6 +75,7 @@ public class ProductDto {
         productService.addProduct(productPojo);
         inventoryPojo.setProductId(productPojo.getId());
         inventoryPojo.setQuantity(0);
+        // TODO: 29/01/23 what is use of sending productPojo? inventoryPojo has already productId
         inventoryService.addInventory(inventoryPojo, productPojo);
     }
 
@@ -80,10 +86,13 @@ public class ProductDto {
 //    TODO can i throw the error from here AND what if the barcode changes from postman
     public void update(Integer id, ProductForm form) throws ApiException  {
         validateFormData(form);
+        // TODO: 29/01/23 move to service
         normalizeFormData(form);
         BrandPojo brand =  brandService.checkBrandExistByNameAndCategory(form.getBrandName(), form.getBrandCategory());
+        // TODO: 29/01/23 remove
         ProductPojo product = productService.getProductById(id, form.getBarcode());
         ProductPojo productPojo = convertToProductPojo(form, brand.getId());
+        // TODO: 29/01/23 why passing brand? productPojo has brandId already irght?
         productService.update(productPojo,  id, brand);
 
 

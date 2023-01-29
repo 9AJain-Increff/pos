@@ -27,6 +27,8 @@ public class BrandDto {
          BrandPojo brandPojo = service.getAndCheckBrandById(id);
          return convertToBrandData(brandPojo);
     }
+
+    // TODO: 29/01/23 why are you pojo to controller?
     public BrandPojo addBrand(BrandForm form) throws ApiException {
         validateFormData(form);
         BrandPojo p = convertToBrandPojo(form);
@@ -50,6 +52,8 @@ public class BrandDto {
         }
         return brandsData;
     }
+
+    // TODO: 29/01/23 move validations also to a different class
     private void validateFormData(BrandForm form) throws ApiException {
         if(isBlank(form.getName())){
             throw new ApiException("name cannot be empty");

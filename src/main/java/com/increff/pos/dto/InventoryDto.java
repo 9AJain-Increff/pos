@@ -21,6 +21,7 @@ import static com.increff.pos.util.ValidationUtil.isBlank;
 import static com.increff.pos.util.ValidationUtil.isNegative;
 
 @Component
+// TODO: 29/01/23 every add/edit methd should return something like data or id
 public class InventoryDto {
     @Autowired
     private InventoryService inventoryService;
@@ -28,12 +29,15 @@ public class InventoryDto {
     private ProductService productService;
 
     public InventoryData getInventoryByBarcode(String barcode) throws ApiException {
+        // TODO: 29/01/23 normalisation should happen inside service
         barcode = normalize(barcode);
         ProductPojo product = productService.getProductByBarcode(barcode);
         InventoryPojo b = inventoryService.getAndCheckInventoryByProductId(product.getId());
         return convertToInventoryData(b, product.getBarcode());
     }
+
     public void addInventory(InventoryForm form) throws ApiException {
+        // TODO: 29/01/23 normalisation should happen inside service if its already happening there then there is no need of this
         form.setBarcode(normalize(form.getBarcode()));
         validateFormData(form);
         ProductPojo product = productService.getAndCheckProductByBarcode(form.getBarcode());
@@ -42,6 +46,7 @@ public class InventoryDto {
     }
 
     public void updateInventory(InventoryForm form) throws ApiException  {
+        // TODO: 29/01/23 normalisation should happen inside service if its already happening there then there is no need of this
         form.setBarcode(normalize(form.getBarcode()));
         validateFormData(form);
         ProductPojo product = productService.getProductByBarcode(form.getBarcode());
@@ -53,12 +58,15 @@ public class InventoryDto {
     public List<String> getBarcodes(List<InventoryPojo> inventoryPojoList) throws ApiException {
 
         List<String> barcodes = new ArrayList<>();
+        // TODO: 29/01/23 orderItem?
         for(InventoryPojo orderItem : inventoryPojoList){
             ProductPojo product = productService.getProductById(orderItem.getProductId());
             barcodes.add(product.getBarcode());
         }
         return barcodes;
     }
+
+    // TODO: 29/01/23 iterate over inventoryList only once and poplate dont depend on indices 
     public List<InventoryData> getAllInventory() throws ApiException {
         List<InventoryPojo> inventoryList = inventoryService.getAllInventory();
         List<String> barcodes = getBarcodes(inventoryList);

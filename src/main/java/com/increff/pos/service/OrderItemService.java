@@ -20,6 +20,7 @@ public class OrderItemService {
     @Transactional(rollbackOn = ApiException.class)
     public void addOrderItem(OrderItemPojo p) throws ApiException {
 
+        // TODO: 29/01/23 what is the use of this check? If yes, how are you checking?
         OrderItemPojo check = dao.checkOrderItemExists(p.getProductId());
         dao.insert(p);
     }
@@ -27,11 +28,13 @@ public class OrderItemService {
     @Transactional
     public void delete(int id) {
         // TODO: throw ApiException
+        // TODO: 29/01/23 why?
         dao.delete(id);
     }
 
 
     @Transactional(rollbackOn = ApiException.class)
+    // TODO: 29/01/23 why apiException?
     public List<OrderItemPojo> getOrderItemsById(int id) throws ApiException {
         return dao.select(id);
     }
@@ -44,6 +47,7 @@ public class OrderItemService {
     @Transactional(rollbackOn  = ApiException.class)
     public void updateOrderItem( OrderItemPojo p) throws ApiException {
 
+        // TODO: 29/01/23 remove system.out.println
         OrderItemPojo ex = getOrderItem(p.getId());
         System.out.println(p.getQuantity());
 
@@ -51,7 +55,7 @@ public class OrderItemService {
 
     }
 
-
+    // TODO: 29/01/23 why apiException?
     public OrderItemPojo getOrderItem(int id) throws ApiException {
         OrderItemPojo p = dao.orderItem(id);
 

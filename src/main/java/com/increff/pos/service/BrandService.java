@@ -13,6 +13,12 @@ import org.springframework.stereotype.Service;
 import static com.increff.pos.util.Normalization.normalize;
 
 @Service
+/**
+ * Todo
+ * missed following points which are mentioned in the doc
+ *
+ * 1. @Transactional has to be at class level with required rollback fields
+ */
 public class BrandService {
 
     @Autowired
@@ -23,6 +29,7 @@ public class BrandService {
     public BrandPojo addBrand(BrandPojo brandPojo) throws ApiException {
         normalization(brandPojo);
         BrandPojo brand = dao.getBrand(brandPojo.getName(),brandPojo.getCategory());
+        // TODO: 29/01/23 create isDuplicateMethod and use it
         if(brand == null) {
             dao.addBrand(brandPojo);
             return brandPojo;
@@ -37,7 +44,7 @@ public class BrandService {
     public BrandPojo getAndCheckBrandById(int id) throws ApiException {
         BrandPojo brandPojo = dao.getBrandById(id);
         if (brandPojo == null) {
-            throw new ApiException("Brand witFh given ID does not exit, id: " + id);
+            throw new ApiException("Brand with given ID does not exist, id: " + id);
         }
         return brandPojo;
     }
@@ -49,6 +56,7 @@ public class BrandService {
     @Transactional(rollbackOn  = ApiException.class)
     public BrandPojo update(int id, BrandPojo p) throws ApiException {
         normalization(p);
+        // TODO: 29/01/23 can use getAndCheckBrandById?
         BrandPojo exist = dao.getBrandById(id);
         if(exist == null)
             throw new ApiException("Brand with given ID does not exit, id: " + id);
@@ -65,6 +73,7 @@ public class BrandService {
 
 
     public BrandPojo checkBrandExistByNameAndCategory(String brandName, String brandCategory) throws ApiException {
+        // TODO: 29/01/23 why not pass BrandPojo instead of passing both as sep variables?
         normalize(brandName);
         normalize(brandCategory);
         BrandPojo brand = dao.getBrand(brandName, brandCategory);
@@ -72,6 +81,8 @@ public class BrandService {
             throw new ApiException("Brand with given name and category does not exit " );
         return brand;
     }
+
+    // TODO: 29/01/23 remove throws
     public BrandPojo getBrandByNameAndCategory(String brandName, String brandCategory) throws ApiException {
         BrandPojo brand = dao.getBrand(brandName, brandCategory);
         return brand;
@@ -87,6 +98,7 @@ public class BrandService {
         return brands;
     }
 
+    // TODO: 29/01/23 move normalisation to a common class
     private void normalization(BrandPojo brand){
         brand.setName(normalize(brand.getName()));
         brand.setCategory(normalize(brand.getCategory()));
