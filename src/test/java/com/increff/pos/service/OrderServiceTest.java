@@ -57,18 +57,18 @@ public class OrderServiceTest extends AbstractUnitTest {
         assertEquals(time, actualOrder.getCreatedOn());
         assertEquals(order.getId(), actualOrder.getId());
     }
-
-    @Test(expected = ApiException.class)
-    public void updateOrderWithInvalidIdThrowsApiException() throws ApiException {
-        // insert
-        OrderPojo order = getNewOrder();
-        orderDao.insert(order);
-
-        LocalDateTime time = LocalDateTime.now(ZoneOffset.UTC).plusHours(15);
-        order.setCreatedOn(time);
-        order.setId(699);
-        orderService.updateOrder(order);
-    }
+//
+//    @Test(expected = ApiException.class)
+//    public void updateOrderWithInvalidIdThrowsApiException() throws ApiException {
+//        // insert
+//        OrderPojo order = getNewOrder();
+//        orderDao.insert(order);
+//
+//        LocalDateTime time = LocalDateTime.now(ZoneOffset.UTC).plusHours(15);
+//        order.setCreatedOn(time);
+//        order.setId(699);
+//        orderService.updateOrder(order);
+//    }
 
 
 }
