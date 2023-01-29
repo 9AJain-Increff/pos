@@ -84,42 +84,31 @@ public class ConversionUtil {
     }
 
 
-    public static OrderItemData convertToOrderItemData(OrderItemPojo p, ProductPojo product) {
+    public static OrderItemData convertToOrderItemData(OrderItemPojo p, ProductPojo product, Integer orderId) {
         OrderItemData d = new OrderItemData();
-        d.setPrice(p.getPrice());
+        d.setSellingPrice(p.getSellingPrice());
         d.setQuantity(p.getQuantity());
-        d.setOrderId(p.getOrderId());
+        d.setOrderId(orderId);
         d.setId(p.getId());
         d.setName(product.getName());
         d.setBarcode(product.getBarcode());
         return d;
     }
-    public static InvoiceData convertToInvoiceData(OrderItemForm p, Integer id) {
+    public static InvoiceData convertToInvoiceData(OrderItemForm p, ProductPojo product, Integer orderId) {
         InvoiceData d = new InvoiceData();
         d.setBarcode(p.getBarcode());
-        d.setPrice(p.getPrice());
+        d.setPrice(p.getSellingPrice());
         d.setQuantity(p.getQuantity());
-        d.setName(p.getName());
-        d.setOrderId(id);
+        d.setName(product.getName());
+        d.setOrderId(orderId);
         return d;
     }
-    public static OrderItemData convertToOrderItemData(OrderItemForm p, Integer id) {
-        OrderItemData d = new OrderItemData();
-        d.setBarcode(p.getBarcode());
-        d.setPrice(p.getPrice());
-        d.setQuantity(p.getQuantity());
-        d.setOrderId(p.getOrderId());
-        d.setName(p.getName());
-        d.setId(id);
-        return d;
-    }
-
 
     public static  OrderItemPojo convertToOrderItemPojo(Float price,OrderItemForm o, int id, int productId) {
         OrderItemPojo p = new OrderItemPojo();
         p.setQuantity(o.getQuantity());
         p.setOrderId(id);
-        p.setPrice(price);
+        p.setSellingPrice(price);
         p.setProductId(productId);
         return p;
     }

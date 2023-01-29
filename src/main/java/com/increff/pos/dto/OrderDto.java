@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.transaction.Transactional;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -32,10 +34,10 @@ public class OrderDto {
     @Autowired
     private OrderItemService orderItemService;
 
-    public List<OrderItemData> getOrderById(int id) throws ApiException {
+    public List<OrderItemData> getOrderItemsById(Integer orderId) throws ApiException {
 
-        orderService.checkOrderExist(id);
-        List<OrderItemPojo> orderItemPojoList = orderItemService.getOrderItemsById(id);
+        orderService.checkOrderExist(orderId);
+        List<OrderItemPojo> orderItemPojoList = orderItemService.getOrderItemsById(orderId);
         List<String> barcodes = getBarcodes(orderItemPojoList);
         List<ProductPojo> productPojoList = getProductList(barcodes);
         List<OrderItemData> orderItemDataList = new ArrayList<>();
@@ -44,11 +46,14 @@ public class OrderDto {
             ProductPojo product= productPojoList.get(index);
 
             OrderItemPojo orderItem = orderItemPojoList.get(index);
-            orderItemDataList.add(convertToOrderItemData(orderItem, product));
+            orderItemDataList.add(convertToOrderItemData(orderItem, product, orderId));
         }
         return (orderItemDataList);
     }
 
+    public OrderPojo getOrderById(Integer orderId){
+        return orderService.getOrderByOrderId(orderId);
+    }
     public String getOrderPdf(Integer id) throws ApiException {
         return orderService.getPdfUrl(id);
     }
@@ -107,11 +112,12 @@ public class OrderDto {
         for (OrderItemPojo orderItemPojo : addedOrderItems) {
             ProductPojo product = productService.getProductById(orderItemPojo.getProductId());
             orderItemPojo.setProductId(product.getId());
-            orderItemService.addOrderItem(orderItemPojo);
         }
+            orderItemService.addOrderItem(addedOrderItems);
+
     }
     @Transactional(rollbackOn = ApiException.class)
-    public List<InvoiceData> addOrder(List<OrderItemForm> orderItemForm) throws ApiException {
+    public OrderPojo addOrder(List<OrderItemForm> orderItemForm) throws ApiException {
         for (OrderItemForm orderItem : orderItemForm) {
             normalizeFormData(orderItem);
             validateFormData(orderItem);
@@ -122,13 +128,13 @@ public class OrderDto {
 
         List<InventoryPojo> inventoryPojoList = getInventoryPojo(barcodes);
         List<ProductPojo> productPojoList = getProductList(barcodes);
-        OrderPojo newOrder = orderService.createNewOrder();
-
+        LocalDateTime date = LocalDateTime.now(ZoneOffset.UTC);
+        OrderPojo newOrder = orderService.createNewOrder(convertToOrderPojo(date));
         List<OrderItemPojo> orderItemPojoList = new ArrayList<>();
         for (int i = 0; i < orderItemForm.size(); i++) {
             ProductPojo product = productService.getProductByBarcode(orderItemForm.get(i).getBarcode());
             OrderItemPojo pojo = convertToOrderItemPojo(
-                    orderItemForm.get(i).getPrice(),
+                    orderItemForm.get(i).getSellingPrice(),
                     orderItemForm.get(i),
                     newOrder.getId(),
                     product.getId()
@@ -139,20 +145,9 @@ public class OrderDto {
         validateInventory(inventoryPojoList, orderItemPojoList);
         updateInventory(inventoryPojoList);
         addOrderItems(orderItemPojoList);
-        List<InvoiceData> invoiceData = new ArrayList<>();
-        for (int i = 0; i < orderItemForm.size(); i++) {
-            InvoiceData data = convertToInvoiceData(
-                    orderItemForm.get(i),
-                    newOrder.getId()
-            );
-            invoiceData.add(data);
-        }
-        return invoiceData;
-    }
+        return newOrder;
 
-//    public void deleting(int id) throws ApiException {
-//        orderItemService.delete(id);
-//    }
+    }
 
     public void addNewlyUpdatedOrderItems(List<OrderItemPojo> addedOrderItems) throws ApiException {
         List<String> barcodes = getBarcodes(addedOrderItems);
@@ -206,7 +201,7 @@ public class OrderDto {
     }
 
     @Transactional(rollbackOn = ApiException.class)
-    public List<InvoiceData> updateOrder(int id, @NotNull List<OrderItemForm> orderItemForms) throws ApiException {
+    public OrderPojo updateOrder(Integer orderId, @NotNull List<OrderItemForm> orderItemForms) throws ApiException {
         if (orderItemForms.isEmpty()) {
             throw new ApiException("Add a Order Item");
         }
@@ -215,35 +210,30 @@ public class OrderDto {
             normalizeFormData(orderItem);
             validateFormData(orderItem);
             ProductPojo product =productService.getProductByBarcode(orderItem.getBarcode());
-            updatedOrder.add(convertToOrderItemPojo(orderItem.getPrice(), orderItem, id, product.getId()));
+            updatedOrder.add(convertToOrderItemPojo(orderItem.getSellingPrice(), orderItem, orderId, product.getId()));
         }
 
 
         Map<Integer, OrderItemPojo> mappingFormData = new HashMap<>();
 
-        List<OrderItemPojo> oldOrder = orderItemService.getOrderItemsById(id);
-        Map<Integer, OrderItemPojo> productToToOrderItemMapping = new HashMap<>();
+        List<OrderItemPojo> oldOrder = orderItemService.getOrderItemsById(orderId);
+        Map<Integer, OrderItemPojo> productIdToOrderItemMapping = new HashMap<>();
         for (OrderItemPojo temp : updatedOrder) {
             ProductPojo product = productService.getProductById(temp.getProductId());
-            productToToOrderItemMapping.put(product.getId(), temp);
+            productIdToOrderItemMapping.put(product.getId(), temp);
             mappingFormData.put(product.getId(), temp);
         }
 
         GetList getlist = new GetList();
-        getlist.updatesList(oldOrder, mappingFormData, id);
+        getlist.updatesList(oldOrder, mappingFormData, orderId);
         List<OrderItemPojo> updatedOrderItems = getlist.getToUpdate();
         List<OrderItemPojo> deletedOrderItems = getlist.getToDelete();
         List<OrderItemPojo> addedOrderItems = getlist.getToAdd();
 
         addNewlyUpdatedOrderItems(addedOrderItems);
-        updateOrderItems(updatedOrderItems, productToToOrderItemMapping);
+        updateOrderItems(updatedOrderItems, productIdToOrderItemMapping);
         deleteOrderItems(deletedOrderItems);
-        List<InvoiceData> invoiceData = new ArrayList<>();
-        for (OrderItemForm orderItemForm : orderItemForms) {
-            InvoiceData invoice = convertToInvoiceData(orderItemForm, id);
-            invoiceData.add(invoice);
-        }
-        return invoiceData;
+        return orderService.getOrderByOrderId(orderId);
     }
 
 
@@ -256,6 +246,20 @@ public class OrderDto {
         return ordersData;
     }
 
+    public List<InvoiceData> getInvoiceData(List<OrderItemForm> form, OrderPojo order) throws ApiException {
+        List<InvoiceData> invoiceData = new ArrayList<>();
+        for (int i = 0; i < form.size(); i++) {
+            ProductPojo product = productService.getProductByBarcode(form.get(i).getBarcode());
+            InvoiceData data = convertToInvoiceData(
+                    form.get(i),
+                    product,
+                    order.getId()
+            );
+            invoiceData.add(data);
+        }
+        return invoiceData;
+    }
+
     public void  addPdfURL(Integer id){
         orderService.addPdfURL(id);
     }
@@ -265,7 +269,7 @@ public class OrderDto {
             throw new ApiException("brand cannot be empty");
         }
 
-        if (isNegative(form.getPrice())) {
+        if (isNegative(form.getSellingPrice())) {
             throw new ApiException("enter a valid price");
         }
         if (isNegative(form.getQuantity())) {
@@ -275,7 +279,6 @@ public class OrderDto {
     }
 
     private void normalizeFormData(OrderItemForm form) {
-//        form.setName(normalize(form.getName()));
         form.setBarcode(normalize(form.getBarcode()));
     }
 

@@ -18,8 +18,8 @@ public class InventoryService {
 
 
     @Transactional(rollbackOn = ApiException.class)
-    public void addInventory(InventoryPojo p, ProductPojo product) throws ApiException {
-        InventoryPojo exist = inventoryDao.selectInventoryByProductId(product.getId());
+    public void addInventory(InventoryPojo p) throws ApiException {
+        InventoryPojo exist = inventoryDao.selectInventoryByProductId(p.getProductId());
         if(exist == null){
             inventoryDao.insert(p);
         }

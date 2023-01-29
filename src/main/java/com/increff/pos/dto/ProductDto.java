@@ -26,16 +26,12 @@ import static com.increff.pos.util.ValidationUtil.isNegative;
 
 @Component
 public class ProductDto {
-
-
     @Autowired
     private ProductService productService;
     @Autowired
     private BrandService brandService;
     @Autowired
     private InventoryService inventoryService;
-
-
 
     private List<String> getBarcodes(List<ProductPojo> products){
         List<String> barcodes = products.stream()
@@ -60,39 +56,32 @@ public class ProductDto {
     }
 
     @Transactional(rollbackOn = ApiException.class)
-    public void addProduct(ProductForm form) throws ApiException {
+    public ProductPojo addProduct(ProductForm form) throws ApiException {
         validateFormData(form);
         normalizeFormData(form);
         BrandPojo brand =  brandService.checkBrandExistByNameAndCategory(form.getBrandName(), form.getBrandCategory());
         ProductPojo productPojo = convertToProductPojo(form, brand.getId());
         InventoryPojo inventoryPojo = new InventoryPojo();
 
-        productService.addProduct(productPojo);
+        ProductPojo product = productService.addProduct(productPojo);
         inventoryPojo.setProductId(productPojo.getId());
         inventoryPojo.setQuantity(0);
-        inventoryService.addInventory(inventoryPojo, productPojo);
+        inventoryService.addInventory(inventoryPojo);
+        return product;
     }
 
-//    public void delete(String barcode) throws ApiException  {
-//        service.delete(barcode);
-//    }
 
 //    TODO can i throw the error from here AND what if the barcode changes from postman
     public void update(Integer id, ProductForm form) throws ApiException  {
         validateFormData(form);
         normalizeFormData(form);
         BrandPojo brand =  brandService.checkBrandExistByNameAndCategory(form.getBrandName(), form.getBrandCategory());
-        ProductPojo product = productService.getProductById(id, form.getBarcode());
+        productService.getProductById(id, form.getBarcode());
         ProductPojo productPojo = convertToProductPojo(form, brand.getId());
         productService.update(productPojo,  id, brand);
 
 
     }
-
-
-
-
-
 
     public List<ProductData> getAllProduct() throws ApiException {
         List<ProductPojo> products = productService.getAllProduct();
@@ -116,7 +105,7 @@ public class ProductDto {
             throw new ApiException("category cannot be empty");
         }
         if(isNegative(form.getPrice())){
-            throw new ApiException("enter a valid price");
+            throw new ApiException("Invalid input: price can only be a positive number!");
         }
         if (isBlank(form.getBarcode())) {
             throw new ApiException("barcode cannot be empty");

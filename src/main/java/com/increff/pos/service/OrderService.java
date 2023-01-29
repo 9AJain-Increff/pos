@@ -30,26 +30,35 @@ public class OrderService {
 //        dao.delete(id);
 //    }
 
+    public OrderPojo getOrderByOrderId(Integer orderId) {
+        return orderDao.selectOrderById(orderId);
+    }
 
 
-
-    @Transactional
     public List<OrderPojo> getAllOrders() {
         return orderDao.selectAll();
     }
-    public OrderPojo createNewOrder() throws ApiException {
-        LocalDateTime date = LocalDateTime.now(ZoneOffset.UTC);
-        OrderPojo newOrder = convertToOrderPojo(date);
+
+    public OrderPojo createNewOrder(OrderPojo newOrder) throws ApiException {
+
         return orderDao.insert(newOrder);
     }
 
-    @Transactional(rollbackOn  = ApiException.class)
-    public void addPdfURL(Integer id){
-        OrderPojo order = orderDao.getOrderById(id);
-        order.setOrderURL("/home/ankurjain/Downloads/employee-spring-full-master/order"+id+".pdf");
+    @Transactional(rollbackOn = ApiException.class)
+    public OrderPojo updateOrder(OrderPojo order) throws ApiException {
+        OrderPojo o = orderDao.getOrderById(order.getId());
+        if (o == null)
+            throw new ApiException("order id doesn't exist");
+        o.setCreatedOn(order.getCreatedOn());
+        o.setOrderURL(order.getOrderURL());
+        return o;
     }
 
-
+    @Transactional(rollbackOn = ApiException.class)
+    public void addPdfURL(Integer id) {
+        OrderPojo order = orderDao. getOrderById(id);
+        order.setOrderURL("/home/ankurjain/Downloads/employee-spring-full-master/order" + id + ".pdf");
+    }
 
 
     public String getPdfUrl(Integer id) throws ApiException {
@@ -58,10 +67,9 @@ public class OrderService {
     }
 
 
-
     @Transactional
     public OrderPojo checkOrderExist(int id) throws ApiException {
-        OrderPojo p = orderDao.select(id);
+        OrderPojo p = orderDao.getOrderById(id);
         if (p == null) {
             throw new ApiException("Order with given ID does not exit, id: " + id);
         }
@@ -76,28 +84,20 @@ public class OrderService {
     }
 
 
-    public List<OrderPojo> getOrdersBetweenTime(Date start, Date end){
-        LocalDateTime s,e;
-        if(start == null) {
+    public List<OrderPojo> getOrdersBetweenTime(Date start, Date end) {
+        LocalDateTime s, e;
+        if (start == null) {
             s = LocalDateTime.MIN;
-        }
-        else{
+        } else {
             s = convertToLocalDateViaInstant(start);
         }
-        if(end == null){
+        if (end == null) {
             e = LocalDateTime.now(ZoneOffset.UTC);
-        }
-        else {
+        } else {
             e = convertToLocalDateViaInstant(end);
         }
         return orderDao.getOrdersForReport(s, e);
     }
-
-
-
-
-
-
 
 
 }

@@ -31,16 +31,17 @@ public  class GetList {
 
 
     public void updatesList(List<OrderItemPojo> orderBeforeUpdate,
-                            Map<Integer, OrderItemPojo> mapping, int orderId) {
+                            Map<Integer, OrderItemPojo> mapping,
+                            Integer orderId) {
 
         for (OrderItemPojo data : orderBeforeUpdate) {
             if (mapping.containsKey(data.getProductId())) {
                 int requiredQuantity = mapping.get(data.getProductId()).getQuantity();
                 data.setQuantity(requiredQuantity - data.getQuantity());
+                data.setSellingPrice(mapping.get(data.getProductId()).getSellingPrice());
                 toUpdate.add(data);
                 mapping.remove(data.getProductId());
             } else {
-                int requiredQuantity = data.getQuantity();
                 data.setQuantity(-1 * data.getQuantity());
                 toDelete.add(data);
             }

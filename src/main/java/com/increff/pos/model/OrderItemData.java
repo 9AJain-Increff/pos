@@ -3,10 +3,10 @@ package com.increff.pos.model;
 import lombok.Data;
 
 @Data
+
 public class OrderItemData extends OrderItemForm{
-
-
-    private int id;
-
+    private Integer id;
+    private Integer orderId;
+    private String name;
 
 }

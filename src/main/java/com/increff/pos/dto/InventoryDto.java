@@ -31,14 +31,14 @@ public class InventoryDto {
         barcode = normalize(barcode);
         ProductPojo product = productService.getProductByBarcode(barcode);
         InventoryPojo b = inventoryService.getAndCheckInventoryByProductId(product.getId());
-        return convertToInventoryData(b, product.getBarcode());
+        return convertToInventoryData(b, product);
     }
     public void addInventory(InventoryForm form) throws ApiException {
         form.setBarcode(normalize(form.getBarcode()));
         validateFormData(form);
         ProductPojo product = productService.getAndCheckProductByBarcode(form.getBarcode());
         InventoryPojo p = convertToInventoryPojo(form, product.getId());
-        inventoryService.addInventory(p, product);
+        inventoryService.addInventory(p);
     }
 
     public void updateInventory(InventoryForm form) throws ApiException  {
@@ -46,12 +46,10 @@ public class InventoryDto {
         validateFormData(form);
         ProductPojo product = productService.getProductByBarcode(form.getBarcode());
         InventoryPojo p = convertToInventoryPojo(form, product.getId());
-
         inventoryService.update(p);
     }
 
     public List<String> getBarcodes(List<InventoryPojo> inventoryPojoList) throws ApiException {
-
         List<String> barcodes = new ArrayList<>();
         for(InventoryPojo orderItem : inventoryPojoList){
             ProductPojo product = productService.getProductById(orderItem.getProductId());
@@ -81,6 +79,4 @@ public class InventoryDto {
         }
 
     }
-
-
 }

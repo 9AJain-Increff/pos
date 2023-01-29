@@ -27,10 +27,10 @@ public class ProductService {
     private BrandService brandService;
 
     @Transactional(rollbackOn = ApiException.class)
-    public void addProduct(@NotNull ProductPojo product) throws ApiException {
+    public ProductPojo addProduct(@NotNull ProductPojo product) throws ApiException {
         normalization(product);
         checkBarcode(product.getBarcode());
-        dao.add(product);
+        return dao.add(product);
     }
 
 
@@ -52,7 +52,7 @@ public class ProductService {
         normalize(barcode);
         ProductPojo p = dao.getProductByBarcode(barcode);
         if (p == null) {
-            throw new ApiException("Product with given barcode does not exit, id: " + barcode);
+            throw new ApiException("Product with given barcode does not exit, barcode: " + barcode);
         }
         return p;
     }

@@ -93,10 +93,10 @@ public class ReportDto {
             ProductPojo product = productService.getProductById(orderItem.getProductId());
             BrandPojo brand = brandService.getAndCheckBrandById(product.getBrandId());
             if(brandToRevenueMapping.containsKey(brand.getId())){
-                brandToRevenueMapping.put(brand.getId(), brandToRevenueMapping.get(brand.getId())+orderItem.getPrice());
+                brandToRevenueMapping.put(brand.getId(), brandToRevenueMapping.get(brand.getId())+orderItem.getSellingPrice());
             }
             else{
-                brandToRevenueMapping.put(brand.getId(),orderItem.getPrice());
+                brandToRevenueMapping.put(brand.getId(),orderItem.getSellingPrice());
             }
         }
         return brandToRevenueMapping;
@@ -211,11 +211,11 @@ public class ReportDto {
             for(OrderItemPojo orderItem: orderItems){
                 if(dateToRevenue.containsKey(order.getCreatedOn().toLocalDate())) {
                     dateToOrderItemsQuantity.put(order.getCreatedOn().toLocalDate(), dateToOrderItemsQuantity.get(order.getCreatedOn().toLocalDate()) + orderItem.getQuantity());
-                    dateToRevenue.put(order.getCreatedOn().toLocalDate(), dateToRevenue.get(order.getCreatedOn().toLocalDate()) + orderItem.getQuantity()*orderItem.getPrice());
+                    dateToRevenue.put(order.getCreatedOn().toLocalDate(), dateToRevenue.get(order.getCreatedOn().toLocalDate()) + orderItem.getQuantity()*orderItem.getSellingPrice());
                 }
                 else{
                     dateToOrderItemsQuantity.put(order.getCreatedOn().toLocalDate(), orderItem.getQuantity());
-                    dateToRevenue.put(order.getCreatedOn().toLocalDate(), orderItem.getQuantity()*orderItem.getPrice());
+                    dateToRevenue.put(order.getCreatedOn().toLocalDate(), orderItem.getQuantity()*orderItem.getSellingPrice());
                 }
             }
 

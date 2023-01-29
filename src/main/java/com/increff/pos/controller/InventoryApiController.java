@@ -24,18 +24,11 @@ public class InventoryApiController {
         inventoryDto.addInventory(form);
     }
 
-//    @ApiOperation(value = "Deletes a inventory")
-//    @RequestMapping(path = "/{barcode}", method = RequestMethod.DELETE)
-//    public void deleteInventory(@PathVariable String barcode) throws ApiException {
-//        inventoryDto.deleting(barcode);
-//    }
-
     @ApiOperation(value = "Gets list of all inventory")
     @RequestMapping(path = "", method = RequestMethod.GET)
     public List<InventoryData> getAllInventory() throws ApiException {
         return inventoryDto.getAllInventory();
     }
-
 
     @ApiOperation(value = "Gets a inventory by barode")
     @RequestMapping(path = "/{barcode}", method = RequestMethod.GET)
@@ -44,11 +37,9 @@ public class InventoryApiController {
         return (p);
     }
 
-
-
     @ApiOperation(value = "Edit a Inventory")
     @RequestMapping(path = "/{barcode}", method = RequestMethod.PUT)
-    public void editInventory(@PathVariable String barcode, @RequestBody InventoryForm form) throws ApiException {
+    public void updateInventory(@PathVariable String barcode, @RequestBody InventoryForm form) throws ApiException {
         inventoryDto.updateInventory(form);
     }
 

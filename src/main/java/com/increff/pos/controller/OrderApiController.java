@@ -2,6 +2,7 @@ package com.increff.pos.controller;
 
 import com.increff.pos.dto.OrderDto;
 import com.increff.pos.model.*;
+import com.increff.pos.pojo.OrderPojo;
 import com.increff.pos.service.ApiException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -23,8 +24,6 @@ import java.util.List;
 @RestController
 @RequestMapping(path = "/api/orders")
 public class OrderApiController {
-
-
     @Autowired
     private OrderDto orderDto;
 
@@ -32,7 +31,8 @@ public class OrderApiController {
     // todo change path
     @RequestMapping(path = "", method = RequestMethod.POST)
     public void addOrder(@RequestBody List<OrderItemForm> form) throws ApiException {
-        List<InvoiceData> invoiceData = orderDto.addOrder(form);
+        OrderPojo order = orderDto.addOrder(form);
+        List<InvoiceData> invoiceData = orderDto.getInvoiceData(form, order);
         getEncodedPdf(invoiceData);
         int orderId = invoiceData.get(0).getOrderId();
         orderDto.addPdfURL(orderId);
@@ -56,32 +56,24 @@ public class OrderApiController {
         }
     }
 
-//    @ApiOperation(value = "Deletes a order")
-//    @RequestMapping(path = "/{id}", method = RequestMethod.DELETE)
-//    public void deleteOrder(@PathVariable int id) throws ApiException {
-//        orderDto.deleting(id);
-//    }
-
     @ApiOperation(value = "Gets list of all orders")
     @RequestMapping(path = "", method = RequestMethod.GET)
     public List<OrderData> getAllOrder() {
         return orderDto.getAllOrder();
     }
 
-
     @ApiOperation(value = "Gets a order by ID")
     @RequestMapping(path = "/{id}", method = RequestMethod.GET)
     public List<OrderItemData> get(@PathVariable int id) throws ApiException {
-        return orderDto.getOrderById(id);
+        return orderDto.getOrderItemsById(id);
     }
-
 
     @ApiOperation(value = "Edit a Order")
     // todo replace with logger
     @RequestMapping(path = "/{id}", method = RequestMethod.PUT)
-    public void editOrder(@PathVariable int id, @RequestBody List<OrderItemForm> form) throws ApiException {
-//        orderDto.updateOrder(id, form);
-        List<InvoiceData> invoiceData = orderDto.updateOrder(id,form);
+    public void updateOrder(@PathVariable int id, @RequestBody List<OrderItemForm> form) throws ApiException {
+        OrderPojo order = orderDto.updateOrder(id, form);
+        List<InvoiceData> invoiceData = orderDto.getInvoiceData(form, order);
         getEncodedPdf(invoiceData);
         orderDto.addPdfURL(id);
     }
@@ -90,10 +82,6 @@ public class OrderApiController {
     // todo replace with logger
     @RequestMapping(path = "/{id}", method = RequestMethod.POST)
 
-//    public void downloadPdf(@PathVariable int id) throws ApiException {
-//        List<OrderItemData> orderItemDataList = orderDto.getOrderById(id);
-//        getEncodedPdf(orderItemDataList);
-//    }
 
     @ResponseBody
     private String getEncodedPdf(List<InvoiceData> invoiceDetails) throws RestClientException {
@@ -109,8 +97,6 @@ public class OrderApiController {
         File file = new File("./order"+orderId+".pdf");
 
         try (FileOutputStream fos = new FileOutputStream(file);) {
-            // To be short I use a corrupted PDF string, so make sure to use a valid one if you want to preview the PDF file
-//            String b64 = "JVBERi0xLjUKJYCBgoMKMSAwIG9iago8PC9GaWx0ZXIvRmxhdGVEZWNvZGUvRmlyc3QgMTQxL04gMjAvTGVuZ3==";
             byte[] decoder = Base64.getDecoder().decode(b64);
 
             fos.write(decoder);

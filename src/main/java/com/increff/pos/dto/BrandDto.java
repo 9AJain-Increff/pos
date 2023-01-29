@@ -17,23 +17,19 @@ import static com.increff.pos.util.ValidationUtil.isBlank;
 
 @Component
 public class BrandDto {
-
-
     @Autowired
     private BrandService service;
-
 
     public BrandData getBrandById(int id) throws ApiException {
          BrandPojo brandPojo = service.getAndCheckBrandById(id);
          return convertToBrandData(brandPojo);
     }
+
     public BrandPojo addBrand(BrandForm form) throws ApiException {
         validateFormData(form);
         BrandPojo p = convertToBrandPojo(form);
         return service.addBrand(p);
     }
-
-
 
     public BrandData updateBrand(int id, BrandForm form) throws ApiException  {
         validateFormData(form);
@@ -50,6 +46,7 @@ public class BrandDto {
         }
         return brandsData;
     }
+
     private void validateFormData(BrandForm form) throws ApiException {
         if(isBlank(form.getName())){
             throw new ApiException("name cannot be empty");
@@ -58,5 +55,4 @@ public class BrandDto {
             throw new ApiException("category cannot be empty");
         }
     }
-
 }

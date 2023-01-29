@@ -55,14 +55,14 @@ function getCureentOrderItem() {
   return {
     barcode: $('#inputBarcode').val(),
     quantity: Number.parseInt($('#inputQuantity').val()),
-    price: Number.parseInt($('#inputSellingPrice').val()),
+    sellingPrice: Number.parseInt($('#inputSellingPrice').val()),
   };
 }
 function getCureentEditOrderItem() {
   return {
     barcode: $('#inputNewBarcode').val(),
     quantity: Number.parseInt($('#inputNewQuantity').val()),
-    price: Number.parseInt($('#inputNewSellingPrice').val()),
+    sellingPrice: Number.parseInt($('#inputNewSellingPrice').val()),
   };
 }
 
@@ -88,11 +88,11 @@ if (item.quantity <= 0  ) {
     $.notify('Quantity must be positve!', 'error');
     return true;
   }
-  if (item.price < 0  ) {
+  if (item.sellingPrice < 0  ) {
       $.notify('Selling Price must be positve!', 'error');
       return true;
     }
-if (!item.quantity ||  !item.price) {
+if (!item.quantity ||  !item.sellingPrice) {
     $.notify('Quantity cannot be empty!', 'error');
     return true;
   }
@@ -124,6 +124,14 @@ function onEditQuantityChanged(barcode) {
   const newQuantity = $(`#edit-order-item-${barcode}`).val();
   orderItems[index].quantity = Number.parseInt(newQuantity);
 }
+function onEditPriceChanged(barcode) {
+  const index = orderItems.findIndex((it) => it.barcode === barcode);
+  console.log('on change ', index)
+  if (index == -1) return;
+
+  const newPrice = $(`#edit-order-item-price-${barcode}`).val();
+  orderItems[index].sellingPrice = Number.parseInt(newPrice);
+}
 
 function displayCreateOrderItems(data) {
   const $tbody = $('#create-order-table').find('tbody');
@@ -136,7 +144,7 @@ function displayCreateOrderItems(data) {
         <td>${Number.parseInt(i) + 1}</td>
         <td class="barcodeData">${item.barcode}</td>
         <td>${item.name}</td>
-        <td >${item.price}</td>
+        <td >${item.sellingPrice}</td>
         <td>
           <input
             id="order-item-${item.barcode}"
@@ -233,7 +241,7 @@ const pdfUrl = getPdfUrl();
         return {
           barcode: it.barcode,
           quantity: it.quantity,
-          sellingPrice: it.price,
+          sellingPrice: it.sellingPrice,
           name: it.name,
           id: it.id
         };
@@ -327,7 +335,7 @@ const $tbody = $('#show-order-table').find('tbody');
     		var row = '<tr>'
     		+ '<td>' + i + '</td>'
     		+ '<td>' + item.barcode + '</td>'
-    		+ '<td>'  + item.price + '</td>'
+    		+ '<td>'  + item.sellingPrice + '</td>'
     		+ '<td>' + item.quantity + '</td>'
 //    		+ '<td>' + e.price + '</td>'
 //    		+ '<td>' + e.barcode + '</td>'
@@ -402,13 +410,22 @@ function displayEditOrderItems( data) {
 
     const item = data[i];
     console.log('ankur jainnnnnnnnnnn');
-    console.log(item.price);
+    console.log(item.sellingPrice);
     const row = `
       <tr>
         <td>${Number.parseInt(i) + 1}</td>
         <td class="barcodeData">${item.barcode}</td>
         <td>${item.name}</td>
-        <td >${item.price}</td>
+        <td>
+          <input
+            id="edit-order-item-price-${item.barcode}"
+            type="number"
+            class="form-controll
+            quantityData"
+            value="${item.sellingPrice}"
+            onchange="onEditPriceChanged('${item.barcode}')"
+            style="width:70%" min="1">
+        </td>
         <td>
           <input
             id="edit-order-item-${item.barcode}"
@@ -502,7 +519,7 @@ function editOrder() {
       quantity: it.quantity,
       id: it.id,
       orderId: orderId,
-      price: it.price,
+      sellingPrice: it.sellingPrice,
       name: it.name,
     };
   });
@@ -530,7 +547,7 @@ const url = getInventoryUrl() + '/' + item.barcode;
                     addItem({
                       barcode: product.barcode,
                       name: product.name,
-                      price: item.price,
+                      sellingPrice: item.sellingPrice,
                       quantity: item.quantity,
                     });
 
@@ -574,7 +591,7 @@ function placeNewOrder() {
     return {
       barcode: it.barcode,
       quantity: it.quantity,
-      price: it.price,
+      sellingPrice: it.sellingPrice,
       name:it.name
     };
   });

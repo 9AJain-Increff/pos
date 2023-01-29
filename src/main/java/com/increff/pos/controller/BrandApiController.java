@@ -26,33 +26,22 @@ public class BrandApiController {
         dto.addBrand(form);
     }
 
-
     @ApiOperation(value = "Gets list of all brands")
     @RequestMapping(path = "", method = RequestMethod.GET)
     public List<BrandData> getAllBrand() {
-
         return dto.getAllBrand();
     }
-
-
     @ApiOperation(value = "Gets a brand by ID")
-    @RequestMapping(path = "{id}", method = RequestMethod.GET)
-    public BrandData get(@PathVariable int id) throws ApiException {
-        BrandData p = dto.getBrandById(id);
+    @RequestMapping(path = "{orderId}", method = RequestMethod.GET)
+    public BrandData get(@PathVariable int orderId) throws ApiException {
+        BrandData p = dto.getBrandById(orderId);
         return (p);
     }
-
-
     @ApiOperation(value = "Edit a Brand")
     @RequestMapping(path = "{id}", method = RequestMethod.PUT)
-    public void editBrand(@PathVariable int id, @RequestBody BrandForm form) throws ApiException {
+    public void updateBrand(@PathVariable int id, @RequestBody BrandForm form) throws ApiException {
         dto.updateBrand(id, form);
     }
 
-//
-//    @Scheduled(cron = "0 0 0 ? * * *")
-//    private void cron() {
-//
-//    }
 
 }
