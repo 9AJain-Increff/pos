@@ -1,9 +1,8 @@
 package com.increff.pos.util;
 
-import com.increff.pos.model.BrandData;
-import com.increff.pos.model.InventoryData;
-import com.increff.pos.model.OrderData;
-import com.increff.pos.model.ProductData;
+import com.increff.pos.model.data.BrandData;
+import com.increff.pos.model.data.OrderData;
+import com.increff.pos.model.data.ProductData;
 import com.increff.pos.pojo.BrandPojo;
 import com.increff.pos.pojo.OrderItemPojo;
 import com.increff.pos.pojo.OrderPojo;
@@ -46,7 +45,7 @@ public class AssertUtil {
 
     }
 
-    public static void assertEqualInventoryData(InventoryData expected, InventoryData actual) {
+    public static void assertEqualInventoryData(BrandData.InventoryData expected, BrandData.InventoryData actual) {
         assertEquals(expected.getBarcode(), actual.getBarcode());
         assertEquals(expected.getProductName(), actual.getProductName());
         assertEquals(expected.getQuantity(), actual.getQuantity());

@@ -1,6 +1,7 @@
 package com.increff.pos.util;
 
-import com.increff.pos.model.*;
+import com.increff.pos.model.data.*;
+import com.increff.pos.model.form.*;
 import com.increff.pos.pojo.*;
 
 import java.time.LocalDateTime;
@@ -44,16 +45,16 @@ public class ConversionUtil {
         return p;
     }
 
-    public static InventoryData convertToInventoryData(InventoryPojo p, String barcode) {
-        InventoryData d = new InventoryData();
+    public static BrandData.InventoryData convertToInventoryData(InventoryPojo p, String barcode) {
+        BrandData.InventoryData d = new BrandData.InventoryData();
         d.setBarcode(barcode);
         d.setQuantity(p.getQuantity());
         return d;
     }
 
-    public static InventoryData convertToInventoryData(InventoryPojo i,ProductPojo p) {
+    public static BrandData.InventoryData convertToInventoryData(InventoryPojo i, ProductPojo p) {
 
-        InventoryData d = new InventoryData();
+        BrandData.InventoryData d = new BrandData.InventoryData();
         d.setBarcode(p.getBarcode());
         d.setQuantity(i.getQuantity());
         d.setProductName(p.getName());
@@ -113,7 +114,7 @@ public class ConversionUtil {
         return p;
     }
 
-    public static  DailyData convertToDailyData(DailyReportPojo d) {
+    public static DailyData convertToDailyData(DailyReportPojo d) {
         DailyData p = new DailyData();
         p.setDate(d.getDate());
         p.setRevenue(d.getRevenue());

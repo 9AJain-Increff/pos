@@ -16,24 +16,36 @@ public class InventoryService {
     @Autowired
     private InventoryDao inventoryDao;
 
-
+    //
+//    @Transactional(rollbackOn = ApiException.class)
+//    public void addInventory(InventoryPojo p, ProductPojo product) throws ApiException {
+//        InventoryPojo exist = inventoryDao.selectInventoryByProductId(product.getId());
+//        // TODO: 29/01/23 use a sep method to check the duplicate
+//        if(exist == null){
+//            inventoryDao.insert(p);
+//        }
+//        else {
+//            p.setQuantity(p.getQuantity()+exist.getQuantity());
+//            update(p);
+//        }
+//    }
     @Transactional(rollbackOn = ApiException.class)
-    public void addInventory(InventoryPojo p, ProductPojo product) throws ApiException {
-        InventoryPojo exist = inventoryDao.selectInventoryByProductId(product.getId());
-        // TODO: 29/01/23 use a sep method to check the duplicate
-        if(exist == null){
+    public void addInventory(InventoryPojo p) throws ApiException {
+        ;
+        InventoryPojo exist = inventoryDao.selectInventoryByProductId(p.getProductId());
+        if (exist == null) {
             inventoryDao.insert(p);
-        }
-        else {
-            p.setQuantity(p.getQuantity()+exist.getQuantity());
+        } else {
+            p.setQuantity(p.getQuantity() + exist.getQuantity());
             update(p);
         }
     }
 
+
     public InventoryPojo getAndCheckInventoryByProductId(Integer productId) throws ApiException {
         InventoryPojo p = inventoryDao.selectInventoryByProductId(productId);
         if (p == null) {
-            throw new ApiException("Inventory with given barcode does not exit, id: " + productId);
+            throw new ApiException("Inventory with given product id does not exit, id: ");
         }
         return p;
     }
@@ -41,11 +53,9 @@ public class InventoryService {
     @Transactional
     public List<InventoryPojo> getAllInventory() {
         return inventoryDao.selectAll();
-
-
     }
 
-    @Transactional(rollbackOn  = ApiException.class)
+    @Transactional(rollbackOn = ApiException.class)
     public void update(InventoryPojo p) throws ApiException {
 
         InventoryPojo ex = inventoryDao.selectInventoryByProductId(p.getProductId());

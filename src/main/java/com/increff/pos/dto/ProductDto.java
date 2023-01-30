@@ -1,8 +1,8 @@
 package com.increff.pos.dto;
 
 
-import com.increff.pos.model.ProductData;
-import com.increff.pos.model.ProductForm;
+import com.increff.pos.model.data.ProductData;
+import com.increff.pos.model.form.ProductForm;
 import com.increff.pos.pojo.BrandPojo;
 import com.increff.pos.pojo.InventoryPojo;
 import com.increff.pos.pojo.ProductPojo;
@@ -20,8 +20,7 @@ import java.util.stream.Collectors;
 
 import static com.increff.pos.util.ConversionUtil.*;
 import static com.increff.pos.util.Normalization.normalize;
-import static com.increff.pos.util.ValidationUtil.isBlank;
-import static com.increff.pos.util.ValidationUtil.isNegative;
+import static com.increff.pos.util.ValidationUtil.*;
 //import static sun.java2d.loops.GraphicsPrimitive.convertTo;
 
 @Component
@@ -34,38 +33,26 @@ public class ProductDto {
     private InventoryService inventoryService;
 
 
-    // TODO: 29/01/23 remove
-    private List<String> getBarcodes(List<ProductPojo> products){
-        List<String> barcodes = products.stream()
-                .map(ProductPojo::getBarcode)
-                .collect(Collectors.toList());
-        return barcodes;
-    }
-
     // TODO: 29/01/23 instead of this call brandApi from calling place only
     private List<Integer> getBrandIdList(List<ProductPojo> products){
-        List<Integer> barcodes = products.stream()
+        List<Integer> brandIds = products.stream()
                 .map(ProductPojo::getBrandId)
                 .collect(Collectors.toList());
-        return barcodes;
+        return brandIds;
     }
 
     public ProductData getProductByBarcode(String barcode) throws ApiException {
         if(isBlank(barcode)){
             throw new ApiException("barcode cannot be empty");
         }
-        // TODO: 29/01/23 move normalise to service
-        barcode = normalize(barcode);
-        ProductPojo product = productService.getAndCheckProductByBarcode(barcode);
+        ProductPojo product = productService.getProductByBarcode(barcode);
         BrandPojo brand = brandService.getAndCheckBrandById(product.getBrandId());
         return convertToProductData(product, brand);
     }
 
     @Transactional(rollbackOn = ApiException.class)
-    public ProductPojo addProduct(ProductForm form) throws ApiException {
-        validateFormData(form);
-        // TODO: 29/01/23 move to service
-        normalizeFormData(form);
+    public ProductData addProduct(ProductForm form) throws ApiException {
+        validateProductForm(form);
         BrandPojo brand =  brandService.checkBrandExistByNameAndCategory(form.getBrandName(), form.getBrandCategory());
         ProductPojo productPojo = convertToProductPojo(form, brand.getId());
         InventoryPojo inventoryPojo = new InventoryPojo();
@@ -74,25 +61,20 @@ public class ProductDto {
         inventoryPojo.setProductId(productPojo.getId());
         inventoryPojo.setQuantity(0);
         inventoryService.addInventory(inventoryPojo);
-        return product;
-        // TODO: 29/01/23 what is use of sending productPojo? inventoryPojo has already productId
-        inventoryService.addInventory(inventoryPojo, productPojo);
+        return convertToProductData(product,brand);
+        // FIXED: 29/01/23 what is use of sending productPojo? inventoryPojo has already productId
     }
 
 
 //    TODO can i throw the error from here AND what if the barcode changes from postman
-    public void update(Integer id, ProductForm form) throws ApiException  {
-        validateFormData(form);
-        // TODO: 29/01/23 move to service
-        normalizeFormData(form);
+    public ProductData update(Integer id, ProductForm form) throws ApiException  {
+        validateProductForm(form);
         BrandPojo brand =  brandService.checkBrandExistByNameAndCategory(form.getBrandName(), form.getBrandCategory());
         productService.getProductById(id, form.getBarcode());
-        // TODO: 29/01/23 remove
-        ProductPojo product = productService.getProductById(id, form.getBarcode());
         ProductPojo productPojo = convertToProductPojo(form, brand.getId());
-        // TODO: 29/01/23 why passing brand? productPojo has brandId already irght?
-        productService.update(productPojo,  id, brand);
-
+        // FIXED: 29/01/23 why passing brand? productPojo has brandId already irght?
+        productService.update(productPojo,  id);
+        return convertToProductData(productPojo,brand);
 
     }
 
@@ -107,30 +89,7 @@ public class ProductDto {
         }
         return productsData;
     }
-    private void validateFormData(ProductForm form) throws ApiException {
-        if(isBlank(form.getName())){
-            throw new ApiException("name cannot be empty");
-        }
-        if(isBlank(form.getBrandName())){
-            throw new ApiException("brand cannot be empty");
-        }
-        if(isBlank(form.getBrandCategory())){
-            throw new ApiException("category cannot be empty");
-        }
-        if(isNegative(form.getPrice())){
-            throw new ApiException("Invalid input: price can only be a positive number!");
-        }
-        if (isBlank(form.getBarcode())) {
-            throw new ApiException("barcode cannot be empty");
-        }
-    }
 
-    private void normalizeFormData(ProductForm form){
-        form.setName(normalize(form.getName()));
-        form.setBrandName(normalize(form.getBrandName()));
-        form.setBrandCategory(normalize(form.getBrandCategory()));
-        form.setBarcode(normalize(form.getBarcode()));
-        form.setPrice(normalize(form.getPrice()));
-    }
+
 
 }

@@ -1,14 +1,4 @@
 
-
-
-
-
-
-
-
-
-
-
 function getInventoryUrl(){
 	var baseUrl = $("meta[name=baseUrl]").attr("content")
 	return baseUrl + "/api/inventory";

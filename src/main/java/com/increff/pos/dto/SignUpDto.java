@@ -1,6 +1,6 @@
 package com.increff.pos.dto;
 
-import com.increff.pos.model.UserForm;
+import com.increff.pos.model.form.UserForm;
 import com.increff.pos.pojo.UserPojo;
 import com.increff.pos.service.ApiException;
 import com.increff.pos.service.UserService;

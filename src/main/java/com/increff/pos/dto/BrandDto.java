@@ -1,8 +1,8 @@
 package com.increff.pos.dto;
 
 
-import com.increff.pos.model.BrandData;
-import com.increff.pos.model.BrandForm;
+import com.increff.pos.model.data.BrandData;
+import com.increff.pos.model.form.BrandForm;
 import com.increff.pos.pojo.BrandPojo;
 import com.increff.pos.service.ApiException;
 import com.increff.pos.service.BrandService;
@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.increff.pos.util.ConversionUtil.*;
-import static com.increff.pos.util.ValidationUtil.isBlank;
+import static com.increff.pos.util.ValidationUtil.validateBrandForm;
 
 @Component
 public class BrandDto {
@@ -25,15 +25,15 @@ public class BrandDto {
          return convertToBrandData(brandPojo);
     }
 
-    // TODO: 29/01/23 why are you pojo to controller?
-    public BrandPojo addBrand(BrandForm form) throws ApiException {
-        validateFormData(form);
-        BrandPojo p = convertToBrandPojo(form);
-        return service.addBrand(p);
+    // FIXED: 29/01/23 why are you pojo to controller?
+    public BrandData addBrand(BrandForm form) throws ApiException {
+        validateBrandForm(form);
+        BrandPojo brand = convertToBrandPojo(form);
+        return convertToBrandData(brand);
     }
 
     public BrandData updateBrand(int id, BrandForm form) throws ApiException  {
-        validateFormData(form);
+        validateBrandForm(form);
         BrandPojo brandPojo = convertToBrandPojo(form);
         BrandPojo b = service.update(id,brandPojo);
         return convertToBrandData(b);
@@ -48,13 +48,5 @@ public class BrandDto {
         return brandsData;
     }
 
-    // TODO: 29/01/23 move validations also to a different class
-    private void validateFormData(BrandForm form) throws ApiException {
-        if(isBlank(form.getName())){
-            throw new ApiException("name cannot be empty");
-        }
-        if(isBlank(form.getCategory())){
-            throw new ApiException("category cannot be empty");
-        }
-    }
+
 }

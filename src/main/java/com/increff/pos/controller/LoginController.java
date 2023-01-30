@@ -17,8 +17,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.increff.pos.model.InfoData;
-import com.increff.pos.model.LoginForm;
+import com.increff.pos.model.data.InfoData;
+import com.increff.pos.model.form.LoginForm;
 import com.increff.pos.pojo.UserPojo;
 import com.increff.pos.service.ApiException;
 import com.increff.pos.service.UserService;

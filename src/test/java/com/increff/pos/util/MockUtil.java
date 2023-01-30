@@ -1,9 +1,9 @@
 package com.increff.pos.util;
 
-import com.increff.pos.model.InventoryData;
-import com.increff.pos.model.OrderItemForm;
-import com.increff.pos.model.ProductData;
-import com.increff.pos.model.ProductForm;
+import com.increff.pos.model.form.OrderItemForm;
+import com.increff.pos.model.data.ProductData;
+import com.increff.pos.model.form.ProductForm;
+import com.increff.pos.model.data.BrandData;
 import com.increff.pos.pojo.*;
 import com.increff.pos.service.*;
 import javafx.util.Pair;
@@ -92,15 +92,15 @@ public class MockUtil {
         return products;
     }
 
-    public static List<InventoryData> getMockInventoryData() {
+    public static List<BrandData.InventoryData> getMockInventoryData() {
         return Arrays.asList(
-                new InventoryData(1, "a1001", "iphone x", 10),
-                new InventoryData(2, "a1002", "iphone se", 10),
-                new InventoryData(3, "a1003", "galaxy fold", 10),
-                new InventoryData(4, "a1004", "note 9", 10),
-                new InventoryData(5, "a1005", "mac book pro", 10),
-                new InventoryData(6, "a1006", "legion 5", 10),
-                new InventoryData(7, "a1007", "air jordan", 10)
+                new BrandData.InventoryData(1, "a1001", "iphone x", 10),
+                new BrandData.InventoryData(2, "a1002", "iphone se", 10),
+                new BrandData.InventoryData(3, "a1003", "galaxy fold", 10),
+                new BrandData.InventoryData(4, "a1004", "note 9", 10),
+                new BrandData.InventoryData(5, "a1005", "mac book pro", 10),
+                new BrandData.InventoryData(6, "a1006", "legion 5", 10),
+                new BrandData.InventoryData(7, "a1007", "air jordan", 10)
         );
     }
 

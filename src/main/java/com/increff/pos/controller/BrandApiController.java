@@ -1,8 +1,8 @@
 package com.increff.pos.controller;
 
 import com.increff.pos.dto.BrandDto;
-import com.increff.pos.model.BrandData;
-import com.increff.pos.model.BrandForm;
+import com.increff.pos.model.data.BrandData;
+import com.increff.pos.model.form.BrandForm;
 import com.increff.pos.service.ApiException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -22,8 +22,8 @@ public class BrandApiController {
 
     @ApiOperation(value = "Adds a brand")
     @RequestMapping(path = "", method = RequestMethod.POST)
-    public void addBrand(@RequestBody BrandForm form) throws ApiException {
-        dto.addBrand(form);
+    public BrandData addBrand(@RequestBody BrandForm form) throws ApiException {
+        return dto.addBrand(form);
     }
 
     @ApiOperation(value = "Gets list of all brands")
@@ -39,8 +39,8 @@ public class BrandApiController {
     }
     @ApiOperation(value = "Edit a Brand")
     @RequestMapping(path = "{id}", method = RequestMethod.PUT)
-    public void updateBrand(@PathVariable int id, @RequestBody BrandForm form) throws ApiException {
-        dto.updateBrand(id, form);
+    public BrandData updateBrand(@PathVariable int id, @RequestBody BrandForm form) throws ApiException {
+        return dto.updateBrand(id, form);
     }
 
 

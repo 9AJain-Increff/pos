@@ -11,6 +11,9 @@ import com.increff.pos.pojo.OrderPojo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import static com.increff.pos.util.Normalizationutil.normalizeOrderItem;
+
+
 @Service
 public class OrderItemService {
 
@@ -18,46 +21,46 @@ public class OrderItemService {
     private OrderItemDao dao;
 
     @Transactional(rollbackOn = ApiException.class)
-    public void addOrderItem(List<OrderItemPojo> p) throws ApiException {
+    public void addOrderItem(List<OrderItemPojo> p) {
         for (OrderItemPojo orderItemPojo : p) {
-            // TODO: 29/01/23 what is the use of this check? If yes, how are you checking?
-            OrderItemPojo check = dao.checkOrderItemExists(orderItemPojo.getProductId());
+            normalizeOrderItem(orderItemPojo);
+        }
+        for (OrderItemPojo orderItemPojo : p) {
+            // FIXED: 29/01/23 what is the use of this check? If yes, how are you checking?
             dao.insert(orderItemPojo);
         }
 
     }
 
-    @Transactional
-    public void delete(int id) {
+    @Transactional(rollbackOn = ApiException.class)
+    public void delete(Integer orderItemId) {
         // TODO: throw ApiException
         // TODO: 29/01/23 why?
-        dao.delete(id);
+        dao.delete(orderItemId);
     }
 
 
-    // TODO: 29/01/23 why apiException?
-    public List<OrderItemPojo> getOrderItemsById(int id)  {
+    // FIXED: 29/01/23 why apiException?
+    public List<OrderItemPojo> getOrderItemsById(Integer id) {
         return dao.select(id);
     }
 
-    @Transactional
     public List<OrderItemPojo> getAll() {
         return dao.selectAll();
     }
 
-    @Transactional(rollbackOn  = ApiException.class)
-    public void updateOrderItem( OrderItemPojo p) throws ApiException {
+    @Transactional(rollbackOn = ApiException.class)
+    public void updateOrderItem(OrderItemPojo p) {
 
-        // TODO: 29/01/23 remove system.out.println
+        // FIXED: 29/01/23 remove system.out.println
         OrderItemPojo ex = getOrderItem(p.getId());
-        System.out.println(p.getQuantity());
         ex.setSellingPrice(p.getSellingPrice());
         ex.setQuantity(p.getQuantity());
 
     }
 
-    // TODO: 29/01/23 why apiException?
-    public OrderItemPojo getOrderItem(int id) throws ApiException {
+    // FIXED: 29/01/23 why apiException?
+    public OrderItemPojo getOrderItem(Integer id) {
         OrderItemPojo p = dao.getOrderItem(id);
 
         return p;
@@ -65,15 +68,14 @@ public class OrderItemService {
 
 
 
-    public List<OrderItemPojo> getOrderItemByOrders(List<OrderPojo> orders) throws ApiException {
+    public List<OrderItemPojo> getOrderItemByOrders(List<OrderPojo> orders) {
         List<OrderItemPojo> orderItems = new ArrayList<>();
-        for(OrderPojo order : orders){
+        for (OrderPojo order : orders) {
             List<OrderItemPojo> o = getOrderItemsById(order.getId());
             orderItems.addAll(o);
         }
         return orderItems;
     }
-
 
 
 }

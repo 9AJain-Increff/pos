@@ -1,5 +1,6 @@
-package com.increff.pos.model;
+package com.increff.pos.model.data;
 
+import com.increff.pos.model.form.ProductForm;
 import lombok.Data;
 
 @Data

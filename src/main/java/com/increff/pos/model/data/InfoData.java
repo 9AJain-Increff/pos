@@ -1,4 +1,4 @@
-package com.increff.pos.model;
+package com.increff.pos.model.data;
 
 import java.io.Serializable;
 
@@ -25,7 +25,7 @@ public class InfoData implements Serializable {
 	private String email;
 
 	public InfoData() {
-		message = "No message";
+		message = "";
 		email = "No email";
 	}
 	

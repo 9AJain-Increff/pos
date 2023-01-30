@@ -38,7 +38,7 @@ public class BrandServiceTest extends AbstractUnitTest{
     public void getBrandByIdForUnknownIdThrowsApiException() throws ApiException {
         exceptionRule.expect(ApiException.class);
         int id = -1;
-        exceptionRule.expectMessage("Brand witFh given ID does not exit, id: " + id);
+        exceptionRule.expectMessage("Brand with given ID does not exist, id: " + id);
         brandService.getAndCheckBrandById(id);
     }
     @Test

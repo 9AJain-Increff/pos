@@ -9,8 +9,8 @@ public abstract class AbstractDao {
 	@PersistenceContext
 	private EntityManager em;
 
-	// TODO: 29/01/23 why getSingleBrand is there in AbstractDao ?
-	protected <T> T getSingleBrand(TypedQuery<T> query) {
+	// FIXED: 29/01/23 why getSingleBrand is there in AbstractDao ?
+	protected <T> T getSingle(TypedQuery<T> query) {
 		return query.getResultList().stream().findFirst().orElse(null);
 	}
 	

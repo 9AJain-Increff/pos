@@ -1,4 +1,4 @@
-package com.increff.pos.model;
+package com.increff.pos.model.form;
 
 public class LoginForm {
 

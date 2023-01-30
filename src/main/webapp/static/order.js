@@ -132,6 +132,14 @@ function onEditPriceChanged(barcode) {
   const newPrice = $(`#edit-order-item-price-${barcode}`).val();
   orderItems[index].sellingPrice = Number.parseInt(newPrice);
 }
+function onPriceChanged(barcode) {
+  const index = orderItems.findIndex((it) => it.barcode === barcode);
+  console.log('on change ', index)
+  if (index == -1) return;
+
+  const newPrice = $(`#add-order-item-price-${barcode}`).val();
+  orderItems[index].sellingPrice = Number.parseInt(newPrice);
+}
 
 function displayCreateOrderItems(data) {
   const $tbody = $('#create-order-table').find('tbody');
@@ -144,7 +152,16 @@ function displayCreateOrderItems(data) {
         <td>${Number.parseInt(i) + 1}</td>
         <td class="barcodeData">${item.barcode}</td>
         <td>${item.name}</td>
-        <td >${item.sellingPrice}</td>
+        <td>
+          <input
+            id="add-order-item-price-${item.barcode}"
+            type="number"
+            class="form-controll
+            quantityData"
+            value="${item.sellingPrice}"
+            onchange="onPriceChanged('${item.barcode}')"
+            style="width:70%" min="1">
+        </td>
         <td>
           <input
             id="order-item-${item.barcode}"
@@ -214,7 +231,7 @@ const sec = timeUTC.second;
 }
 
 function callPdfGenerator(id){
-const url = getOrderUrl() +'getPdf/'+ id;
+const url = getOrderUrl() +'invoice/'+ id;
   $.ajax({
     url: url,
     type: 'GET',
@@ -329,11 +346,12 @@ function displayUploadData() {
 function displayOrderDetails(data) {
 const $tbody = $('#show-order-table').find('tbody');
   $tbody.empty();
+  var count =1;
   for (let i in data) {
     const item = data[i];
 //     var count = i+1;
     		var row = '<tr>'
-    		+ '<td>' + i + '</td>'
+    		+ '<td>' + count + '</td>'
     		+ '<td>' + item.barcode + '</td>'
     		+ '<td>'  + item.sellingPrice + '</td>'
     		+ '<td>' + item.quantity + '</td>'
@@ -344,6 +362,8 @@ const $tbody = $('#show-order-table').find('tbody');
 //            $tbody.append(row);
 
     $tbody.append(row);
+    count++;
+
   }
 }
 

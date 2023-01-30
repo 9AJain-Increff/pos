@@ -1,4 +1,4 @@
-package com.increff.pos.model;
+package com.increff.pos.model.form;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

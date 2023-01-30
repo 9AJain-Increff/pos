@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static com.increff.pos.util.Normalization.normalize;
+import static com.increff.pos.util.Normalizationutil.normalizeBrand;
+
 
 @Service
 /**
@@ -27,7 +29,7 @@ public class BrandService {
 
     @Transactional(rollbackOn = ApiException.class)
     public BrandPojo addBrand(BrandPojo brandPojo) throws ApiException {
-        normalization(brandPojo);
+        normalizeBrand(brandPojo);
         BrandPojo brand = dao.getBrand(brandPojo.getName(),brandPojo.getCategory());
         // TODO: 29/01/23 create isDuplicateMethod and use it
         if(brand == null) {
@@ -55,7 +57,7 @@ public class BrandService {
 
     @Transactional(rollbackOn  = ApiException.class)
     public BrandPojo update(int id, BrandPojo p) throws ApiException {
-        normalization(p);
+        normalizeBrand(p);
         // TODO: 29/01/23 can use getAndCheckBrandById?
         BrandPojo exist = dao.getBrandById(id);
         if(exist == null)
@@ -73,7 +75,7 @@ public class BrandService {
 
 
     public BrandPojo checkBrandExistByNameAndCategory(String brandName, String brandCategory) throws ApiException {
-        // TODO: 29/01/23 why not pass BrandPojo instead of passing both as sep variables?
+        // TODO: 29/01/23 why not pass BrandPojo instead of passing both as sep variables?  ....in product form we have brand and category ... in order to get brandpojo , still we have tto pass name and category
         normalize(brandName);
         normalize(brandCategory);
         BrandPojo brand = dao.getBrand(brandName, brandCategory);
@@ -82,8 +84,8 @@ public class BrandService {
         return brand;
     }
 
-    // TODO: 29/01/23 remove throws
-    public BrandPojo getBrandByNameAndCategory(String brandName, String brandCategory) throws ApiException {
+    // FIXED: 29/01/23 remove throws
+    public BrandPojo getBrandByNameAndCategory(String brandName, String brandCategory)  {
         BrandPojo brand = dao.getBrand(brandName, brandCategory);
         return brand;
     }
@@ -96,12 +98,6 @@ public class BrandService {
             brands.add((getAndCheckBrandById(brandId)));
         }
         return brands;
-    }
-
-    // TODO: 29/01/23 move normalisation to a common class
-    private void normalization(BrandPojo brand){
-        brand.setName(normalize(brand.getName()));
-        brand.setCategory(normalize(brand.getCategory()));
     }
 
 

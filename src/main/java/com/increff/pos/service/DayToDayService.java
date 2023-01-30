@@ -13,8 +13,12 @@ public class DayToDayService {
     @Autowired
     private DailyReportDao dailyReportDao;
     @Transactional(rollbackOn = ApiException.class)
-    // TODO: 29/01/23 why api exception?
-    public void addDailyReport(List<DailyReportPojo> dailyReports) throws ApiException {
+    // FIXED: 29/01/23 why api exception?
+    public void addDailyReport(List<DailyReportPojo> dailyReports){
         for(DailyReportPojo d: dailyReports) dailyReportDao.insert(d);
+    }
+
+    public List<DailyReportPojo> getDailyReport(){
+        return dailyReportDao.getDailyReport();
     }
 }

@@ -1,6 +1,6 @@
 function getSalesReportUrl(){
    var baseUrl = $("meta[name=baseUrl]").attr("content")
-   return baseUrl + "/api/report/inventory";
+   return baseUrl + "/api/reports/inventory";
 }
 
 function getInventoryReport() {

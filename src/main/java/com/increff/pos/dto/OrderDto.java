@@ -2,6 +2,10 @@ package com.increff.pos.dto;
 
 
 import com.increff.pos.model.*;
+import com.increff.pos.model.data.InvoiceData;
+import com.increff.pos.model.data.OrderData;
+import com.increff.pos.model.data.OrderItemData;
+import com.increff.pos.model.form.OrderItemForm;
 import com.increff.pos.pojo.InventoryPojo;
 import com.increff.pos.pojo.OrderItemPojo;
 import com.increff.pos.pojo.OrderPojo;
@@ -11,17 +15,19 @@ import com.increff.pos.service.*;
 import com.sun.istack.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
 
 import javax.transaction.Transactional;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.increff.pos.util.ConversionUtil.*;
-import static com.increff.pos.util.Normalization.normalize;
-import static com.increff.pos.util.ValidationUtil.isBlank;
-import static com.increff.pos.util.ValidationUtil.isNegative;
+import static com.increff.pos.util.ValidationUtil.*;
 
 @Component
 public class OrderDto {
@@ -50,6 +56,10 @@ public class OrderDto {
             orderItemDataList.add(convertToOrderItemData(orderItem, product, orderId));
         }
         return (orderItemDataList);
+    }
+
+    public OrderPojo getOrderById(Integer orderId){
+        return orderService.getOrderByOrderId(orderId);
     }
 
     // TODO: 29/01/23 can use get by order id method instead of having a sep method
@@ -100,7 +110,7 @@ public class OrderDto {
     public List<ProductPojo> getProductList(List<String> barcode) throws ApiException {
         List<ProductPojo> productPojoList = new ArrayList<>();
         for (String orderItemBarcode : barcode) {
-            ProductPojo productPojo = productService.getAndCheckProductByBarcode(orderItemBarcode);
+            ProductPojo productPojo = productService.getProductByBarcode(orderItemBarcode);
             productPojoList.add(productPojo);
         }
         return productPojoList;
@@ -124,24 +134,24 @@ public class OrderDto {
     // TODO: 29/01/23 remove unused variables
     // TODO: 29/01/23 try to reduce the DB calls
     @Transactional(rollbackOn = ApiException.class)
-    public OrderPojo addOrder(List<OrderItemForm> orderItemForm) throws ApiException {
+    public OrderData addOrder(List<OrderItemForm> orderItemForm) throws ApiException {
+        if(orderItemForm.size() == 0){
+            throw new ApiException("Order must contain atleast 1 order item");
+        }
         for (OrderItemForm orderItem : orderItemForm) {
-            // TODO: 29/01/23 normlise should be in service
-            normalizeFormData(orderItem);
-            validateFormData(orderItem);
+            validateOrderForm(orderItem);
         }
         List<String> barcodes = orderItemForm.stream()
                 .map(OrderItemForm::getBarcode)
                 .collect(Collectors.toList());
 
         List<InventoryPojo> inventoryPojoList = getInventoryPojo(barcodes);
-        // TODO: 29/01/23 why?
-        List<ProductPojo> productPojoList = getProductList(barcodes);
         LocalDateTime date = LocalDateTime.now(ZoneOffset.UTC);
         OrderPojo newOrder = orderService.createNewOrder(convertToOrderPojo(date));
         List<OrderItemPojo> orderItemPojoList = new ArrayList<>();
         for (int i = 0; i < orderItemForm.size(); i++) {
             ProductPojo product = productService.getProductByBarcode(orderItemForm.get(i).getBarcode());
+            productService.validateSellingPrice(orderItemForm.get(i).getSellingPrice(),product.getPrice());
             // TODO: 29/01/23 where are you validating selling price? Place it in productService
             OrderItemPojo pojo = convertToOrderItemPojo(
                     orderItemForm.get(i).getSellingPrice(),
@@ -155,9 +165,39 @@ public class OrderDto {
         validateInventory(inventoryPojoList, orderItemPojoList);
         updateInventory(inventoryPojoList);
         addOrderItems(orderItemPojoList);
-        return newOrder;
+
+        List<InvoiceData> invoiceData = getInvoiceData(orderItemForm, newOrder);
+        getEncodedPdf(invoiceData);
+        // FIXED: 29/01/23 if there are no orderitems will this work?
+        int orderId = invoiceData.get(0).getOrderId();
+        // FIXED: 29/01/23 create pdf inside DTO
+        addPdfURL(orderId);
+        return convertToOrderData(newOrder);
 
     }
+    private String getEncodedPdf(List<InvoiceData> invoiceDetails) throws RestClientException {
+        // TODO: 29/01/23 Create a sep class Constants and declare this there
+        String INVOICE_API_URL = "http://localhost:8000/invoice/api/generate";
+        RestTemplate restTemplate = new RestTemplate();
+        String s = restTemplate.postForObject(INVOICE_API_URL, invoiceDetails, String.class);
+        Integer orderId = invoiceDetails.get(0).getOrderId();
+        generatePdf(s, orderId);
+        return s;
+    }
+
+    private void generatePdf(String b64, Integer orderId) {
+        File file = new File("./order"+orderId+".pdf");
+
+        try (FileOutputStream fos = new FileOutputStream(file);) {
+            byte[] decoder = Base64.getDecoder().decode(b64);
+
+            fos.write(decoder);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
 
     public void addNewlyUpdatedOrderItems(List<OrderItemPojo> addedOrderItems) throws ApiException {
         List<String> barcodes = getBarcodes(addedOrderItems);
@@ -217,13 +257,13 @@ public class OrderDto {
         if (orderItemForms.isEmpty()) {
             throw new ApiException("Add a Order Item");
         }
-        List<OrderItemPojo> updatedOrder = new ArrayList<>();
+        List<OrderItemPojo> updatedOrderList = new ArrayList<>();
         for (OrderItemForm orderItem : orderItemForms) {
-            // TODO: 29/01/23 remove normalise
-            normalizeFormData(orderItem);
-            validateFormData(orderItem);
+
+            validateOrderForm(orderItem);
             ProductPojo product =productService.getProductByBarcode(orderItem.getBarcode());
-            updatedOrder.add(convertToOrderItemPojo(orderItem.getSellingPrice(), orderItem, orderId, product.getId()));
+            productService.validateSellingPrice(orderItem.getSellingPrice(),product.getPrice());
+            updatedOrderList.add(convertToOrderItemPojo(orderItem.getSellingPrice(), orderItem, orderId, product.getId()));
         }
 
 
@@ -232,7 +272,7 @@ public class OrderDto {
         List<OrderItemPojo> oldOrder = orderItemService.getOrderItemsById(orderId);
         Map<Integer, OrderItemPojo> productIdToOrderItemMapping = new HashMap<>();
         // TODO: 29/01/23 rename variables properly
-        for (OrderItemPojo temp : updatedOrder) {
+        for (OrderItemPojo temp : updatedOrderList) {
             ProductPojo product = productService.getProductById(temp.getProductId());
             productIdToOrderItemMapping.put(product.getId(), temp);
             mappingFormData.put(product.getId(), temp);
@@ -248,7 +288,11 @@ public class OrderDto {
         addNewlyUpdatedOrderItems(addedOrderItems);
         updateOrderItems(updatedOrderItems, productIdToOrderItemMapping);
         deleteOrderItems(deletedOrderItems);
-        return orderService.getOrderByOrderId(orderId);
+        OrderPojo updatedOrder = orderService.getOrderByOrderId(orderId);
+        List<InvoiceData> invoiceData = getInvoiceData(orderItemForms, updatedOrder);
+        getEncodedPdf(invoiceData);
+        addPdfURL(orderId);
+        return updatedOrder;
     }
 
 
@@ -275,29 +319,8 @@ public class OrderDto {
         }
         return invoiceData;
     }
-
     public void  addPdfURL(Integer id){
         orderService.addPdfURL(id);
-    }
-
-    private void validateFormData(OrderItemForm form) throws ApiException {
-
-        if (isBlank(form.getBarcode())) {
-            // TODO: 29/01/23 brand?
-            throw new ApiException("brand cannot be empty");
-        }
-
-        if (isNegative(form.getSellingPrice())) {
-            throw new ApiException("enter a valid price");
-        }
-        if (isNegative(form.getQuantity())) {
-            throw new ApiException("enter a valid quantity");
-        }
-
-    }
-
-    private void normalizeFormData(OrderItemForm form) {
-        form.setBarcode(normalize(form.getBarcode()));
     }
 
 }

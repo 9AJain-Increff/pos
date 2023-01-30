@@ -1,8 +1,8 @@
 package com.increff.pos.controller;
 
 import com.increff.pos.dto.ProductDto;
-import com.increff.pos.model.*;
-import com.increff.pos.pojo.ProductPojo;
+import com.increff.pos.model.data.ProductData;
+import com.increff.pos.model.form.ProductForm;
 import com.increff.pos.service.ApiException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -13,8 +13,6 @@ import java.util.List;
 
 @Api
 @RestController
-// TODO: 29/01/23 every add/edit method should return corresponding data
-// TODO: 29/01/23 format the lines properly
 @RequestMapping(path = "/api/products")
 public class ProductApiController {
     @Autowired
@@ -22,7 +20,7 @@ public class ProductApiController {
 
     @ApiOperation(value = "Adds a product")
     @RequestMapping(path = "", method = RequestMethod.POST)
-    public ProductPojo addProduct(@RequestBody ProductForm form) throws ApiException {
+    public ProductData addProduct(@RequestBody ProductForm form) throws ApiException {
         return productDto.addProduct(form);
     }
 
@@ -37,14 +35,13 @@ public class ProductApiController {
     @RequestMapping(path = "/{barcode}", method = RequestMethod.GET)
     // TODO: 29/01/23 use id instead of barcode
     public ProductData get(@PathVariable String barcode) throws ApiException {
-        ProductData p = productDto.getProductByBarcode(barcode);
-        return (p);
+        return (productDto.getProductByBarcode(barcode));
     }
 
     @ApiOperation(value = "Edit a Product")
     @RequestMapping(path = "/{id}", method = RequestMethod.PUT)
-    public void editProduct(@PathVariable Integer id, @RequestBody ProductForm form) throws ApiException {
-        productDto.update(id, form);
+    public ProductData updateProduct(@PathVariable Integer id, @RequestBody ProductForm form) throws ApiException {
+        return productDto.update(id, form);
 
     }
 }
