@@ -1,9 +1,10 @@
 package com.increff.pos.util;
 
+import com.increff.pos.exception.ApiException;
+import com.increff.pos.model.data.InventoryData;
 import com.increff.pos.model.form.OrderItemForm;
 import com.increff.pos.model.data.ProductData;
 import com.increff.pos.model.form.ProductForm;
-import com.increff.pos.model.data.BrandData;
 import com.increff.pos.pojo.*;
 import com.increff.pos.service.*;
 import javafx.util.Pair;
@@ -92,15 +93,15 @@ public class MockUtil {
         return products;
     }
 
-    public static List<BrandData.InventoryData> getMockInventoryData() {
+    public static List<InventoryData> getMockInventoryData() {
         return Arrays.asList(
-                new BrandData.InventoryData(1, "a1001", "iphone x", 10),
-                new BrandData.InventoryData(2, "a1002", "iphone se", 10),
-                new BrandData.InventoryData(3, "a1003", "galaxy fold", 10),
-                new BrandData.InventoryData(4, "a1004", "note 9", 10),
-                new BrandData.InventoryData(5, "a1005", "mac book pro", 10),
-                new BrandData.InventoryData(6, "a1006", "legion 5", 10),
-                new BrandData.InventoryData(7, "a1007", "air jordan", 10)
+                new InventoryData(1, "a1001", "iphone x", 10),
+                new InventoryData(2, "a1002", "iphone se", 10),
+                new InventoryData(3, "a1003", "galaxy fold", 10),
+                new InventoryData(4, "a1004", "note 9", 10),
+                new InventoryData(5, "a1005", "mac book pro", 10),
+                new InventoryData(6, "a1006", "legion 5", 10),
+                new InventoryData(7, "a1007", "air jordan", 10)
         );
     }
 
@@ -153,8 +154,8 @@ public class MockUtil {
         product.setPrice(1800.0f);
         product.setName("Nike Shoes");
         product.setBarcode("ni0102");
-        product.setBrandName("Nike");
-        product.setBrandCategory("Shoe");
+        product.setBrandName("nike");
+        product.setBrandCategory("shoe");
         return product;
     }
 
@@ -199,7 +200,7 @@ public class MockUtil {
 
         // Brand: Samsung | Category: Phone
         items = Arrays.asList(
-                new OrderItemPojo(null,products.get(PRODUCT_GALAXY_FOLD).getId(), 1,null, 180000.0f), // Galaxy Fold
+                new OrderItemPojo(null, products.get(PRODUCT_GALAXY_FOLD).getId(), 1, null, 180000.0f), // Galaxy Fold
                 new OrderItemPojo(null, products.get(PRODUCT_NOTE_9).getId(), 1, null, 130000.0f)
         );
         order = addOrder(orderService, orderItemService, currentDate.minusDays(2), inventoryService, items); // Note 9
@@ -207,7 +208,7 @@ public class MockUtil {
 
         // Brand: Nike | Category: Shoe
         items = Collections.singletonList(
-                new OrderItemPojo(null, products.get(PRODUCT_AIR_JORDAN).getId(), 3,null, 20000.0f)
+                new OrderItemPojo(null, products.get(PRODUCT_AIR_JORDAN).getId(), 3, null, 20000.0f)
         ); // Air Jordan
         order = addOrder(orderService, orderItemService, currentDate.minusDays(1), inventoryService, items);
         orders.add(order);
@@ -259,5 +260,36 @@ public class MockUtil {
         orderItemForm.setQuantity(1);
         orderItemForm.setSellingPrice(1000.0f);
         return orderItemForm;
+    }
+
+    public static ProductPojo getMockProduct() {
+        ProductPojo product = new ProductPojo();
+        product.setBarcode("a1001");
+        product.setPrice(1800.0f);
+        product.setName("Nike Shoes");
+        product.setBrandId(1);
+        return product;
+    }
+
+    public static List<ProductPojo> getMockProducts(int size) {
+        List<ProductPojo> products = new ArrayList<>(size);
+
+        for (int i = 0; i < size; i++) {
+            ProductPojo product = getMockProduct();
+            product.setBarcode(product.getBarcode() + i);
+            product.setPrice(product.getPrice() + i);
+            product.setName(product.getName() + i);
+            products.add(product);
+        }
+
+        return products;
+    }
+
+    public static UserPojo getMockUser() {
+        UserPojo mock = new UserPojo();
+        mock.setEmail("mockuser@pos.com");
+        mock.setPassword("pass@123");
+        mock.setRole("operator");
+        return mock;
     }
 }

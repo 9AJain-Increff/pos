@@ -5,17 +5,17 @@ import javax.servlet.http.HttpServletRequest;
 
 public class CookieUtil {
 
-	public static String getCookie(HttpServletRequest req, String name) {
-		Cookie[] cookies = req.getCookies();
-		if (cookies == null) {
-			return null;
-		}
-		for (Cookie c : cookies) {
-			if (name.equals(c.getName())) {
-				return c.getValue();
-			}
-		}
+    public static String getCookie(HttpServletRequest req, String name) {
+        Cookie[] cookies = req.getCookies();
+        if (cookies == null) {
+            return null;
+        }
+        for (Cookie c : cookies) {
+            if (name.equals(c.getName())) {
+                return c.getValue();
+            }
+        }
 
-		return null;
-	}
+        return null;
+    }
 }

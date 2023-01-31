@@ -12,15 +12,5 @@ public class BrandData extends BrandForm {
 
     private int id;
 
-    @Data
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class InventoryData {
-        private Integer id;
-        private String barcode;
-        private String productName;
-        private Integer quantity;
 
-
-    }
 }

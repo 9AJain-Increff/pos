@@ -160,7 +160,7 @@ function displayCreateOrderItems(data) {
             quantityData"
             value="${item.sellingPrice}"
             onchange="onPriceChanged('${item.barcode}')"
-            style="width:70%" min="1">
+            style="width:40%" min="1">
         </td>
         <td>
           <input
@@ -444,7 +444,7 @@ function displayEditOrderItems( data) {
             quantityData"
             value="${item.sellingPrice}"
             onchange="onEditPriceChanged('${item.barcode}')"
-            style="width:70%" min="1">
+            style="width:40%" min="1">
         </td>
         <td>
           <input

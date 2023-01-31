@@ -31,6 +31,7 @@ function addProduct(event){
        	'Content-Type': 'application/json'
        },
 	   success: function(response) {
+	   $.notify('Product added successfully!', 'success');
 	   	$('#add-product-modal').modal('toggle');
 	   		getProductList();
 
@@ -58,6 +59,7 @@ function updateProduct(event){
        	'Content-Type': 'application/json'
        },
 	   success: function(response) {
+	   $.notify('Product updated successfully!', 'success');
 	   		getProductList();
 	   },
 	   error: handleAjaxError
@@ -179,7 +181,7 @@ console.log('ankur jinfo')
 }
 
 function displayEditProduct(e){
-	var url = getProductUrl() + "/" + e.barcode;
+	var url = getProductUrl() + "/" + e.id;
 	$.ajax({
 	   url: url,
 	   type: 'GET',

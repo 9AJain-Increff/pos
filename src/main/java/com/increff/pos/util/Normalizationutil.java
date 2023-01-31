@@ -8,7 +8,7 @@ import static com.increff.pos.util.Normalization.normalize;
 
 public class Normalizationutil {
 
-    public static void normalizeBrand(BrandPojo brand){
+    public static void normalizeBrand(BrandPojo brand) {
         brand.setName(normalize(brand.getName()));
         brand.setCategory(normalize(brand.getCategory()));
     }

@@ -21,6 +21,7 @@ function addBrand(event){
        	'Content-Type': 'application/json'
        },
 	   success: function(response) {
+	   $.notify('Brand Added successfully!', 'success');
 	   	$('#add-brand-modal').modal('toggle');
 	   	getBrandList();
 	   },
@@ -48,6 +49,7 @@ function updateBrand(event){
        	'Content-Type': 'application/json'
        },
 	   success: function(response) {
+	   $.notify('Brand updated successfully!', 'success');
 	   		getBrandList();
 	   },
 	   error: handleAjaxError

@@ -4,7 +4,7 @@ import com.increff.pos.model.form.BrandForm;
 import com.increff.pos.model.form.InventoryForm;
 import com.increff.pos.model.form.OrderItemForm;
 import com.increff.pos.model.form.ProductForm;
-import com.increff.pos.service.ApiException;
+import com.increff.pos.exception.ApiException;
 
 import static com.increff.pos.util.Normalization.normalize;
 
@@ -15,13 +15,6 @@ public class ValidationUtil {
         return input == null || input.trim().isEmpty();
     }
 
-    public static boolean isPositiveNumber(Double number) {
-        return number != null && number > 0;
-    }
-
-    public static boolean isPositiveNumber(Integer number) {
-        return number != null && number > 0;
-    }
 
     public static boolean isNegative(Float number) {
         return number == null || number <= 0;
@@ -30,25 +23,26 @@ public class ValidationUtil {
     public static boolean isNegative(Integer number) {
         return number == null || number < 0;
     }
+
     public static boolean isValidEmail(String email) {
         return email.matches(EMAIL_PATTERN);
     }
 
     public static void validateBrandForm(BrandForm form) throws ApiException {
-        if(isBlank(form.getName())){
+        if (isBlank(form.getName())) {
             throw new ApiException("name cannot be empty");
         }
-        if(isBlank(form.getCategory())){
+        if (isBlank(form.getCategory())) {
             throw new ApiException("category cannot be empty");
         }
     }
 
     public static void validateInventoryForm(InventoryForm form) throws ApiException {
-        if(isBlank(form.getBarcode())){
+        if (isBlank(form.getBarcode())) {
             throw new ApiException("barcode cannot be empty");
         }
 
-        if(isNegative(form.getQuantity())){
+        if (isNegative(form.getQuantity())) {
             throw new ApiException("quantity cannot be negative");
         }
 
@@ -57,8 +51,8 @@ public class ValidationUtil {
     public static void validateOrderForm(OrderItemForm form) throws ApiException {
 
         if (isBlank(form.getBarcode())) {
-            // TODO: 29/01/23 brand?
-            throw new ApiException("brand cannot be empty");
+            // FIXED: 29/01/23 brand?
+            throw new ApiException("barcode cannot be empty");
         }
 
         if (isNegative(form.getSellingPrice())) {
@@ -71,16 +65,16 @@ public class ValidationUtil {
     }
 
     public static void validateProductForm(ProductForm form) throws ApiException {
-        if(isBlank(form.getName())){
+        if (isBlank(form.getName())) {
             throw new ApiException("name cannot be empty");
         }
-        if(isBlank(form.getBrandName())){
+        if (isBlank(form.getBrandName())) {
             throw new ApiException("brand cannot be empty");
         }
-        if(isBlank(form.getBrandCategory())){
+        if (isBlank(form.getBrandCategory())) {
             throw new ApiException("category cannot be empty");
         }
-        if(isNegative(form.getPrice())){
+        if (isNegative(form.getPrice())) {
             throw new ApiException("Invalid input: price can only be a positive number!");
         }
         if (isBlank(form.getBarcode())) {

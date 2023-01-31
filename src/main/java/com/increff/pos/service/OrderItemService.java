@@ -6,6 +6,7 @@ import java.util.List;
 import javax.transaction.Transactional;
 
 import com.increff.pos.dao.OrderItemDao;
+import com.increff.pos.exception.ApiException;
 import com.increff.pos.pojo.OrderItemPojo;
 import com.increff.pos.pojo.OrderPojo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,8 +35,6 @@ public class OrderItemService {
 
     @Transactional(rollbackOn = ApiException.class)
     public void delete(Integer orderItemId) {
-        // TODO: throw ApiException
-        // TODO: 29/01/23 why?
         dao.delete(orderItemId);
     }
 
@@ -65,7 +64,6 @@ public class OrderItemService {
 
         return p;
     }
-
 
 
     public List<OrderItemPojo> getOrderItemByOrders(List<OrderPojo> orders) {

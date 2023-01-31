@@ -1,6 +1,7 @@
 package com.increff.pos.dto;
 
 import com.increff.pos.dao.DailyReportDao;
+import com.increff.pos.exception.ApiException;
 import com.increff.pos.model.data.BrandData;
 import com.increff.pos.model.data.DailyData;
 import com.increff.pos.model.data.InventoryReportData;
@@ -8,7 +9,6 @@ import com.increff.pos.model.data.SalesData;
 import com.increff.pos.model.form.SalesForm;
 import com.increff.pos.pojo.*;
 import com.increff.pos.service.*;
-import io.swagger.models.auth.In;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -20,7 +20,8 @@ import java.util.stream.Collectors;
 
 import static com.increff.pos.util.ConversionUtil.convertToBrandData;
 import static com.increff.pos.util.ConversionUtil.convertToDailyData;
-import static com.increff.pos.util.DateTimeUtil.convertToLocalDateViaInstant;
+import static com.increff.pos.util.DateTimeUtil.formatEndDate;
+import static com.increff.pos.util.DateTimeUtil.formatStartDate;
 
 @Component
 public class ReportDto {
@@ -55,7 +56,7 @@ public class ReportDto {
     private List<OrderItemPojo> filterOrderItems(List<OrderItemPojo> orderItems, String brandName, String brandCategory) throws ApiException {
         List<OrderItemPojo> filteredOrderItems = new ArrayList<>();
         for (OrderItemPojo orderItem : orderItems) {
-            ProductPojo product = productService.getProductById(orderItem.getProductId());
+            ProductPojo product = productService.checkProduct(orderItem.getProductId());
             BrandPojo brand = brandService.getAndCheckBrandById(product.getBrandId());
             if (checkValidity(brand, brandName, brandCategory)) {
                 filteredOrderItems.add(orderItem);
@@ -81,7 +82,7 @@ public class ReportDto {
         Map<Integer, Integer> mapping = new HashMap<>();
         for (int index = 0; index < productIds.size(); index++) {
             Integer productId = productIds.get(index);
-            ProductPojo product = productService.getProductById(productId);
+            ProductPojo product = productService.checkProduct(productId);
             BrandPojo brand = brandService.getAndCheckBrandById(product.getBrandId());
             OrderItemPojo orderItem = orderItems.get(index);
             if (mapping.containsKey(brand.getId())) {
@@ -96,7 +97,7 @@ public class ReportDto {
     private Map<Integer, Float> getRevenueMapping(List<OrderItemPojo> orderItems) throws ApiException {
         Map<Integer, Float> brandToRevenueMapping = new HashMap<>();
         for (OrderItemPojo orderItem : orderItems) {
-            ProductPojo product = productService.getProductById(orderItem.getProductId());
+            ProductPojo product = productService.checkProduct(orderItem.getProductId());
             BrandPojo brand = brandService.getAndCheckBrandById(product.getBrandId());
             if (brandToRevenueMapping.containsKey(brand.getId())) {
                 brandToRevenueMapping.put(brand.getId(), brandToRevenueMapping.get(brand.getId()) + orderItem.getSellingPrice());
@@ -107,12 +108,9 @@ public class ReportDto {
         return brandToRevenueMapping;
     }
 
-    private LocalDateTime getLocalDateTime(Date startTime, LocalDateTime extremeTime) {
-        LocalDateTime time;
-        if (startTime == null) {
+    private LocalDateTime getLocalDateTime(LocalDateTime time, LocalDateTime extremeTime) {
+        if (time == null) {
             time = extremeTime;
-        } else {
-            time = convertToLocalDateViaInstant(startTime);
         }
         return time;
     }
@@ -121,13 +119,15 @@ public class ReportDto {
     public List<SalesData> getSalesReport(
             String brandName,
             String brandCategory,
-            Date startTime,
-            Date endTime) throws ApiException {
+            LocalDateTime startTime,
+            LocalDateTime endTime) throws ApiException {
         LocalDateTime start, end;
-        start = getLocalDateTime(startTime, LocalDateTime.MIN);
-        end = getLocalDateTime(endTime, LocalDateTime.MAX);
+        startTime = formatStartDate(startTime);
+        endTime = formatEndDate(endTime);
+//        start = getLocalDateTime(startTime, LocalDateTime.MIN);
+//        end = getLocalDateTime(endTime, LocalDateTime.MAX);
 
-        List<OrderPojo> orders = orderService.getOrdersBetweenTime(start, end);
+        List<OrderPojo> orders = orderService.getOrdersBetweenTime(startTime, endTime);
         List<OrderItemPojo> orderItems = orderItemService.getOrderItemByOrders(orders);
         List<OrderItemPojo> filteredOrderItems = filterOrderItems(orderItems, brandName, brandCategory);
         List<Integer> productIds = filteredOrderItems.stream()
@@ -156,7 +156,6 @@ public class ReportDto {
 
     public List<SalesData> getSalesReport(SalesForm form) throws ApiException {
 
-
         List<SalesData> salesReport = getSalesReport(form.getBrandName(), form.getBrandCategory(),
                 form.getStartTime(), form.getEndTime());
         return salesReport;
@@ -169,23 +168,29 @@ public class ReportDto {
         for (InventoryPojo inventory : inventoryPojoList) {
             productIds.add(inventory.getProductId());
         }
-        Map<Integer, ProductPojo> productIdToProductMapping = productService.getProductsByProductIds(productIds);
+        List<ProductPojo> products = productService.getProductsByIds(productIds);
+        Map<Integer, ProductPojo> productIdToProductMapping = new HashMap<>();
+        for(ProductPojo product : products){
+            productIdToProductMapping.put(product.getId(),product);
+        }
+//        Map<Integer, ProductPojo> productIdToProductMapping = productService.getProductsByProductIds(productIds);
         List<InventoryReportData> inventoriesReportData = new ArrayList<>();
         Map<Integer, Integer> brandIdToQuantityMapping = new HashMap<>();
         Map<Integer, BrandPojo> brandIdToBrandMapping = new HashMap<>();
         for (InventoryPojo inventory : inventoryPojoList) {
             ProductPojo product = productIdToProductMapping.get(inventory.getProductId());
             BrandPojo brand = brandService.getAndCheckBrandById(product.getBrandId());
-            brandIdToBrandMapping.put(brand.getId(),brand);
+            brandIdToBrandMapping.put(brand.getId(), brand);
             if (brandIdToQuantityMapping.containsKey(brand.getId()))
                 brandIdToQuantityMapping.put(brand.getId(), brandIdToQuantityMapping.get(brand.getId()) + inventory.getQuantity());
             else
                 brandIdToQuantityMapping.put(brand.getId(), inventory.getQuantity());
         }
-        return getInventoryRportdata(brandIdToQuantityMapping,brandIdToBrandMapping);
+        return getInventoryRportdata(brandIdToQuantityMapping, brandIdToBrandMapping);
     }
+
     private List<InventoryReportData> getInventoryRportdata(Map<Integer, Integer> brandIdToQuantityMapping,
-                                                            Map<Integer, BrandPojo> brandIdToBrandMapping ){
+                                                            Map<Integer, BrandPojo> brandIdToBrandMapping) {
         Iterator<Map.Entry<Integer, Integer>> iterator = brandIdToQuantityMapping.entrySet().iterator();
         List<InventoryReportData> inventoriesReportData = new ArrayList<>();
         while (iterator.hasNext()) {
@@ -199,9 +204,7 @@ public class ReportDto {
         return inventoriesReportData;
     }
 
-
-    // TODO: 29/01/23 remove throws
-    public List<BrandData> getBrandReport() throws ApiException {
+    public List<BrandData> getBrandReport() {
         List<BrandPojo> brands = brandService.getAllBrand();
         List<BrandData> brandsData = new ArrayList<BrandData>();
         for (BrandPojo brandPojo : brands) {
@@ -251,11 +254,14 @@ public class ReportDto {
         Map<LocalDate, Float> dateToRevenue = new HashMap<>();
 
         for (OrderPojo order : orders) {
-            if (dateToOrdersQuantity.containsKey(order.getCreatedOn().toLocalDate())) {
-                dateToOrdersQuantity.put(order.getCreatedOn().toLocalDate(), dateToOrdersQuantity.get(order.getCreatedOn().toLocalDate()) + 1);
-            } else {
-                dateToOrdersQuantity.put(order.getCreatedOn().toLocalDate(), 1);
-            }
+            // todo use getOrDefault
+            dateToOrdersQuantity.put(order.getCreatedOn().toLocalDate(), dateToOrdersQuantity.getOrDefault(order.getCreatedOn().toLocalDate(), 0) + 1);
+
+//            if (dateToOrdersQuantity.containsKey(order.getCreatedOn().toLocalDate())) {
+//                dateToOrdersQuantity.put(order.getCreatedOn().toLocalDate(), dateToOrdersQuantity.get(order.getCreatedOn().toLocalDate()) + 1);
+//            } else {
+//                dateToOrdersQuantity.put(order.getCreatedOn().toLocalDate(), 1);
+//            }
 
             List<OrderItemPojo> orderItems = orderItemService.getOrderItemsById(order.getId());
             for (OrderItemPojo orderItem : orderItems) {

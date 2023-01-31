@@ -14,7 +14,9 @@
             <h3>Products</h3>
         </div>
         <div class="col text-right">
-            <button type="button" class="btn px-3 btn-primary mr-2" id="upload-data" th:if="${info.getRole() == 'supervisor'}">Upload</button>
+            <button type="button" class="btn px-3 btn-primary mr-2" id="upload-data"
+                    th:if="${info.getRole() == 'supervisor'}">Upload
+            </button>
             <button type="button" class="btn btn-primary" id="create-new-product">Add</button>
         </div>
     </div>
@@ -27,9 +29,9 @@
     <div class="row">
 
         <!-- Table -->
-        <div class="col-12 my-custom-scrollbar" >
+        <div class="col-12 my-custom-scrollbar">
             <table class="table table-striped" id="product-table">
-                <thead class = "sticky-top">
+                <thead class="sticky-top">
                 <tr>
                     <th scope="col">S.No.</th>
                     <th scope="col">Barcode</th>
@@ -107,7 +109,7 @@
                                 <label for="editPrice" class="col-sm-2 col-form-label">Price</label>
                             </div>
                             <div class="col-sm-9">
-                                <input type="text" class="form-control" name="price" id="addPrice"
+                                <input type="number" class="form-control" name="price" id="addPrice"
                                        placeholder="enter price">
                             </div>
                         </div>
@@ -148,7 +150,7 @@
                             <div class="col-sm-3">
                                 <label for="brand-name-edit" class="col-sm-2 col-form-label">Brand </label>
                             </div>
-                            <div class="col-sm-9" >
+                            <div class="col-sm-9">
                                 <select class="form-control" name="brandName" id="brand-name-edit">
                                     <option value="" selected></option>
                                 </select>
@@ -169,13 +171,13 @@
                                 <label for="editPrice" class="col-sm-2 col-form-label">Price</label>
                             </div>
                             <div class="col-sm-9">
-                                <input type="text" class="form-control" name="price" id="editPrice"
+                                <input type="number" class="form-control" name="price" id="editPrice"
                                        placeholder="enter price">
                             </div>
                         </div>
                         <div class="form-group row">
                             <div class="col-sm-3">
-                                <label for="editBarcode" class="col-sm-2 col-form-label" >Barcode</label>
+                                <label for="editBarcode" class="col-sm-2 col-form-label">Barcode</label>
                             </div>
                             <div class="col-sm-9">
                                 <input type="text" class="form-control" name="barcode" id="editBarcode"

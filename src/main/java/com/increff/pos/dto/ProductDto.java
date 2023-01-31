@@ -6,7 +6,7 @@ import com.increff.pos.model.form.ProductForm;
 import com.increff.pos.pojo.BrandPojo;
 import com.increff.pos.pojo.InventoryPojo;
 import com.increff.pos.pojo.ProductPojo;
-import com.increff.pos.service.ApiException;
+import com.increff.pos.exception.ApiException;
 import com.increff.pos.service.BrandService;
 import com.increff.pos.service.InventoryService;
 import com.increff.pos.service.ProductService;
@@ -34,7 +34,7 @@ public class ProductDto {
 
 
     // TODO: 29/01/23 instead of this call brandApi from calling place only
-    private List<Integer> getBrandIdList(List<ProductPojo> products){
+    private List<Integer> getBrandIdList(List<ProductPojo> products) {
         List<Integer> brandIds = products.stream()
                 .map(ProductPojo::getBrandId)
                 .collect(Collectors.toList());
@@ -42,7 +42,7 @@ public class ProductDto {
     }
 
     public ProductData getProductByBarcode(String barcode) throws ApiException {
-        if(isBlank(barcode)){
+        if (isBlank(barcode)) {
             throw new ApiException("barcode cannot be empty");
         }
         ProductPojo product = productService.getProductByBarcode(barcode);
@@ -50,10 +50,12 @@ public class ProductDto {
         return convertToProductData(product, brand);
     }
 
+
     @Transactional(rollbackOn = ApiException.class)
     public ProductData addProduct(ProductForm form) throws ApiException {
         validateProductForm(form);
-        BrandPojo brand =  brandService.checkBrandExistByNameAndCategory(form.getBrandName(), form.getBrandCategory());
+
+        BrandPojo brand = brandService.checkBrandExistByNameAndCategory(form.getBrandName(), form.getBrandCategory());
         ProductPojo productPojo = convertToProductPojo(form, brand.getId());
         InventoryPojo inventoryPojo = new InventoryPojo();
 
@@ -61,35 +63,35 @@ public class ProductDto {
         inventoryPojo.setProductId(productPojo.getId());
         inventoryPojo.setQuantity(0);
         inventoryService.addInventory(inventoryPojo);
-        return convertToProductData(product,brand);
+        return convertToProductData(product, brand);
         // FIXED: 29/01/23 what is use of sending productPojo? inventoryPojo has already productId
     }
 
 
-//    TODO can i throw the error from here AND what if the barcode changes from postman
-    public ProductData update(Integer id, ProductForm form) throws ApiException  {
+    //    FIXED can i throw the error from here AND what if the barcode changes from postman
+    public ProductData update(Integer id, ProductForm form) throws ApiException {
         validateProductForm(form);
-        BrandPojo brand =  brandService.checkBrandExistByNameAndCategory(form.getBrandName(), form.getBrandCategory());
-        productService.getProductById(id, form.getBarcode());
+        BrandPojo brand = brandService.checkBrandExistByNameAndCategory(form.getBrandName(), form.getBrandCategory());
+        productService.checkProductByIdAndBarcode(id, form.getBarcode());
         ProductPojo productPojo = convertToProductPojo(form, brand.getId());
+        productPojo.setId(id);
         // FIXED: 29/01/23 why passing brand? productPojo has brandId already irght?
-        productService.update(productPojo,  id);
-        return convertToProductData(productPojo,brand);
+        productService.update(productPojo);
+        return convertToProductData(productPojo, brand);
 
     }
 
     public List<ProductData> getAllProduct() throws ApiException {
         List<ProductPojo> products = productService.getAllProduct();
         List<Integer> brandIds = getBrandIdList(products);
-        List<BrandPojo> brands =brandService.getBrandsByBrandId(brandIds);
+        List<BrandPojo> brands = brandService.getBrandsByBrandId(brandIds);
         List<ProductData> productsData = new ArrayList<ProductData>();
 
-        for(int index = 0; index < products.size(); index++){
-            productsData.add(convertToProductData(products.get(index),brands.get(index)));
+        for (int index = 0; index < products.size(); index++) {
+            productsData.add(convertToProductData(products.get(index), brands.get(index)));
         }
         return productsData;
     }
-
 
 
 }

@@ -17,9 +17,9 @@ public class OrderDao extends AbstractDao {
     // FIXED: 29/01/23 constants should be in uppercase
     private static final String SELECT_ORDER_BY_ID = "select p from OrderPojo p where id=:id";
     private static final String SELECT_ALL_ORDERS = "select p from OrderPojo p";
-    private static final String GET_BETWEEN_DATE = "select p from OrderPojo p where p.createdOn  BETWEEN :start and :end";
+    private static final String GET_BETWEEN_DATE = "select p from OrderPojo p where p.createdOn BETWEEN :start and :end";
 
-    public OrderPojo insert(OrderPojo p)  {
+    public OrderPojo insert(OrderPojo p) {
         em().persist(p);
         return p;
     }
@@ -43,7 +43,7 @@ public class OrderDao extends AbstractDao {
         return query.getResultList();
     }
 
-    public List<OrderPojo> getOrdersForReport(LocalDateTime start, LocalDateTime end){
+    public List<OrderPojo> getOrdersForReport(LocalDateTime start, LocalDateTime end) {
         TypedQuery<OrderPojo> query = getQuery(GET_BETWEEN_DATE, OrderPojo.class);
         query.setParameter("start", start);
         query.setParameter("end", end);

@@ -4,7 +4,7 @@ import com.increff.pos.dto.OrderDto;
 import com.increff.pos.model.data.OrderData;
 import com.increff.pos.model.data.OrderItemData;
 import com.increff.pos.model.form.OrderItemForm;
-import com.increff.pos.service.ApiException;
+import com.increff.pos.exception.ApiException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.io.IOUtils;
@@ -35,7 +35,7 @@ public class OrderApiController {
     // todo change path
     @RequestMapping(path = "/invoice/{id}", method = RequestMethod.GET)
     public void getPdf(@PathVariable Integer id, HttpServletResponse response) throws ApiException {
-        String filePath = orderDto.getOrderPdf(id);
+        String filePath = orderDto.getOrderById(id).getOrderURL();
         response.setContentType("application/pdf");
         response.addHeader("Content-disposition:", "attachment; filename=invoice-" + id);
 

@@ -17,7 +17,7 @@ public class ConversionUtil {
         return d;
     }
 
-    public static  BrandPojo convertToBrandPojo(BrandForm f) {
+    public static BrandPojo convertToBrandPojo(BrandForm f) {
         BrandPojo p = new BrandPojo();
         p.setName(f.getName());
         p.setCategory(f.getCategory());
@@ -36,7 +36,7 @@ public class ConversionUtil {
         return d;
     }
 
-    public static  ProductPojo convertToProductPojo(ProductForm f, int brandId) {
+    public static ProductPojo convertToProductPojo(ProductForm f, int brandId) {
         ProductPojo p = new ProductPojo();
         p.setName(f.getName());
         p.setBrandId(brandId);
@@ -45,16 +45,16 @@ public class ConversionUtil {
         return p;
     }
 
-    public static BrandData.InventoryData convertToInventoryData(InventoryPojo p, String barcode) {
-        BrandData.InventoryData d = new BrandData.InventoryData();
+    public static InventoryData convertToInventoryData(InventoryPojo p, String barcode) {
+        InventoryData d = new InventoryData();
         d.setBarcode(barcode);
         d.setQuantity(p.getQuantity());
         return d;
     }
 
-    public static BrandData.InventoryData convertToInventoryData(InventoryPojo i, ProductPojo p) {
+    public static InventoryData convertToInventoryData(InventoryPojo i, ProductPojo p) {
 
-        BrandData.InventoryData d = new BrandData.InventoryData();
+        InventoryData d = new InventoryData();
         d.setBarcode(p.getBarcode());
         d.setQuantity(i.getQuantity());
         d.setProductName(p.getName());
@@ -62,7 +62,7 @@ public class ConversionUtil {
         return d;
     }
 
-    public static  InventoryPojo convertToInventoryPojo(InventoryForm f, Integer productId) {
+    public static InventoryPojo convertToInventoryPojo(InventoryForm f, Integer productId) {
         InventoryPojo p = new InventoryPojo();
         p.setProductId(productId);
         p.setQuantity(f.getQuantity());
@@ -70,13 +70,12 @@ public class ConversionUtil {
     }
 
 
-
-
     public static OrderPojo convertToOrderPojo(LocalDateTime d) {
         OrderPojo o = new OrderPojo();
         o.setCreatedOn(d);
         return o;
     }
+
     public static OrderData convertToOrderData(OrderPojo p) {
         OrderData d = new OrderData();
         d.setId(p.getId());
@@ -95,6 +94,7 @@ public class ConversionUtil {
         d.setBarcode(product.getBarcode());
         return d;
     }
+
     public static InvoiceData convertToInvoiceData(OrderItemForm p, ProductPojo product, Integer orderId) {
         InvoiceData d = new InvoiceData();
         d.setBarcode(p.getBarcode());
@@ -105,11 +105,11 @@ public class ConversionUtil {
         return d;
     }
 
-    public static  OrderItemPojo convertToOrderItemPojo(Float price,OrderItemForm o, int id, int productId) {
+    public static OrderItemPojo convertToOrderItemPojo(OrderItemForm o, int id, int productId) {
         OrderItemPojo p = new OrderItemPojo();
         p.setQuantity(o.getQuantity());
         p.setOrderId(id);
-        p.setSellingPrice(price);
+        p.setSellingPrice(o.getSellingPrice());
         p.setProductId(productId);
         return p;
     }
@@ -123,7 +123,8 @@ public class ConversionUtil {
 
         return p;
     }
-    public static  UserPojo convertToUserPojo(UserForm d) {
+
+    public static UserPojo convertToUserPojo(UserForm d) {
         UserPojo p = new UserPojo();
         p.setRole(d.getRole());
         p.setEmail(d.getEmail());

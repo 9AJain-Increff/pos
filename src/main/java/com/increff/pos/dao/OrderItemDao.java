@@ -17,7 +17,7 @@ public class OrderItemDao extends AbstractDao {
     private static final String SELECT_ORDER_ITEM_BY_ID = "select p from OrderItemPojo p where id=:id ";
 
 
-    public void insert(OrderItemPojo p)  {
+    public void insert(OrderItemPojo p) {
         em().persist(p);
     }
 

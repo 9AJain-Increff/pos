@@ -1,13 +1,12 @@
 package com.increff.pos.service;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.transaction.Transactional;
 
 import com.increff.pos.dao.ProductDao;
+import com.increff.pos.exception.ApiException;
 import com.increff.pos.pojo.ProductPojo;
 
 import com.sun.istack.NotNull;
@@ -37,10 +36,10 @@ public class ProductService {
         return dao.getAllProduct();
     }
 
-    @Transactional(rollbackOn  = ApiException.class)
-    public void update(ProductPojo product,  Integer id) throws ApiException {
+    @Transactional(rollbackOn = ApiException.class)
+    public void update(ProductPojo product) throws ApiException {
         normalizeProduct(product);
-        ProductPojo exist = getProductById(id, product.getBarcode());
+        ProductPojo exist = checkProduct(product.getId());
         exist.setName(product.getName());
         exist.setPrice(product.getPrice());
         exist.setBrandId(product.getBrandId());
@@ -48,7 +47,7 @@ public class ProductService {
 
     private ProductPojo checkIfProductExist(ProductPojo p, String identity) throws ApiException {
         if (p == null) {
-            throw new ApiException("Product with given "+ identity +" does not exist" );
+            throw new ApiException("Product with given " + identity + " does not exist");
         }
         return p;
     }
@@ -57,70 +56,66 @@ public class ProductService {
         normalize(barcode);
         ProductPojo p = dao.getProductByBarcode(barcode);
         /// FIXED: 29/01/23 below code can be combined with getProductById method
-        return checkIfProductExist(p,"barcode");
-    }
-    public ProductPojo getProductById(Integer productId) throws ApiException {
-        ProductPojo p = dao.getProductById(productId);
-        return checkIfProductExist(p,"id");
+        return checkIfProductExist(p, "barcode");
     }
 
-    public ProductPojo getProductById(Integer id, String barcode) throws ApiException {
+    public ProductPojo checkProduct(Integer productId) throws ApiException {
+        ProductPojo p = dao.getProductById(productId);
+        return checkIfProductExist(p, "id");
+    }
+
+    public ProductPojo checkProductByIdAndBarcode(Integer id, String barcode) throws ApiException {
         normalize(barcode);
         // FIXED: 29/01/23 cant we use getProductById?
         ProductPojo p = dao.getProductById(id);
         if (p == null) {
             throw new ApiException("Product with given id does not exit, id: " + id);
         }
-        if(p.getBarcode() == barcode){
+        if (p.getBarcode().equals(barcode)) {
             return p;
         }
         // FIXED: 29/01/23 barcode can be changed but not to an existing one.....(?)
         checkBarcode(barcode);
         return p;
     }
+
     public void validateSellingPrice(Float sellingPrice, Float price) throws ApiException {
-        if(sellingPrice > price){
-            throw new ApiException("selling price should not be more than the MRP!");
+        if (sellingPrice > price) {
+            throw new ApiException("selling price should not be more than the MRP = "+price);
         }
     }
-
 
 
     // FIXED: 29/01/23 public is needed?
     private void checkBarcode(String barcode) throws ApiException {
         normalize(barcode);
         ProductPojo p = dao.getProductByBarcode(barcode);
-        if(p != null){
+        if (p != null) {
             throw new ApiException(("barcode already exist "));
         }
 
     }
 
-
-
-
-    public Map<Integer, ProductPojo> getProductsByProductIds(List<Integer> productIds ) {
-        Map<Integer, ProductPojo> mapping = new HashMap<>();
-        for(Integer productId: productIds){
-            mapping.put(productId,dao.getProductById(productId));
-        }
-        return mapping;
-    }
-
-
-    public List<ProductPojo> getProducts(List<String> b) {
-        List<String> barcodes = new ArrayList<>();
-        for (String barcode: b){
-            barcodes.add(normalize(barcode));
-        }
+    public List<ProductPojo> getProductsByIds(List<Integer> productIds) {
         List<ProductPojo> products = new ArrayList<>();
-        for(String barcode: barcodes){
-            products.add(dao.getProductByBarcode(barcode));
+        for (Integer productId : productIds) {
+            products.add(dao.getProductById(productId));
         }
         return products;
     }
 
 
+    public List<ProductPojo> getProductsByBarcodes(List<String> b) {
+        List<String> barcodes = new ArrayList<>();
+        for (String barcode : b) {
+            barcodes.add(normalize(barcode));
+        }
+        List<ProductPojo> products = new ArrayList<>();
+        for (String barcode : barcodes) {
+            products.add(dao.getProductByBarcode(barcode));
+        }
+        return products;
+    }
 
 
 }

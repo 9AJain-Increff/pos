@@ -2,14 +2,14 @@ package com.increff.pos.model.data;
 
 public class MessageData {
 
-	private String message;
+    private String message;
 
-	public String getMessage() {
-		return message;
-	}
+    public String getMessage() {
+        return message;
+    }
 
-	public void setMessage(String message) {
-		this.message = message;
-	}
+    public void setMessage(String message) {
+        this.message = message;
+    }
 
 }

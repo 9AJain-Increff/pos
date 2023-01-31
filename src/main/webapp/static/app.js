@@ -16,9 +16,21 @@ function toJson($form){
 function handleAjaxError(response){
 console.log('failllllllllllll')
 	var response = JSON.parse(response.responseText);
+	$('.notifyjs-wrapper').trigger('notify-hide');
 	$.notify(response.message, 'error');
 }
 
+//prevent 'e' press in number field
+var invalidChars = [
+    "-",
+    "+",
+    "e",
+];
+const verifyNumberInput = () =>  document.querySelectorAll('input[type="number"]').forEach( input => input.addEventListener("keydown", function(e) {
+    if (invalidChars.includes(e.key)) {
+      e.preventDefault();
+    }
+  }));
 function readFileData(file, callback){
 	var config = {
 		header: true,

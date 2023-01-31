@@ -16,7 +16,7 @@ public class ProductDao extends AbstractDao {
     private static final String SELECT_ALL = "select p from ProductPojo p";
 
 
-    public ProductPojo add(ProductPojo p)  {
+    public ProductPojo add(ProductPojo p) {
         em().persist(p);
         return p;
     }

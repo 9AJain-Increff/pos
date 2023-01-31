@@ -5,8 +5,8 @@ import java.util.List;
 import javax.transaction.Transactional;
 
 import com.increff.pos.dao.InventoryDao;
+import com.increff.pos.exception.ApiException;
 import com.increff.pos.pojo.InventoryPojo;
-import com.increff.pos.pojo.ProductPojo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,7 +31,6 @@ public class InventoryService {
 //    }
     @Transactional(rollbackOn = ApiException.class)
     public void addInventory(InventoryPojo p) throws ApiException {
-        ;
         InventoryPojo exist = inventoryDao.selectInventoryByProductId(p.getProductId());
         if (exist == null) {
             inventoryDao.insert(p);
@@ -59,6 +58,9 @@ public class InventoryService {
     public void update(InventoryPojo p) throws ApiException {
 
         InventoryPojo ex = inventoryDao.selectInventoryByProductId(p.getProductId());
+        if (ex == null) {
+            throw new ApiException("Inventory Doesn't exist");
+        }
         ex.setQuantity((p.getQuantity()));
     }
 

@@ -33,12 +33,7 @@ body {
     font-size: 4rem;
 }
 
-th,
-tr,
-.table td {
-  text-align: center;
-  vertical-align: middle;
-}
+
 
 .my-custom-scrollbar {
   position: relative;
@@ -55,4 +50,30 @@ background :white;
 
 .navbar{
 color:purple;
+}
+
+
+table{
+   width: 100%; /* For Responsive design set 100% */
+   border-collapse: collapse;
+   margin: 30px 0px 30px;
+   background-color: #fff;
+   font-size: 1.1rem;
+}
+
+table tr {
+   height: 40px;
+}
+
+table th {
+   background: #333;
+   color: #fff;
+   font-weight: bold;
+   font-size: 1.1rem;
+}
+
+table td, th {
+   padding: 6px 6px 6px 10px;
+   border: 1px solid #ccc;
+   text-align:center;
 }

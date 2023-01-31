@@ -1,6 +1,6 @@
 function getSalesReportUrl(){
    var baseUrl = $("meta[name=baseUrl]").attr("content")
-   return baseUrl + "/api/report/sales";
+   return baseUrl + "/api/reports/sales";
 }
 
 function getBaseUrl() {
@@ -10,18 +10,37 @@ function getBaseUrl() {
 function getBrandUrl() {
   return getBaseUrl() + '/api/brands';
 }
+function getIsoDate(dateString) {
+  const date = new Date(dateString);
+  return date.toISOString();
+}
 
+function setupDate(json) {
+  if (json.startDate) {
+    json.startDate = getIsoDate(json.startDate);
+  }
+
+  if (json.endDate) {
+    json.endDate = getIsoDate(json.endDate);
+  }
+}
 
 function filterSalesReport() {
     var $form = $("#sales-form");
-    var json = toJson($form);
-    var url = getSalesReportUrl();
-    console.log(url);
-    console.log(json);
+
+    let jsonString = toJson($form);
+
+      const json = JSON.parse(jsonString);
+
+      setupDate(json);
+      jsonString = JSON.stringify(json);
+
+      const url = getSalesReportUrl();
+
     $.ajax({
        url: url,
        type: 'POST',
-       data: json,
+       data: jsonString,
        headers: {
         'Content-Type': 'application/json'
        },

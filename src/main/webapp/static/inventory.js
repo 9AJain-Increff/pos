@@ -37,31 +37,30 @@ function addInventory(event){
 function updateInventory(event){
 	$('#edit-inventory-modal').modal('toggle');
 	//Get the ID
-	var barcode = $("#inventory-edit-form input[name=barcode]").val();
-	var url = getInventoryUrl() + "/" + barcode;
+//	var barcode = $("#inventory-edit-form input[name=barcode]").val();
+//	var url = getInventoryUrl() + "/" + barcode;
 
 	//Set the values to update
 	var $form = $("#inventory-edit-form");
 	var json = toJson($form);
-    console.log(url,barcode)
-	$.ajax({
-	   url: url,
-	   type: 'PUT',
-	   data: json,
-	   headers: {
-       	'Content-Type': 'application/json'
-       },
-	   success: function(response) {
-	   console.log("successsssssssssss")
-	   		getInventoryList();
-	   },
-	   error:
-	   handleAjaxError
+    var url = getInventoryUrl();
 
-	});
+    	$.ajax({
+    	   url: url,
+    	   type: 'POST',
+    	   data: json,
+    	   headers: {
+           	'Content-Type': 'application/json'
+           },
+    	   success: function(response) {
+    	   		getInventoryList();
+    	   },
+    	   error: handleAjaxError,
+    	});
 
-	return false;
-}
+    	return false;
+    }
+
 
 
 function getInventoryList(){

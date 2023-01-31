@@ -1,12 +1,10 @@
 package com.increff.pos.util;
 
 import com.increff.pos.model.data.BrandData;
+import com.increff.pos.model.data.InventoryData;
 import com.increff.pos.model.data.OrderData;
 import com.increff.pos.model.data.ProductData;
-import com.increff.pos.pojo.BrandPojo;
-import com.increff.pos.pojo.OrderItemPojo;
-import com.increff.pos.pojo.OrderPojo;
-import com.increff.pos.pojo.ProductPojo;
+import com.increff.pos.pojo.*;
 
 import java.util.List;
 
@@ -33,6 +31,7 @@ public class AssertUtil {
         assertEquals(expected.getCategory(), actual.getCategory());
         assertEquals(expected.getName(), actual.getName());
     }
+
     public static void assertEqualBrands(BrandPojo expected, BrandPojo actual) {
         assertEquals(expected.getId(), actual.getId());
         assertEquals(expected.getName(), actual.getName());
@@ -45,11 +44,12 @@ public class AssertUtil {
 
     }
 
-    public static void assertEqualInventoryData(BrandData.InventoryData expected, BrandData.InventoryData actual) {
+    public static void assertEqualInventoryData(InventoryData expected, InventoryData actual) {
         assertEquals(expected.getBarcode(), actual.getBarcode());
         assertEquals(expected.getProductName(), actual.getProductName());
         assertEquals(expected.getQuantity(), actual.getQuantity());
     }
+
     public static void assertEqualProducts(ProductPojo expected, ProductPojo actual) {
         assertEquals(expected.getId(), actual.getId());
         assertEquals(expected.getBrandId(), actual.getBrandId());
@@ -83,5 +83,15 @@ public class AssertUtil {
     public static void assertEqualOrderData(OrderData expected, OrderData actual) {
         assertEquals(expected.getId(), actual.getId());
         assertEquals(expected.getCreatedOn(), actual.getCreatedOn());
+    }
+
+    public static void assertEqualInventory(InventoryPojo expected, InventoryPojo actual) {
+        assertEquals(expected.getQuantity(), actual.getQuantity());
+        assertEquals(expected.getProductId(), actual.getProductId());
+    }
+
+    public static void assertEqualOrders(OrderPojo expected, OrderPojo actual) {
+        assertEquals(expected.getCreatedOn(), actual.getCreatedOn());
+//        assertEquals(expected.getOrderURL(), actual.getOrderURL());
     }
 }

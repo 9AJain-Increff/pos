@@ -3,10 +3,10 @@ package com.increff.pos.controller;
 import com.increff.pos.dto.SignUpDto;
 import com.increff.pos.model.form.UserForm;
 import com.increff.pos.pojo.UserPojo;
-import com.increff.pos.service.ApiException;
+import com.increff.pos.exception.ApiException;
 import com.increff.pos.service.UserService;
 import com.increff.pos.util.SecurityUtil;
-import com.increff.pos.util.UserPrincipal;
+import com.increff.pos.model.auth.UserPrincipal;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +48,7 @@ public class SignUpApiController extends AbstractUiController {
 
         return new ModelAndView("redirect:/ui/home");
     }
+
     private static Authentication convert(UserPojo p) {
         // Create principal
         UserPrincipal principal = new UserPrincipal();

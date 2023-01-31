@@ -1,7 +1,8 @@
 package com.increff.pos.dto;
 
 
-import com.increff.pos.model.*;
+import com.increff.pos.exception.ApiException;
+import com.increff.pos.helper.OrderItemsUpdates;
 import com.increff.pos.model.data.InvoiceData;
 import com.increff.pos.model.data.OrderData;
 import com.increff.pos.model.data.OrderItemData;
@@ -24,7 +25,6 @@ import java.io.FileOutputStream;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static com.increff.pos.util.ConversionUtil.*;
 import static com.increff.pos.util.ValidationUtil.*;
@@ -40,34 +40,21 @@ public class OrderDto {
     @Autowired
     private OrderItemService orderItemService;
 
-    // TODO: 29/01/23 dont depend on index
     public List<OrderItemData> getOrderItemsById(Integer orderId) throws ApiException {
-
-        orderService.checkOrderExist(orderId);
-        List<OrderItemPojo> orderItemPojoList = orderItemService.getOrderItemsById(orderId);
-        List<String> barcodes = getBarcodes(orderItemPojoList);
-        List<ProductPojo> productPojoList = getProductList(barcodes);
+        orderService.getOrderByOrderId(orderId);
         List<OrderItemData> orderItemDataList = new ArrayList<>();
-
-        for (int index = 0; index < orderItemPojoList.size(); index++) {
-            ProductPojo product= productPojoList.get(index);
-
-            OrderItemPojo orderItem = orderItemPojoList.get(index);
+        List<OrderItemPojo> orderItemPojoList = orderItemService.getOrderItemsById(orderId);
+        for (OrderItemPojo orderItem : orderItemPojoList) {
+            ProductPojo product = productService.checkProduct(orderItem.getProductId());
             orderItemDataList.add(convertToOrderItemData(orderItem, product, orderId));
         }
-        return (orderItemDataList);
+        return orderItemDataList;
     }
 
-    public OrderPojo getOrderById(Integer orderId){
+    public OrderPojo getOrderById(Integer orderId) throws ApiException {
         return orderService.getOrderByOrderId(orderId);
     }
 
-    // TODO: 29/01/23 can use get by order id method instead of having a sep method
-    public String getOrderPdf(Integer id) throws ApiException {
-        return orderService.getPdfUrl(id);
-    }
-
-    // TODO: 29/01/23 dont depend on list index. Iterate over the items and do the required things
     private void validateInventory(
             List<InventoryPojo> inventoryPojoList,
             List<OrderItemPojo> orderItemPojoList) throws ApiException {
@@ -76,7 +63,7 @@ public class OrderDto {
             int inventoryQuantity = inventoryPojoList.get(index).getQuantity();
             int requiredQuantity = orderItemPojoList.get(index).getQuantity();
             Integer productId = orderItemPojoList.get(index).getProductId();
-            ProductPojo product = productService.getProductById(productId);
+            ProductPojo product = productService.checkProduct(productId);
             if (requiredQuantity > inventoryQuantity) {
                 throw new ApiException("Only " + inventoryQuantity + " pieces of the product with barcode = " + product.getBarcode() + " exists");
             } else {
@@ -89,8 +76,8 @@ public class OrderDto {
     public List<String> getBarcodes(List<OrderItemPojo> orderItemPojos) throws ApiException {
 
         List<String> barcodes = new ArrayList<>();
-        for(OrderItemPojo orderItem : orderItemPojos){
-            ProductPojo product = productService.getProductById(orderItem.getProductId());
+        for (OrderItemPojo orderItem : orderItemPojos) {
+            ProductPojo product = productService.checkProduct(orderItem.getProductId());
             barcodes.add(product.getBarcode());
         }
         return barcodes;
@@ -122,59 +109,43 @@ public class OrderDto {
             inventoryService.update(inventoryPojo);
         }
     }
+
     public void addOrderItems(List<OrderItemPojo> addedOrderItems) throws ApiException {
         for (OrderItemPojo orderItemPojo : addedOrderItems) {
-            ProductPojo product = productService.getProductById(orderItemPojo.getProductId());
+            ProductPojo product = productService.checkProduct(orderItemPojo.getProductId());
             orderItemPojo.setProductId(product.getId());
         }
-            orderItemService.addOrderItem(addedOrderItems);
+        orderItemService.addOrderItem(addedOrderItems);
 
     }
 
-    // TODO: 29/01/23 remove unused variables
-    // TODO: 29/01/23 try to reduce the DB calls
     @Transactional(rollbackOn = ApiException.class)
     public OrderData addOrder(List<OrderItemForm> orderItemForm) throws ApiException {
-        if(orderItemForm.size() == 0){
+        if (orderItemForm.size() == 0) {
             throw new ApiException("Order must contain atleast 1 order item");
         }
         for (OrderItemForm orderItem : orderItemForm) {
             validateOrderForm(orderItem);
         }
-        List<String> barcodes = orderItemForm.stream()
-                .map(OrderItemForm::getBarcode)
-                .collect(Collectors.toList());
-
-        List<InventoryPojo> inventoryPojoList = getInventoryPojo(barcodes);
         LocalDateTime date = LocalDateTime.now(ZoneOffset.UTC);
         OrderPojo newOrder = orderService.createNewOrder(convertToOrderPojo(date));
         List<OrderItemPojo> orderItemPojoList = new ArrayList<>();
-        for (int i = 0; i < orderItemForm.size(); i++) {
-            ProductPojo product = productService.getProductByBarcode(orderItemForm.get(i).getBarcode());
-            productService.validateSellingPrice(orderItemForm.get(i).getSellingPrice(),product.getPrice());
-            // TODO: 29/01/23 where are you validating selling price? Place it in productService
-            OrderItemPojo pojo = convertToOrderItemPojo(
-                    orderItemForm.get(i).getSellingPrice(),
-                    orderItemForm.get(i),
-                    newOrder.getId(),
-                    product.getId()
-            );
-            orderItemPojoList.add(pojo);
+        List<InventoryPojo> inventoryPojoList = new ArrayList<>();
+        for (OrderItemForm orderItem : orderItemForm) {
+            ProductPojo product = productService.getProductByBarcode(orderItem.getBarcode());
+            InventoryPojo inventoryPojo = inventoryService.getAndCheckInventoryByProductId(product.getId());
+            inventoryPojoList.add(inventoryPojo);
+            orderItemPojoList.add(convertToOrderItemPojo(orderItem, newOrder.getId(), product.getId()));
         }
-
         validateInventory(inventoryPojoList, orderItemPojoList);
         updateInventory(inventoryPojoList);
         addOrderItems(orderItemPojoList);
-
         List<InvoiceData> invoiceData = getInvoiceData(orderItemForm, newOrder);
         getEncodedPdf(invoiceData);
-        // FIXED: 29/01/23 if there are no orderitems will this work?
-        int orderId = invoiceData.get(0).getOrderId();
-        // FIXED: 29/01/23 create pdf inside DTO
-        addPdfURL(orderId);
+        addPdfURL(newOrder.getId());
         return convertToOrderData(newOrder);
-
     }
+
     private String getEncodedPdf(List<InvoiceData> invoiceDetails) throws RestClientException {
         // TODO: 29/01/23 Create a sep class Constants and declare this there
         String INVOICE_API_URL = "http://localhost:8000/invoice/api/generate";
@@ -186,7 +157,7 @@ public class OrderDto {
     }
 
     private void generatePdf(String b64, Integer orderId) {
-        File file = new File("./order"+orderId+".pdf");
+        File file = new File("./order" + orderId + ".pdf");
 
         try (FileOutputStream fos = new FileOutputStream(file);) {
             byte[] decoder = Base64.getDecoder().decode(b64);
@@ -196,8 +167,6 @@ public class OrderDto {
             e.printStackTrace();
         }
     }
-
-
 
     public void addNewlyUpdatedOrderItems(List<OrderItemPojo> addedOrderItems) throws ApiException {
         List<String> barcodes = getBarcodes(addedOrderItems);
@@ -219,14 +188,16 @@ public class OrderDto {
         updateOrderItemList(updatedOrderItems, productIdToOrderItemMapping);
 
     }
+
     public void updateOrderItemList(List<OrderItemPojo> updatedOrderItems,
-                                 Map<Integer, OrderItemPojo> barcodeToOrderItemMapping) throws ApiException {
+                                    Map<Integer, OrderItemPojo> barcodeToOrderItemMapping) throws ApiException {
         for (OrderItemPojo orderItemPojo : updatedOrderItems) {
             int newQuantity = barcodeToOrderItemMapping.get(orderItemPojo.getProductId()).getQuantity();
             orderItemPojo.setQuantity(newQuantity);
             orderItemService.updateOrderItem(orderItemPojo);
         }
     }
+
     public void deleteUpdatedOrderItems(List<OrderItemPojo> deletedOrderItems) throws ApiException {
         for (OrderItemPojo orderItemPojo : deletedOrderItems) {
             orderItemService.delete(orderItemPojo.getId());
@@ -238,13 +209,11 @@ public class OrderDto {
         List<String> barcodes = getBarcodes(deletedOrderItems);
 
         List<InventoryPojo> inventoryPojoList = getInventoryPojo(barcodes);
-
-        // TODO: 29/01/23 why to validate the inventory while deleting?
         validateInventory(inventoryPojoList, deletedOrderItems);
         deleteInventory(inventoryPojoList);
         deleteUpdatedOrderItems(deletedOrderItems);
-
     }
+
     public void deleteInventory(List<InventoryPojo> inventoryPojoList) throws ApiException {
         for (InventoryPojo inventoryPojo : inventoryPojoList) {
             inventoryService.update(inventoryPojo);
@@ -261,9 +230,9 @@ public class OrderDto {
         for (OrderItemForm orderItem : orderItemForms) {
 
             validateOrderForm(orderItem);
-            ProductPojo product =productService.getProductByBarcode(orderItem.getBarcode());
-            productService.validateSellingPrice(orderItem.getSellingPrice(),product.getPrice());
-            updatedOrderList.add(convertToOrderItemPojo(orderItem.getSellingPrice(), orderItem, orderId, product.getId()));
+            ProductPojo product = productService.getProductByBarcode(orderItem.getBarcode());
+            productService.validateSellingPrice(orderItem.getSellingPrice(), product.getPrice());
+            updatedOrderList.add(convertToOrderItemPojo(orderItem, orderId, product.getId()));
         }
 
 
@@ -272,14 +241,14 @@ public class OrderDto {
         List<OrderItemPojo> oldOrder = orderItemService.getOrderItemsById(orderId);
         Map<Integer, OrderItemPojo> productIdToOrderItemMapping = new HashMap<>();
         // TODO: 29/01/23 rename variables properly
-        for (OrderItemPojo temp : updatedOrderList) {
-            ProductPojo product = productService.getProductById(temp.getProductId());
-            productIdToOrderItemMapping.put(product.getId(), temp);
-            mappingFormData.put(product.getId(), temp);
+        for (OrderItemPojo orderItemPojo : updatedOrderList) {
+            ProductPojo product = productService.checkProduct(orderItemPojo.getProductId());
+            productIdToOrderItemMapping.put(product.getId(), orderItemPojo);
+            mappingFormData.put(product.getId(), orderItemPojo);
         }
 
         // TODO: 29/01/23 rename classes and variables properly
-        GetList getlist = new GetList();
+        OrderItemsUpdates getlist = new OrderItemsUpdates();
         getlist.updatesList(oldOrder, mappingFormData, orderId);
         List<OrderItemPojo> updatedOrderItems = getlist.getToUpdate();
         List<OrderItemPojo> deletedOrderItems = getlist.getToDelete();
@@ -295,7 +264,6 @@ public class OrderDto {
         return updatedOrder;
     }
 
-
     public List<OrderData> getAllOrders() {
         List<OrderPojo> orders = orderService.getAllOrders();
         List<OrderData> ordersData = new ArrayList<OrderData>();
@@ -305,22 +273,19 @@ public class OrderDto {
         return ordersData;
     }
 
-    // TODO: 29/01/23 why sep method? you can directly call this one liner from the invocation place
     public List<InvoiceData> getInvoiceData(List<OrderItemForm> form, OrderPojo order) throws ApiException {
         List<InvoiceData> invoiceData = new ArrayList<>();
         for (int i = 0; i < form.size(); i++) {
             ProductPojo product = productService.getProductByBarcode(form.get(i).getBarcode());
             InvoiceData data = convertToInvoiceData(
-                    form.get(i),
-                    product,
-                    order.getId()
+                    form.get(i), product, order.getId()
             );
             invoiceData.add(data);
         }
         return invoiceData;
     }
-    public void  addPdfURL(Integer id){
+
+    public void addPdfURL(Integer id) {
         orderService.addPdfURL(id);
     }
-
 }

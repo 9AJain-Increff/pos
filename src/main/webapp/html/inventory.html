@@ -17,15 +17,17 @@
         </div>
 
         <div class="col text-right">
-            <button type="button" class="btn px-3 btn-primary mr-2" id="upload-data" th:if="${info.getRole() == 'supervisor'}">Upload</button>
+            <button type="button" class="btn px-3 btn-primary mr-2" id="upload-data"
+                    th:if="${info.getRole() == 'supervisor'}">Upload
+            </button>
             <button type="button" class="btn btn-primary" id="create-new-inventory">Add</button>
             <!--            <button type="button" class="btn btn-primary" id="refresh-data">Refresh</button>-->
         </div>
-<!--        <div class="col-3">-->
-<!--            <button type="button" class="btn btn-primary" id="create-new-inventory">Add</button>-->
-<!--            <button type="button" class="btn btn-primary" id="upload-data">Upload</button>-->
-<!--&lt;!&ndash;            <button type="button" class="btn btn-primary" id="refresh-data">Refresh</button>&ndash;&gt;-->
-<!--        </div>-->
+        <!--        <div class="col-3">-->
+        <!--            <button type="button" class="btn btn-primary" id="create-new-inventory">Add</button>-->
+        <!--            <button type="button" class="btn btn-primary" id="upload-data">Upload</button>-->
+        <!--&lt;!&ndash;            <button type="button" class="btn btn-primary" id="refresh-data">Refresh</button>&ndash;&gt;-->
+        <!--        </div>-->
     </div>
 
     <!-- Blank Row -->
@@ -37,7 +39,7 @@
         <!-- Table -->
         <div class="col-12 my-custom-scrollbar">
             <table class="table table-striped" id="inventory-table">
-                <thead class = "sticky-top">
+                <thead class="sticky-top">
                 <tr>
                     <th scope="col">S.No.</th>
                     <th scope="col">Barcode</th>

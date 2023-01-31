@@ -1,4 +1,4 @@
-package com.increff.pos.model;
+package com.increff.pos.helper;
 
 
 import com.increff.pos.pojo.OrderItemPojo;
@@ -8,15 +8,17 @@ import java.util.List;
 import java.util.Map;
 
 // TODO: 29/01/23 rename it
-public  class GetList {
+public class OrderItemsUpdates {
 
-    public GetList() {
+    public OrderItemsUpdates() {
         toAdd = new ArrayList<>();
         toDelete = new ArrayList<>();
         toUpdate = new ArrayList<>();
     }
 
-    private List<OrderItemPojo> toUpdate, toAdd, toDelete;
+    private final List<OrderItemPojo> toUpdate;
+    private final List<OrderItemPojo> toAdd;
+    private final List<OrderItemPojo> toDelete;
 
     public List<OrderItemPojo> getToUpdate() {
         return toUpdate;
