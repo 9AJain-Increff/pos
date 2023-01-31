@@ -156,7 +156,7 @@ function displayInventoryList(data){
 	for(var i in data){
 		var e = data[i];
 		console.log(e);
-		var buttonHtml = ' <button class="btn btn-outline-dark" onclick="displayEditInventory(' + "'" + e.barcode + "'" + ')">edit</button>'
+		var buttonHtml = ' <button class="btn btn-outline-dark" onclick="displayEditInventory(' + "'" + e.id + "'" + ')">edit</button>'
 		var row = '<tr>'
         + '<td>' + count + '</td>'
 		+ '<td>' + e.barcode + '</td>'
@@ -169,8 +169,8 @@ function displayInventoryList(data){
 	}
 }
 
-function displayEditInventory(barcode){
-	var url = getInventoryUrl() + "/" + barcode;
+function displayEditInventory(id){
+	var url = getInventoryUrl() + "/" + id;
 	console.log(url)
 	$.ajax({
 	   url: url,

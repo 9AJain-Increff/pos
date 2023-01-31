@@ -50,6 +50,12 @@ public class ProductDto {
         return convertToProductData(product, brand);
     }
 
+    public ProductData getProductById(Integer id) throws ApiException {
+        ProductPojo product = productService.getProductById(id);
+        BrandPojo brand = brandService.getAndCheckBrandById(product.getBrandId());
+        return convertToProductData(product, brand);
+    }
+
 
     @Transactional(rollbackOn = ApiException.class)
     public ProductData addProduct(ProductForm form) throws ApiException {

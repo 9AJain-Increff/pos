@@ -139,6 +139,12 @@ public class ProductDtoTest extends AbstractUnitTest {
         ProductData actual = productDto.getProductByBarcode(expected.getBarcode());
         AssertUtil.assertEqualProductData(expected, actual);
     }
+    @Test
+    public void getProductByIdForValidIdReturnsPojo() throws ApiException {
+        ProductData expected = productDataList.get(0);
+        ProductData actual = productDto.getProductById(expected.getId());
+        AssertUtil.assertEqualProductData(expected, actual);
+    }
 
     @Test
     public void getByBarcodeForInvalidBarcodeThrowsException() throws ApiException {

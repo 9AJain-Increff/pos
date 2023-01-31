@@ -31,10 +31,9 @@ function getOrderList() {
   });
 }
 
-function getProductByBarcode(barcode, onSuccess) {
-  const url = getProductUrl() + '/' + barcode;
+function getProductById(productId, onSuccess) {
+  const url = getProductUrl() + '/' + productId;
   console.log(url);
-  console.log(barcode);
   $.ajax({
     url: url,
     type: 'GET',
@@ -556,14 +555,15 @@ function editOrderItem() {
 }
 
 function checkInventoryByBarcode(item, displayCallBack, resetCallBack){
-const url = getInventoryUrl() + '/' + item.barcode;
+const url = getInventoryUrl() + "?barcode=" + item.barcode;
   console.log(url);
   $.ajax({
     url: url,
     type: 'GET',
     success: function (data) {
-        if(data.quantity>=item.quantity){
-                  getProductByBarcode(item.barcode, (product) => {
+
+        if(data[0].quantity>=item.quantity){
+                  getProductById(data[0].id, (product) => {
                     addItem({
                       barcode: product.barcode,
                       name: product.name,
@@ -576,7 +576,7 @@ const url = getInventoryUrl() + '/' + item.barcode;
         })
         }
         else{
-               $.notify('only '+ data.quantity+ ' pieces available in inventory', 'error');
+               $.notify('only '+ data[0].quantity+ ' pieces available in inventory', 'error');
         }
     },
     error: handleAjaxError,

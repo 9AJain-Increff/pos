@@ -58,6 +58,11 @@ public class ProductService {
         /// FIXED: 29/01/23 below code can be combined with getProductById method
         return checkIfProductExist(p, "barcode");
     }
+    public ProductPojo getProductById(Integer id) throws ApiException {
+        ProductPojo p = dao.getProductById(id);
+        /// FIXED: 29/01/23 below code can be combined with getProductById method
+        return checkIfProductExist(p, "barcode");
+    }
 
     public ProductPojo checkProduct(Integer productId) throws ApiException {
         ProductPojo p = dao.getProductById(productId);

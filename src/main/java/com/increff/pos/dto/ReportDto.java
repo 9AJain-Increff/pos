@@ -65,93 +65,43 @@ public class ReportDto {
         return filteredOrderItems;
     }
 
-    private Map<Integer, Integer> getQuantityMapping(List<OrderItemPojo> orderItems) {
-        Map<Integer, Integer> mapping = new HashMap<>();
-        for (OrderItemPojo orderItem : orderItems) {
-            Integer productId = orderItem.getProductId();
-            if (mapping.containsKey(productId)) {
-                mapping.put(productId, mapping.get(productId) + orderItem.getQuantity());
-            } else {
-                mapping.put(productId, orderItem.getQuantity());
-            }
-        }
-        return mapping;
-    }
-
-    private Map<Integer, Integer> getQuantityMapping(List<Integer> productIds, List<OrderItemPojo> orderItems) throws ApiException {
-        Map<Integer, Integer> mapping = new HashMap<>();
-        for (int index = 0; index < productIds.size(); index++) {
-            Integer productId = productIds.get(index);
-            ProductPojo product = productService.checkProduct(productId);
-            BrandPojo brand = brandService.getAndCheckBrandById(product.getBrandId());
-            OrderItemPojo orderItem = orderItems.get(index);
-            if (mapping.containsKey(brand.getId())) {
-                mapping.put(brand.getId(), mapping.get(brand.getId()) + orderItem.getQuantity());
-            } else {
-                mapping.put(brand.getId(), orderItem.getQuantity());
-            }
-        }
-        return mapping;
-    }
-
-    private Map<Integer, Float> getRevenueMapping(List<OrderItemPojo> orderItems) throws ApiException {
-        Map<Integer, Float> brandToRevenueMapping = new HashMap<>();
-        for (OrderItemPojo orderItem : orderItems) {
-            ProductPojo product = productService.checkProduct(orderItem.getProductId());
-            BrandPojo brand = brandService.getAndCheckBrandById(product.getBrandId());
-            if (brandToRevenueMapping.containsKey(brand.getId())) {
-                brandToRevenueMapping.put(brand.getId(), brandToRevenueMapping.get(brand.getId()) + orderItem.getSellingPrice());
-            } else {
-                brandToRevenueMapping.put(brand.getId(), orderItem.getSellingPrice());
-            }
-        }
-        return brandToRevenueMapping;
-    }
-
-    private LocalDateTime getLocalDateTime(LocalDateTime time, LocalDateTime extremeTime) {
-        if (time == null) {
-            time = extremeTime;
-        }
-        return time;
-    }
-
-
-    public List<SalesData> getSalesReport(
-            String brandName,
+    public List<SalesData> getSalesReport(String brandName,
             String brandCategory,
             LocalDateTime startTime,
             LocalDateTime endTime) throws ApiException {
-        LocalDateTime start, end;
         startTime = formatStartDate(startTime);
         endTime = formatEndDate(endTime);
-//        start = getLocalDateTime(startTime, LocalDateTime.MIN);
-//        end = getLocalDateTime(endTime, LocalDateTime.MAX);
-
+        if(brandName == (null))brandName = "";
+        if(brandCategory==(null))brandCategory = "";
+        if(startTime.isAfter(endTime)){
+            throw new ApiException("start time should be before end time");
+        }
         List<OrderPojo> orders = orderService.getOrdersBetweenTime(startTime, endTime);
         List<OrderItemPojo> orderItems = orderItemService.getOrderItemByOrders(orders);
         List<OrderItemPojo> filteredOrderItems = filterOrderItems(orderItems, brandName, brandCategory);
-        List<Integer> productIds = filteredOrderItems.stream()
-                .map(OrderItemPojo::getProductId)
-                .collect(Collectors.toList());
-
-        // TODO: 29/01/23 try call productService and brandService only once and make maps
-        Map<Integer, Integer> brandIdToQuantityMapping = getQuantityMapping(productIds, filteredOrderItems);
-        Map<Integer, Float> brandIdToRevenueMapping = getRevenueMapping(filteredOrderItems);
+        Map<Integer, BrandPojo> brandIdToBrandMapping = new HashMap<>();
+        Map<Integer, Integer> brandIdToQuantityMapping = new HashMap<>();
+        Map<Integer, Float> brandIdToRevenueMapping = new HashMap<>();
+        for(OrderItemPojo orderItemPojo : filteredOrderItems){
+            ProductPojo product = productService.getProductById(orderItemPojo.getProductId());
+            BrandPojo brand = brandService.getAndCheckBrandById(product.getBrandId());
+            brandIdToBrandMapping.put(brand.getId(),brand);
+            brandIdToQuantityMapping.put(brand.getId(),brandIdToQuantityMapping.getOrDefault(brand.getId(),0)+orderItemPojo.getQuantity());
+            brandIdToRevenueMapping.put(brand.getId(),brandIdToRevenueMapping.getOrDefault(brand.getId(),0.0f)+orderItemPojo.getSellingPrice()*orderItemPojo.getQuantity());
+        }
         Iterator<Map.Entry<Integer, Integer>> iterator = brandIdToQuantityMapping.entrySet().iterator();
         List<SalesData> salesData = new ArrayList<>();
         while (iterator.hasNext()) {
             Map.Entry<Integer, Integer> entry = iterator.next();
             Integer brandId = entry.getKey();
             SalesData sales = new SalesData();
-            // TODO: 29/01/23 why do you have check again that map keys are formed by using brand?
-            BrandPojo brand = brandService.getAndCheckBrandById(brandId);
             sales.setRevenue(brandIdToRevenueMapping.get(brandId));
             sales.setQuantity(brandIdToQuantityMapping.get(brandId));
-            sales.setBrandName(brand.getName());
-            sales.setBrandCategory(brand.getCategory());
+            sales.setBrandName(brandIdToBrandMapping.get(brandId).getName());
+            sales.setBrandCategory(brandIdToBrandMapping.get(brandId).getCategory());
             salesData.add(sales);
         }
-        return salesData;
+    return salesData;
     }
 
     public List<SalesData> getSalesReport(SalesForm form) throws ApiException {

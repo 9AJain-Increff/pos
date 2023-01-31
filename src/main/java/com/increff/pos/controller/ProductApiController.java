@@ -32,10 +32,10 @@ public class ProductApiController {
     }
 
     @ApiOperation(value = "Gets a product by ID")
-    @RequestMapping(path = "/{barcode}", method = RequestMethod.GET)
+    @RequestMapping(path = "/{id}", method = RequestMethod.GET)
     // TODO: 29/01/23 use id instead of barcode
-    public ProductData get(@PathVariable String barcode) throws ApiException {
-        return (productDto.getProductByBarcode(barcode));
+    public ProductData get(@PathVariable Integer id) throws ApiException {
+        return (productDto.getProductById(id));
     }
 
     @ApiOperation(value = "Edit a Product")

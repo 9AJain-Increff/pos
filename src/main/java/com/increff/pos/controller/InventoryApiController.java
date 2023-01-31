@@ -4,11 +4,13 @@ import com.increff.pos.dto.InventoryDto;
 import com.increff.pos.model.data.InventoryData;
 import com.increff.pos.model.form.InventoryForm;
 import com.increff.pos.exception.ApiException;
+import com.sun.xml.bind.v2.model.core.ID;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
 
 @Api
@@ -29,17 +31,22 @@ public class InventoryApiController {
 
     @ApiOperation(value = "Gets list of all inventory")
     @RequestMapping(path = "", method = RequestMethod.GET)
-    // TODO: 29/01/23 why getAll is throwing ApiException?
-    public List<InventoryData> getAllInventory() throws ApiException {
-        return inventoryDto.getAllInventory();
+//    public List<InventoryData> getAllInventory() throws ApiException {
+//        return inventoryDto.getAllInventory();
+//    }
+    public List<InventoryData> getAllInventory(@RequestParam(required = false) String barcode) throws ApiException {
+        if (barcode != null) {
+                return Collections.singletonList(inventoryDto.getInventoryByBarcode(barcode));
+        } else {
+            return inventoryDto.getAllInventory();
+        }
     }
 
 
-    // TODO: 29/01/23 use id instead of barcode in the path
-    @ApiOperation(value = "Gets a inventory by barode")
-    @RequestMapping(path = "/{barcode}", method = RequestMethod.GET)
-    public InventoryData get(@PathVariable String barcode) throws ApiException {
-        InventoryData p = inventoryDto.getInventoryByBarcode(barcode);
+    @ApiOperation(value = "Gets a inventory by product id")
+    @RequestMapping(path = "/{id}", method = RequestMethod.GET)
+    public InventoryData get(@PathVariable Integer id) throws ApiException {
+        InventoryData p = inventoryDto.getInventoryByProductId(id);
         return (p);
     }
 

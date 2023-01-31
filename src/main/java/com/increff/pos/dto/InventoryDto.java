@@ -35,6 +35,14 @@ public class InventoryDto {
         return convertToInventoryData(b, product);
     }
 
+    public InventoryData getInventoryByProductId(Integer id) throws ApiException {
+        // TODO: 29/01/23 normalisation should happen inside service
+
+        ProductPojo product = productService.getProductById(id);
+        InventoryPojo b = inventoryService.getAndCheckInventoryByProductId(product.getId());
+        return convertToInventoryData(b, product);
+    }
+
     public InventoryData addInventory(InventoryForm form) throws ApiException {
         // TODO: 29/01/23 normalisation should happen inside service if its already happening there then there is no need of this
         validateInventoryForm(form);

@@ -29,12 +29,24 @@ public class MockUtil {
     }
 
     public static final List<BrandPojo> BRANDS = Arrays.asList(
-            new BrandPojo(null, "phone", "apple"),
-            new BrandPojo(null, "phone", "samsung"),
-            new BrandPojo(null, "laptop", "lenovo"),
-            new BrandPojo(null, "laptop", "apple"),
+            new BrandPojo(null, "apple", "phone"),
+            new BrandPojo(null, "samsung", "phone"),
+            new BrandPojo(null, "lenovo", "laptop"),
+            new BrandPojo(null, "apple", "laptop"),
             new BrandPojo(null, "nike", "shoe")
     );
+
+//        public static DailyReportPojo getMockPerDaySale() {
+//        DailyReportPojo perDaySale = new DailyReportPojo();
+//
+//        perDaySale.setOrdersQuantity(1);
+//        perDaySale.setRevenue(100.0f);
+//        perDaySale.setDate(currentDate.minusDays(3));
+//        perDaySale.setUniqueItemCount(3);
+//        perDaySale.setTotalQuantityCount(5);
+//
+//        return perDaySale;
+//    }
 
 
     public static List<BrandPojo> setUpBrands(BrandService brandService) {

@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.increff.pos.util.ConversionUtil.convertToInventoryData;
+import static com.increff.pos.util.ConversionUtil.convertToOrderData;
 
 public class InventoryDtoTest extends AbstractUnitTest {
 
@@ -103,10 +104,15 @@ public class InventoryDtoTest extends AbstractUnitTest {
 
     @Test
     public void testGetInventoryById() throws ApiException {
-        InventoryPojo expected = MockUtil.getMockInventory(1);
-        inventoryService.addInventory(expected);
-        InventoryPojo actual = inventoryService.getAndCheckInventoryByProductId(1);
-        AssertUtil.assertEqualInventory(expected, actual);
+        ProductPojo product = products
+                .stream()
+                .filter(it -> it.getBarcode().equals("a1001"))
+                .collect(Collectors.toList()).get(0);
+
+        InventoryPojo expected = inventoryService.getAndCheckInventoryByProductId(product.getId());
+        InventoryData actual = inventoryDto.getInventoryByProductId(product.getId());
+        InventoryData expectedInventoryData =  convertToInventoryData(expected,product);
+        AssertUtil.assertEqualInventoryData(expectedInventoryData, actual);
     }
 
 //    @Test

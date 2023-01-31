@@ -1,9 +1,6 @@
 package com.increff.pos.util;
 
-import com.increff.pos.model.data.BrandData;
-import com.increff.pos.model.data.InventoryData;
-import com.increff.pos.model.data.OrderData;
-import com.increff.pos.model.data.ProductData;
+import com.increff.pos.model.data.*;
 import com.increff.pos.pojo.*;
 
 import java.util.List;
@@ -80,6 +77,13 @@ public class AssertUtil {
         assertEquals(expected.getProductId(), actual.getProductId());
     }
 
+    public static void assertEqualOrderItemsData(OrderItemData expected, OrderItemData actual) {
+        assertEquals(expected.getOrderId(), actual.getOrderId());
+        assertEquals(expected.getQuantity(), actual.getQuantity());
+        assertEquals(expected.getSellingPrice(), actual.getSellingPrice());
+
+    }
+
     public static void assertEqualOrderData(OrderData expected, OrderData actual) {
         assertEquals(expected.getId(), actual.getId());
         assertEquals(expected.getCreatedOn(), actual.getCreatedOn());
@@ -92,6 +96,22 @@ public class AssertUtil {
 
     public static void assertEqualOrders(OrderPojo expected, OrderPojo actual) {
         assertEquals(expected.getCreatedOn(), actual.getCreatedOn());
-//        assertEquals(expected.getOrderURL(), actual.getOrderURL());
+
+    }
+
+    public static void assertEqualSaleReportData(SalesData expectedReport, SalesData actualReport) {
+        assertEquals(expectedReport.getQuantity(), actualReport.getQuantity());
+        assertEquals(expectedReport.getRevenue(), actualReport.getRevenue());
+        assertEquals(expectedReport.getBrandName(), actualReport.getBrandName());
+        assertEquals(expectedReport.getBrandCategory(), actualReport.getBrandCategory());
+    }
+
+    public static void assertEqualInventoryReportDate(
+            InventoryReportData expectedInventoryReportData,
+            InventoryReportData actualInventoryReportData) {
+
+        assertEquals(expectedInventoryReportData.getBrandName(), actualInventoryReportData.getBrandName());
+        assertEquals(expectedInventoryReportData.getBrandCategory(), actualInventoryReportData.getBrandCategory());
+        assertEquals(expectedInventoryReportData.getQuantity(), actualInventoryReportData.getQuantity());
     }
 }
