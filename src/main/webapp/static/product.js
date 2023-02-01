@@ -246,9 +246,16 @@ function displayProduct(data){
 
 }
 
+
+function displayAddProductModal(){
+    	$("#product-add-form input[name=name]").val('');
+        $("#product-add-form input[name=barcode]").val('');
+        $("#product-add-form input[name=price]").val('');
+}
 function openAddModel(){
 
 	$('#add-product-modal').modal('toggle');
+	displayAddProductModal();
 	var url = getBrandUrl() ;
     	console.log(url)
     	$.ajax({

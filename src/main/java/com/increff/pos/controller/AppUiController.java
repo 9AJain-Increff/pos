@@ -9,6 +9,7 @@ public class AppUiController extends AbstractUiController {
 
     @RequestMapping(value = "/ui/home")
     public ModelAndView home() {
+
         return mav("home.html");
     }
 

@@ -111,8 +111,8 @@ function init(){
 
    $('#filter-sales-report').click(filterSalesReport);
    $('#display-filter-btn').click(showFilterModal);
-//       var element = document.getElementById("sales-icon");
-//       element.classList.add("thick");
+       var element = document.getElementById("report-icon");
+       element.classList.add("thick");
 }
 
 $(document).ready(init);

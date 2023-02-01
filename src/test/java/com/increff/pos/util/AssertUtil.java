@@ -114,4 +114,18 @@ public class AssertUtil {
         assertEquals(expectedInventoryReportData.getBrandCategory(), actualInventoryReportData.getBrandCategory());
         assertEquals(expectedInventoryReportData.getQuantity(), actualInventoryReportData.getQuantity());
     }
+
+    public static void assertEqualPerDaySale(DailyReportPojo expectedItem, DailyReportPojo actualItem) {
+        assertEquals(expectedItem.getDate(), actualItem.getDate());
+        assertEquals(expectedItem.getOrdersQuantity(), actualItem.getOrdersQuantity());
+        assertEquals(expectedItem.getOrderItemsQuantity(), actualItem.getOrderItemsQuantity());
+        assertEquals(expectedItem.getRevenue(), actualItem.getRevenue());
+    }
+
+        public static void assertEqualUsers(UserPojo expected, UserPojo actual) {
+        assertEquals(expected.getEmail(), actual.getEmail());
+        assertEquals(expected.getPassword(), actual.getPassword());
+        assertEquals(expected.getRole(), actual.getRole());
+        assertEquals(expected.getId(), actual.getId());
+    }
 }

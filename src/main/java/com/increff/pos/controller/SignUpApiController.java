@@ -57,7 +57,7 @@ public class SignUpApiController extends AbstractUiController {
 
         // Create Authorities
         ArrayList<SimpleGrantedAuthority> authorities = new ArrayList<SimpleGrantedAuthority>();
-        authorities.add(new SimpleGrantedAuthority(p.getRole()));
+        authorities.add(new SimpleGrantedAuthority(p.getRole().toString()));
         // you can add more roles if required
 
         // Create Authentication

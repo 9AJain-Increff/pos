@@ -35,7 +35,7 @@ public class UserDao extends AbstractDao {
         return getSingle(query);
     }
 
-    public UserPojo select(String email) {
+    public UserPojo selectByEmail(String email) {
         TypedQuery<UserPojo> query = getQuery(SELECT_EMAIL, UserPojo.class);
         query.setParameter("email", email);
         return getSingle(query);

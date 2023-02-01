@@ -1,15 +1,18 @@
 package com.increff.pos.util;
 
 import com.increff.pos.exception.ApiException;
+import com.increff.pos.model.auth.UserRole;
 import com.increff.pos.model.data.InventoryData;
 import com.increff.pos.model.form.OrderItemForm;
 import com.increff.pos.model.data.ProductData;
 import com.increff.pos.model.form.ProductForm;
+import com.increff.pos.model.form.UserForm;
 import com.increff.pos.pojo.*;
 import com.increff.pos.service.*;
 import javafx.util.Pair;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
@@ -36,17 +39,15 @@ public class MockUtil {
             new BrandPojo(null, "nike", "shoe")
     );
 
-//        public static DailyReportPojo getMockPerDaySale() {
-//        DailyReportPojo perDaySale = new DailyReportPojo();
-//
-//        perDaySale.setOrdersQuantity(1);
-//        perDaySale.setRevenue(100.0f);
-//        perDaySale.setDate(currentDate.minusDays(3));
-//        perDaySale.setUniqueItemCount(3);
-//        perDaySale.setTotalQuantityCount(5);
-//
-//        return perDaySale;
-//    }
+        public static DailyReportPojo getMockPerDaySale() {
+        DailyReportPojo perDaySale = new DailyReportPojo();
+
+        perDaySale.setOrdersQuantity(1);
+        perDaySale.setRevenue(100.0f);
+        perDaySale.setDate(LocalDate.from(currentDate.minusDays(3)));
+        perDaySale.setOrderItemsQuantity(5);
+        return perDaySale;
+    }
 
 
     public static List<BrandPojo> setUpBrands(BrandService brandService) {
@@ -75,6 +76,14 @@ public class MockUtil {
     private static final int BRAND_LENOVO_APPLE = 3;
     private static final int BRAND_NIKE_SHOE = 4;
 
+
+        public static UserForm getMockUserForm() {
+        UserForm userForm = new UserForm();
+        userForm.setEmail("mock@user.com");
+        userForm.setPassword("Pass@mock");
+        userForm.setRole(UserRole.OPERATOR.toString());
+        return userForm;
+    }
     public static List<ProductPojo> setUpProductsAndInventory(
             List<BrandPojo> brands,
             ProductService productService,
@@ -301,7 +310,7 @@ public class MockUtil {
         UserPojo mock = new UserPojo();
         mock.setEmail("mockuser@pos.com");
         mock.setPassword("pass@123");
-        mock.setRole("operator");
+        mock.setRole(UserRole.OPERATOR);
         return mock;
     }
 }

@@ -1,5 +1,6 @@
 package com.increff.pos.util;
 
+import com.increff.pos.model.auth.UserRole;
 import com.increff.pos.model.data.*;
 import com.increff.pos.model.form.*;
 import com.increff.pos.pojo.*;
@@ -126,7 +127,6 @@ public class ConversionUtil {
 
     public static UserPojo convertToUserPojo(UserForm d) {
         UserPojo p = new UserPojo();
-        p.setRole(d.getRole());
         p.setEmail(d.getEmail());
         p.setPassword(d.getPassword());
         return p;

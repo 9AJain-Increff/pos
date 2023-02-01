@@ -62,7 +62,7 @@ public class BrandServiceTest extends AbstractUnitTest {
 
     @Test
     @Rollback
-    public void getBrandByIdForValidIdReturnsBrand() throws ApiException {
+    public void  getBrandByIdForValidIdReturnsBrand() throws ApiException {
         BrandPojo brand = MockUtil.getMockBrand();
         brandDao.addBrand(brand);
 
@@ -123,7 +123,6 @@ public class BrandServiceTest extends AbstractUnitTest {
         BrandPojo actual = brandService.getBrandByNameAndCategory(expected.getName(), expected.getCategory());
         AssertUtil.assertEqualBrands(expected, actual);
     }
-
     @Test
     @Rollback
     public void selectByNameAndCategoryForUnknownAttrThrowsException() throws ApiException {

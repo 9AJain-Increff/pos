@@ -1,5 +1,6 @@
 package com.increff.pos.dto;
 
+import com.increff.pos.model.auth.UserRole;
 import com.increff.pos.model.form.UserForm;
 import com.increff.pos.pojo.UserPojo;
 import com.increff.pos.exception.ApiException;
@@ -40,9 +41,9 @@ public class SignUpDto {
         Set<String> set = getAdmins();
         if (set.contains(user.getEmail())) {
             // TODO: 29/01/23 use enums for rolw
-            user.setRole("supervisor");
+            user.setRole(UserRole.SUPERVISOR);
         } else {
-            user.setRole("operator");
+            user.setRole(UserRole.OPERATOR);
         }
         return userService.addUser(user);
     }

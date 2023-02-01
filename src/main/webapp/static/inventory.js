@@ -54,6 +54,7 @@ function updateInventory(event){
            },
     	   success: function(response) {
     	   		getInventoryList();
+	            $.notify('Inventory Updated Successfully!', 'success');
     	   },
     	   error: handleAjaxError,
     	});
@@ -223,29 +224,7 @@ function displayInventory(data){
 
 function createInventory(){
 	$('#add-inventory-modal').modal('toggle');
-	//Get the ID
-//	var url = getInventoryUrl() ;
-//
-//	//Set the values to update
-//	var $form = $("#inventory-add-form");
-//	var json = toJson($form);
-//	$.ajax({
-//	   url: url,
-//	   type: 'POST',
-//	   data: json,
-//	   headers: {
-//       	'Content-Type': 'application/json'
-//       },
-//	   success: function(response) {
-//	   	$('#add-inventory-modal').modal('toggle');
-//	   		getInventoryList();
-//	   },
-//	   error:
-//	   handleAjaxError
-//
-//	});
-//
-//	return false;
+
 }
 
 

@@ -4,8 +4,10 @@
 //import com.increff.ironic.pos.model.auth.UserRole;
 //import com.increff.ironic.pos.model.data.InventoryData;
 //import com.increff.ironic.pos.model.data.ProductData;
+//import com.increff.ironic.pos.model.data.ProductInventoryQuantity;
 //import com.increff.ironic.pos.model.form.OrderItemForm;
 //import com.increff.ironic.pos.model.form.ProductForm;
+//import com.increff.ironic.pos.model.form.UserForm;
 //import com.increff.ironic.pos.pojo.*;
 //import com.increff.ironic.pos.service.*;
 //import com.increff.ironic.pos.util.ConversionUtil;
@@ -30,8 +32,8 @@
 //
 //    public static Brand getMockBrand() {
 //        Brand mock = new Brand();
-//        mock.setName("Mock Brand");
-//        mock.setCategory("Mock Category");
+//        mock.setBrand("mock brand");
+//        mock.setCategory("mock category");
 //        return mock;
 //    }
 //
@@ -49,11 +51,11 @@
 //    private static final int BRAND_NIKE_SHOE = 4;
 //
 //    public static final List<Brand> BRANDS = Arrays.asList(
-//            new Brand(null, "phone", "apple"),
-//            new Brand(null, "phone", "samsung"),
-//            new Brand(null, "laptop", "lenovo"),
-//            new Brand(null, "laptop", "apple"),
-//            new Brand(null, "shoe", "nike")
+//            new Brand(null, "apple", "phone"),
+//            new Brand(null, "samsung", "phone"),
+//            new Brand(null, "lenovo", "laptop"),
+//            new Brand(null, "apple", "laptop"),
+//            new Brand(null, "nike", "shoe")
 //    );
 //
 //    public static List<Brand> setUpBrands(BrandService brandService) {
@@ -112,13 +114,13 @@
 //
 //    public static List<InventoryData> getMockInventoryData() {
 //        return Arrays.asList(
-//                new InventoryData("a1001", "iphone x", 10),
-//                new InventoryData("a1002", "iphone se", 10),
-//                new InventoryData("a1003", "galaxy fold", 10),
-//                new InventoryData("a1004", "note 9", 10),
-//                new InventoryData("a1005", "mac book pro", 10),
-//                new InventoryData("a1006", "legion 5", 10),
-//                new InventoryData("a1007", "air jordan", 10)
+//                new InventoryData(null, "a1001", "iphone x", 10),
+//                new InventoryData(null, "a1002", "iphone se", 10),
+//                new InventoryData(null, "a1003", "galaxy fold", 10),
+//                new InventoryData(null, "a1004", "note 9", 10),
+//                new InventoryData(null, "a1005", "mac book pro", 10),
+//                new InventoryData(null, "a1006", "legion 5", 10),
+//                new InventoryData(null, "a1007", "air jordan", 10)
 //        );
 //    }
 //
@@ -136,14 +138,14 @@
 //            List<OrderItem> orderItems) throws ApiException {
 //
 //        Order order = new Order(null, time, MOCK_INVOICE_PATH);
-//        orderService.create(order);
+//        orderService.add(order);
 //
 //        orderItems.forEach(item -> {
 //            item.setOrderId(order.getId());
 //            updateInventory(inventoryService, item.getProductId(), item.getQuantity());
 //        });
 //
-//        orderItemService.createItems(orderItems);
+//        orderItemService.addItems(orderItems);
 //        return new Pair<>(order, orderItems);
 //    }
 //
@@ -284,6 +286,27 @@
 //        mock.setPassword("pass@123");
 //        mock.setRole(UserRole.OPERATOR);
 //        return mock;
+//    }
+//
+//    public static ProductInventoryQuantity getMockProductInventoryQuantity(
+//            Product product,
+//            Inventory inventory,
+//            Integer requiredQuantity
+//    ) {
+//        ProductInventoryQuantity productInventoryQuantity = new ProductInventoryQuantity();
+//        productInventoryQuantity.setInventory(inventory);
+//        productInventoryQuantity.setProductName(product.getName());
+//        productInventoryQuantity.setRequiredQuantity(requiredQuantity);
+//        productInventoryQuantity.setBarcode(product.getBarcode());
+//        return productInventoryQuantity;
+//    }
+//
+//    public static UserForm getMockUserForm() {
+//        UserForm userForm = new UserForm();
+//        userForm.setEmail("mock@user.com");
+//        userForm.setPassword("Pass@mock");
+//        userForm.setRole(UserRole.OPERATOR.toString());
+//        return userForm;
 //    }
 //
 //}

@@ -216,10 +216,12 @@ function createNewBrand(){
 
 }
 
-function displayAddBrand(data){
-	$("#brand-edit-form input[name=name]").val('');
-	$("#brand-edit-form input[name=category]").val('');
-	$("#brand-edit-form input[name=id]").val('');
+
+
+function displayAddBrandModal(data){
+	$("#brand-add-form input[name=name]").val('');
+	$("#brand-add-form input[name=category]").val('');
+	$("#brand-add-form input[name=id]").val('');
 	$('#add-brand-modal').modal('toggle');
 }
 //INITIALIZATION CODE
@@ -231,7 +233,7 @@ function init(){
 	$('#process-data').click(processData);
 	$('#download-errors').click(downloadErrors);
     $('#brandFile').on('change', updateFileName)
-   	$('#create-new-brand').click(displayAddBrand);
+   	$('#create-new-brand').click(displayAddBrandModal);
 
     var element = document.getElementById("brand-icon");
     element.classList.add("thick");

@@ -76,7 +76,7 @@ function addItem(item) {
 
 function isInvalidInput(item) {
   if (!item.barcode) {
-    $.notify('Please input a valid barcode!', 'error');
+    throwError('Please input a valid barcode!');
     return true;
   }
 //  if(Number.isNaN(item.quantity)){
@@ -84,17 +84,22 @@ function isInvalidInput(item) {
 //    return true;
 //  };
 if (item.quantity <= 0  ) {
-    $.notify('Quantity must be positve!', 'error');
+    throwError('Quantity must be positve!');
     return true;
   }
-  if (item.sellingPrice < 0  ) {
-      $.notify('Selling Price must be positve!', 'error');
+  if (item.sellingPrice <= 0  ) {
+      throwError('Selling Price must be positve!');
       return true;
     }
-if (!item.quantity ||  !item.sellingPrice) {
-    $.notify('Quantity cannot be empty!', 'error');
+if (!item.quantity ) {
+      throwError('Quantity cannot be empty!');
     return true;
   }
+  if (!item.sellingPrice) {
+        throwError('Selling Price cannot be empty!');
+      return true;
+    }
+
 
   return false;
 }
@@ -193,12 +198,10 @@ function deleteOrderItem(barcode) {
 function resetAddItemForm() {
   $('#inputBarcode').val('');
   $('#inputQuantity').val('');
+  $('#inputSellingPrice').val('');
 }
 
-function resetEditItemForm() {
-  $('#inputNewBarcode').val('');
-  $('#inputNewQuantity').val('');
-}
+
 function resetModal() {
   resetAddItemForm();
   orderItems = [];
@@ -387,6 +390,7 @@ function getOrderData(id) {
 function resetEditItemForm() {
   $('#inputNewBarcode').val('');
   $('#inputNewQuantity').val('');
+  $('#inputNewSellingPrice').val('');
 }
 
 
@@ -528,8 +532,8 @@ function updateOrder(json, onSuccess, id) {
 function editOrder() {
 	var orderId = $("#edit-item-form input[name=id]").val();
      if (orderItems.length == 0) {
-           $.notify('Order cannot be empty!', 'error');
-           return ;
+     throwError('Order cannot be empty!');
+     return ;
      }
   const data = orderItems.map((it) => {
 
@@ -564,6 +568,10 @@ const url = getInventoryUrl() + "?barcode=" + item.barcode;
 
         if(data[0].quantity>=item.quantity){
                   getProductById(data[0].id, (product) => {
+                  if(product.price<item.sellingPrice){
+                      throwError(`Selling Price cannot be more than the MRP = ${product.price}`);
+                      return;
+                  }
                     addItem({
                       barcode: product.barcode,
                       name: product.name,
@@ -576,7 +584,8 @@ const url = getInventoryUrl() + "?barcode=" + item.barcode;
         })
         }
         else{
-               $.notify('only '+ data[0].quantity+ ' pieces available in inventory', 'error');
+               throwError('only '+ data[0].quantity+ ' pieces available in inventory');
+               return;
         }
     },
     error: handleAjaxError,
@@ -604,7 +613,7 @@ $(document).ready(getOrderList);
 // Place Order
 function placeNewOrder() {
      if (orderItems.length == 0) {
-       $.notify('Order cannot be empty!', 'error');
+     throwError('Order cannot be empty!');
        return ;
      }
   const data = orderItems.map((it) => {

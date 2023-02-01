@@ -1,8 +1,7 @@
 package com.increff.pos.pojo;
 
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import com.increff.pos.model.auth.UserRole;
+import lombok.*;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -12,6 +11,8 @@ import javax.persistence.Id;
 @Entity
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class UserPojo {
 
     @Id
@@ -19,6 +20,6 @@ public class UserPojo {
     private Integer id;
     private String email;
     private String password;
-    private String role;
+    private UserRole role;
 
 }

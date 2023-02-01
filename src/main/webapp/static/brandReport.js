@@ -37,8 +37,8 @@ function displayInventoryReport(data) {
 //INITIALIZATION CODE
 function init(){
 
-//       var element = document.getElementById("inventory-report-icon");
-//       element.classList.add("thick");
+       var element = document.getElementById("report-icon");
+       element.classList.add("thick");
        getBrandReport();
 }
 

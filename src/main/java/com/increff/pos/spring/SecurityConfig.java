@@ -1,5 +1,8 @@
 package com.increff.pos.spring;
 
+import com.increff.pos.model.auth.UserPrincipal;
+import com.increff.pos.util.SecurityUtil;
+import com.increff.pos.util.ValidationUtil;
 import org.apache.log4j.Logger;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -37,6 +40,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public void configure(WebSecurity web) throws Exception {
         web.ignoring().antMatchers("/v2/api-docs", "/configuration/ui", "/swagger-resources", "/configuration/security",
                 "/swagger-ui.html", "/webjars/**");
+    }
+
+    public static boolean isAuthenticated() {
+        UserPrincipal principal = SecurityUtil.getPrincipal();
+        if (principal == null) return false;
+        return !ValidationUtil.isBlank(principal.getEmail());
     }
 
 }

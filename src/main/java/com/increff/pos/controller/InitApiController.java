@@ -2,6 +2,8 @@ package com.increff.pos.controller;
 
 import java.util.List;
 
+import com.increff.pos.dto.UserDto;
+import com.increff.pos.model.auth.UserRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,8 +21,9 @@ import io.swagger.annotations.ApiOperation;
 @Controller
 public class InitApiController extends AbstractUiController {
 
+
     @Autowired
-    private UserService service;
+    private UserDto userDto;
     @Autowired
     private InfoData info;
 
@@ -35,13 +38,13 @@ public class InitApiController extends AbstractUiController {
     @ApiOperation(value = "Initializes application")
     @RequestMapping(path = "/site/init", method = RequestMethod.POST)
     public ModelAndView initSite(UserForm form) throws ApiException {
-        List<UserPojo> list = service.getAll();
+        List<UserPojo> list = userDto.getAll();
         if (list.size() > 0) {
             info.setMessage("Application already initialized. Please use existing credentials");
         } else {
             form.setRole("supervisor");
             UserPojo p = convert(form);
-            service.addUser(p);
+            userDto.addUser(p);
             info.setMessage("Application initialized");
         }
         return mav("init.html");
@@ -51,7 +54,7 @@ public class InitApiController extends AbstractUiController {
     private static UserPojo convert(UserForm f) {
         UserPojo p = new UserPojo();
         p.setEmail(f.getEmail());
-        p.setRole(f.getRole());
+        p.setRole(UserRole.getRole(f.getRole()));
         p.setPassword(f.getPassword());
         return p;
     }

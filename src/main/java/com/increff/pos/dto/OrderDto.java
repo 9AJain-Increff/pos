@@ -119,7 +119,7 @@ public class OrderDto {
 
     }
 
-    @Transactional(rollbackOn = ApiException.class)
+    @Transactional(rollbackOn = Exception.class)
     public OrderData addOrder(List<OrderItemForm> orderItemForm) throws ApiException {
         if (orderItemForm.size() == 0) {
             throw new ApiException("Order must contain atleast 1 order item");
@@ -136,6 +136,7 @@ public class OrderDto {
             InventoryPojo inventoryPojo = inventoryService.getAndCheckInventoryByProductId(product.getId());
             inventoryPojoList.add(inventoryPojo);
             orderItemPojoList.add(convertToOrderItemPojo(orderItem, newOrder.getId(), product.getId()));
+            productService.validateSellingPrice(orderItem.getSellingPrice(),product.getPrice());
         }
         validateInventory(inventoryPojoList, orderItemPojoList);
         updateInventory(inventoryPojoList);

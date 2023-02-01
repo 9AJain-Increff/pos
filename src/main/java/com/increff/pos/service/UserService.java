@@ -20,7 +20,7 @@ public class UserService {
     @Transactional
     public UserPojo addUser(UserPojo p) throws ApiException {
         normalize(p);
-        UserPojo existing = dao.select(p.getEmail());
+        UserPojo existing = dao.selectByEmail(p.getEmail());
         if (existing != null) {
             throw new ApiException("User with given email already exists");
         }
@@ -29,8 +29,11 @@ public class UserService {
 
     @Transactional(rollbackOn = ApiException.class)
     public UserPojo getUserByEmail(String email) throws ApiException {
-        return dao.select(email);
-
+        UserPojo user = dao.selectByEmail(email);
+        if (user == null) {
+            throw new ApiException("No user found with email");
+        }
+        return user;
     }
 
 
@@ -41,11 +44,11 @@ public class UserService {
 
     @Transactional
     public void delete(int id) {
+
         dao.delete(id);
     }
 
     protected static void normalize(UserPojo p) {
         p.setEmail(p.getEmail().toLowerCase().trim());
-        p.setRole(p.getRole().toLowerCase().trim());
     }
 }

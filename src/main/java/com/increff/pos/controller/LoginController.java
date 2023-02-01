@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.increff.pos.dto.UserDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -31,14 +32,14 @@ import io.swagger.annotations.ApiOperation;
 public class LoginController {
 
     @Autowired
-    private UserService service;
+    private UserDto userDto;
     @Autowired
     private InfoData info;
 
     @ApiOperation(value = "Logs in a user")
     @RequestMapping(path = "/session/login", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     public ModelAndView login(HttpServletRequest req, LoginForm f) throws ApiException {
-        UserPojo p = service.getUserByEmail(f.getEmail());
+        UserPojo p = userDto.getUserByEmail(f.getEmail());
         boolean authenticated = (p != null && Objects.equals(p.getPassword(), f.getPassword()));
         if (!authenticated) {
             info.setMessage("Invalid username or password");
@@ -46,7 +47,7 @@ public class LoginController {
         }
 
         // Create authentication object
-        Authentication authentication = convert(p);
+            Authentication authentication = convert(p);
         // Create new session
         HttpSession session = req.getSession(true);
         // Attach Spring SecurityContext to this new session
@@ -72,7 +73,7 @@ public class LoginController {
 
         // Create Authorities
         ArrayList<SimpleGrantedAuthority> authorities = new ArrayList<SimpleGrantedAuthority>();
-        authorities.add(new SimpleGrantedAuthority(p.getRole()));
+        authorities.add(new SimpleGrantedAuthority(p.getRole().toString().toLowerCase()));
         // you can add more roles if required
 
         // Create Authentication

@@ -1,62 +1,47 @@
-<!doctype html>
+<!DOCTYPE html>
 
 <html lang="en">
-
 <head th:replace="snippets.html :: name_head"></head>
 
 <body>
-
 <nav th:replace="snippets.html :: name_app_navbar"></nav>
 
-<div class="container mt-4">
-
-
-    <div class="row">
-        <h1 class="col my-auto">Reports</h1>
-    </div>
-
-    <!-- Blank Row -->
-    <div class="row m-4">
-        &nbsp;
-    </div>
-    <div class="row m-auto justify-content-center">
-        <div class="col-3">
-            <a th:href="@{/ui/report/inventory-report}" class="">
-                <i data-toggle="tooltip" title="Inventory report" class="fa fa-warehouse fa-5x"></i>
-            </a>
-            <p>Inventory report</p>
-            <!--      <label>Inventory Report</label>-->
+<div
+        class="container text-center px-lg-5"
+        style="display: grid; align-items: center; align-content: center; height: 80vh"
+>
+    <div class="row align-content-between" style="max-height: 80vh">
+        <div class="col-lg-3 col-6 p-2">
+            <div class="card item-card p-2" id="sales-report-card">
+                <img class="card-img-top" th:src="@{/asset/sales-logo.png}" alt="Sales Report" />
+                <div class="card-body">Sales Report</div>
+            </div>
         </div>
-        <div class="col-3">
-            <a th:href="@{/ui/report/brand}" class="">
-                <i data-toggle="tooltip" title="Brand-category report" class="fa fa-tag fa-5x"></i>
-            </a>
-            <p>Brand-category report</p>
-            <!--      <label>Brand Category Report</label>-->
+
+        <div class="col-lg-3 col-6 p-2">
+            <div class="card item-card p-2" id="per-day-sale-report-card">
+                <img class="card-img-top" th:src="@{/asset/per-day-logo.png}" alt="Per-day Sale Report" />
+                <div class="card-body text-dark">Per-Day Sale Report</div>
+            </div>
         </div>
-        <div class="col-3">
-            <a th:href="@{/ui/report/sales}" class="">
-                <i data-toggle="tooltip" title="Sales report" class="fa fa-chart-line fa-5x"></i>
-            </a>
-            <p>Sales report</p>
-            <!--      <label>Sales Report</label>-->
+
+        <div class="col-lg-3 col-6 p-2" onclick="">
+            <div class="card item-card p-2" id="inventory-report-card">
+                <img class="card-img-top" th:src="@{/asset/inventory-logo.png}" alt="Per-day Sale Report" />
+                <div class="card-body text-dark">Inventory Report</div>
+            </div>
         </div>
-        <div class="col-3">
-            <a th:href="@{/ui/report/daily}" class="">
-                <i data-toggle="tooltip" title="Daily report" class="fa fa-pie-chart fa-5x"></i>
-            </a>
-            <p>Daily report</p>
-            <!--      <label>Sales Report</label>-->
+
+        <div class="col-lg-3 col-6 p-2">
+            <div class="card item-card p-2" id="brand-report-card">
+                <img class="card-img-top" th:src="@{/asset/brands-logo.png}" alt="Per-day Sale Report" />
+                <div class="card-body text-dark">Brand Report</div>
+            </div>
         </div>
     </div>
-
-
-</div> <!-- Container end-->
+</div>
 
 <footer th:replace="snippets.html :: name_footer"></footer>
-
 <script th:src="@{/static/report.js}"></script>
-
 </body>
-
 </html>
