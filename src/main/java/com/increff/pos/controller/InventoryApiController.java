@@ -2,6 +2,8 @@ package com.increff.pos.controller;
 
 import com.increff.pos.dto.InventoryDto;
 import com.increff.pos.model.data.InventoryData;
+import com.increff.pos.model.data.ProductData;
+import com.increff.pos.model.form.BarcodeForm;
 import com.increff.pos.model.form.InventoryForm;
 import com.increff.pos.exception.ApiException;
 import com.sun.xml.bind.v2.model.core.ID;
@@ -31,9 +33,6 @@ public class InventoryApiController {
 
     @ApiOperation(value = "Gets list of all inventory")
     @RequestMapping(path = "", method = RequestMethod.GET)
-//    public List<InventoryData> getAllInventory() throws ApiException {
-//        return inventoryDto.getAllInventory();
-//    }
     public List<InventoryData> getAllInventory(@RequestParam(required = false) String barcode) throws ApiException {
         if (barcode != null) {
                 return Collections.singletonList(inventoryDto.getInventoryByBarcode(barcode));
@@ -41,7 +40,11 @@ public class InventoryApiController {
             return inventoryDto.getAllInventory();
         }
     }
-
+    @ApiOperation(value = "Get inventory by barcode")
+    @RequestMapping(path = "/barcode", method = RequestMethod.POST)
+    public InventoryData getByBarcode(@RequestBody BarcodeForm form) throws ApiException {
+        return inventoryDto.getInventoryByBarcode(form.getBarcode());
+    }
 
     @ApiOperation(value = "Gets a inventory by product id")
     @RequestMapping(path = "/{id}", method = RequestMethod.GET)

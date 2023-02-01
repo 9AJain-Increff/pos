@@ -164,7 +164,7 @@ function displayCreateOrderItems(data) {
             quantityData"
             value="${item.sellingPrice}"
             onchange="onPriceChanged('${item.barcode}')"
-            style="width:40%" min="1">
+            style="width:4.5rem" min="1">
         </td>
         <td>
           <input
@@ -447,7 +447,7 @@ function displayEditOrderItems( data) {
             quantityData"
             value="${item.sellingPrice}"
             onchange="onEditPriceChanged('${item.barcode}')"
-            style="width:40%" min="1">
+            style="width:4.5rem" min="1">
         </td>
         <td>
           <input
@@ -559,15 +559,19 @@ function editOrderItem() {
 }
 
 function checkInventoryByBarcode(item, displayCallBack, resetCallBack){
-const url = getInventoryUrl() + "?barcode=" + item.barcode;
+const url = getInventoryUrl() + "/barcode" ;
   console.log(url);
+  data ={barcode: item.barcode};
+  const json = JSON.stringify(data);
   $.ajax({
     url: url,
-    type: 'GET',
+    type: 'POST',
+    data: json,
+    headers: {'Content-Type': 'application/json'},
     success: function (data) {
 
-        if(data[0].quantity>=item.quantity){
-                  getProductById(data[0].id, (product) => {
+        if(data.quantity>=item.quantity){
+                  getProductById(data.id, (product) => {
                   if(product.price<item.sellingPrice){
                       throwError(`Selling Price cannot be more than the MRP = ${product.price}`);
                       return;
@@ -584,7 +588,7 @@ const url = getInventoryUrl() + "?barcode=" + item.barcode;
         })
         }
         else{
-               throwError('only '+ data[0].quantity+ ' pieces available in inventory');
+               throwError('only '+ data.quantity+ ' pieces available in inventory');
                return;
         }
     },

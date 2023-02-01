@@ -92,11 +92,44 @@ var processCount = 0;
 
 function processData(){
 	var file = $('#brandFile')[0].files[0];
+
+	if(!file)
+	{
+	    throwError("File is Empty");
+	    return;
+	}
+
 	readFileData(file, readFileDataCallback);
 }
 
 function readFileDataCallback(results){
+    console.log(results);
 	fileData = results.data;
+	var fields = results.meta.fields;
+	if(fields.length!=2)
+	{
+	    var row = {};
+	    row.error = "Incorrect number of headers";
+	    errorData.add(row);
+	    return;
+	}
+
+	if(fields[0]!='name' || fields[1]!='category')
+	{
+	    var row = {};
+        row.error = "Incorrect headers";
+        errorData.add(row);
+        return;
+	}
+
+
+
+    if(fileData.length===0)
+    {
+        throwError("Empty Tsv");
+        return;
+    }
+
 	console.log('ankur jain', fileData)
 	uploadRows();
 }
@@ -112,6 +145,8 @@ function uploadRows(){
 	//Process next row
 	var row = fileData[processCount];
 	processCount++;
+
+	console.log(row);
 
 	var json = JSON.stringify(row);
 	var url = getBrandUrl();

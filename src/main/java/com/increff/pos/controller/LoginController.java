@@ -45,9 +45,10 @@ public class LoginController {
             info.setMessage("Invalid username or password");
             return new ModelAndView("redirect:/site/login");
         }
+//        UserPojo p = userDto.checkEmailAndPassword(f.getEmail(),f.getPassword());
 
         // Create authentication object
-            Authentication authentication = convert(p);
+        Authentication authentication = convert(p);
         // Create new session
         HttpSession session = req.getSession(true);
         // Attach Spring SecurityContext to this new session

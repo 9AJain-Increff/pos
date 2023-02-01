@@ -64,7 +64,7 @@ function displayUserList(data){
 		var row = '<tr>'
 		+ '<td>' + e.id + '</td>'
 		+ '<td>' + e.email + '</td>'
-		+ '<td>' + buttonHtml + '</td>'
+		+ '<td>' + e.role + '</td>'
 		+ '</tr>';
         $tbody.append(row);
 	}
@@ -75,6 +75,8 @@ function displayUserList(data){
 function init(){
 	$('#add-user').click(addUser);
 	$('#refresh-data').click(getUserList);
+    var element = document.getElementById("admin-icon");
+    element.classList.add("thick");
 }
 
 $(document).ready(init);

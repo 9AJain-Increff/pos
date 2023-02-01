@@ -5,6 +5,7 @@ import com.increff.pos.model.data.BrandData;
 import com.increff.pos.model.data.DailyData;
 import com.increff.pos.model.data.InventoryReportData;
 import com.increff.pos.model.data.SalesData;
+import com.increff.pos.model.form.BrandForm;
 import com.increff.pos.model.form.SalesForm;
 import com.increff.pos.exception.ApiException;
 import io.swagger.annotations.Api;
@@ -32,15 +33,15 @@ public class ReportApiController {
     }
 
     @ApiOperation(value = "Get inventory report")
-    @RequestMapping(path = "/inventory", method = RequestMethod.GET)
-    public List<InventoryReportData> getInventoryReport() throws ApiException {
-        return reportDto.getInventoryReport();
+    @RequestMapping(path = "/inventory", method = RequestMethod.POST)
+    public List<InventoryReportData> getInventoryReport(@RequestBody BrandForm form) throws ApiException {
+        return reportDto.getInventoryReport(form);
     }
 
     @ApiOperation(value = "Get Brand report")
-    @RequestMapping(path = "/brand", method = RequestMethod.GET)
-    public List<BrandData> getBrandReport() throws ApiException {
-        return reportDto.getBrandReport();
+    @RequestMapping(path = "/brand", method = RequestMethod.POST)
+    public List<BrandData> getBrandReport(@RequestBody BrandForm form) throws ApiException {
+        return reportDto.getBrandReport(form);
     }
 
     @Scheduled(cron = "0 0 0 ? * *")
