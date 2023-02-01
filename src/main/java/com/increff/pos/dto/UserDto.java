@@ -30,6 +30,10 @@ public class UserDto {
     public UserPojo getUserByEmail(String email) throws ApiException {
         return userService.getUserByEmail(email);
     }
+    public UserPojo checkEmailAndPassword(String email, String password) throws ApiException {
+        return userService.checkEmailAndPassword(email, password);
+
+    }
     private static UserPojo convert(UserForm f) {
         UserPojo p = new UserPojo();
         p.setEmail(f.getEmail());

@@ -14,9 +14,15 @@
             <h3>Products</h3>
         </div>
         <div class="col text-right">
-            <button type="button" class="btn px-3 btn-primary mr-2" id="upload-data"
-                    th:if="${info.getRole() == 'supervisor'}">Upload
-            </button>
+<!--            <button type="button" class="btn px-3 btn-primary mr-2" id="upload-data"-->
+<!--                    th:if="${info.getRole() == 'supervisor'}">Upload-->
+<!--            </button>-->
+            <button
+                    type="button"
+                    class="btn btn-primary"
+                    id="upload-data"
+                    th:if="${#strings.equalsIgnoreCase(info.getRole().name(), 'supervisor')}"
+            >Upload</button>
             <button type="button" class="btn btn-primary" id="create-new-product">Add</button>
         </div>
     </div>

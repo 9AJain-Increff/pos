@@ -71,48 +71,41 @@ function displaySalesReport(data) {
         $tbody.append(row);
     }
 }
-  function prependOptions(selectElementId, displayName) {
-    const $selectElement = $(selectElementId);
-    const optionHtml = `<option value="" selected >${displayName}</option>`;
-    $selectElement.prepend(optionHtml);
-  }
+//  function prependOptions(selectElementId, displayName) {
+//    const $selectElement = $(selectElementId);
+//    const optionHtml = `<option value="" selected >${displayName}</option>`;
+//    $selectElement.prepend(optionHtml);
+//  }
 
-function getBrandListInFilter() {
-const url = getBrandUrl();
-$.ajax({
+function getBrandListInFilter(onSuccess) {
+    const url = getBrandUrl();
+    $.ajax({
 	   url: url,
 	   type: 'GET',
-	   success:async function(brands) {
-	       const brandCategory = brands.map((brandItem) => {
-             return { brand: brandItem.name, category: brandItem.category };
-           });
-           brandCategory.push()
-          await setupBrandCategoryDropdown(brandCategory, '#brand-name-selection', '#brand-category-selection');
-          prependOptions('#brand-name-selection',"All Brands");
-          prependOptions('#brand-category-selection',"All Category");
-          displayProduct();
-	   },
+	   success: onSuccess,
 	   error:
 	   handleAjaxError
 	});
+};
 
-  };
-
-
-function displayProduct(){
-
-	$('#filter-modal').modal('toggle');
+function initDropdown() {
+    getBrandListInFilter((brands) => {
+        const brandCategory = brands.map((brandItem) => {
+            return { brand: brandItem.name, category: brandItem.category };
+        });
+        setupBrandCategoryDropdown(brandCategory, '#brand-name-selection', '#brand-category-selection');
+    });
 }
-function showFilterModal(){
-    getBrandListInFilter();
-}
+
 //INITIALIZATION CODE
 function init(){
-
+    initDropdown();
    $('#filter-sales-report').click(filterSalesReport);
-   $('#display-filter-btn').click(showFilterModal);
-       var element = document.getElementById("report-icon");
-       element.classList.add("thick");
+   $('#display-filter-btn').click(() => {
+	$('#filter-modal').modal('toggle');
+   });
+   var element = document.getElementById("report-icon");
+   element.classList.add("thick");
 }
 
 $(document).ready(init);

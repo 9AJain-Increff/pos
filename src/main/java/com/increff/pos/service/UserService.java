@@ -1,6 +1,7 @@
 package com.increff.pos.service;
 
 import java.util.List;
+import java.util.Objects;
 
 import javax.transaction.Transactional;
 
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.increff.pos.dao.UserDao;
 import com.increff.pos.pojo.UserPojo;
+import org.springframework.web.servlet.ModelAndView;
 
 @Service
 public class UserService {
@@ -27,7 +29,6 @@ public class UserService {
         return dao.insert(p);
     }
 
-    @Transactional(rollbackOn = ApiException.class)
     public UserPojo getUserByEmail(String email) throws ApiException {
         UserPojo user = dao.selectByEmail(email);
         if (user == null) {
@@ -36,6 +37,15 @@ public class UserService {
         return user;
     }
 
+    public UserPojo checkEmailAndPassword(String email, String password) throws ApiException {
+        UserPojo user = getUserByEmail(email);
+        boolean authenticated = (user != null && Objects.equals(user.getPassword(), password));
+        if (!authenticated) {
+            throw  new ApiException("Invalid username or password");
+
+        }
+        return user;
+    }
 
     @Transactional
     public List<UserPojo> getAll() {

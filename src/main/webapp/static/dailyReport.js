@@ -71,7 +71,8 @@ const sec = timeUTC.second;
 
 //INITIALIZATION CODE
 function init(){
-
+        // todo: change to POST, pass date as JSON
+   $('#filter-sales-report').click(getDailyReport);
        var element = document.getElementById("report-icon");
        element.classList.add("thick");
        getDailyReport();
