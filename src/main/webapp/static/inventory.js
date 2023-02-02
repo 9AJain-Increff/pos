@@ -54,7 +54,7 @@ function updateInventory(event){
            },
     	   success: function(response) {
     	   		getInventoryList();
-	            $.notify('Inventory Updated Successfully!', 'success');
+    	   		throwSuccess("Inventory Updated Successfully");
     	   },
     	   error: handleAjaxError,
     	});
@@ -99,25 +99,74 @@ var processCount = 0;
 
 function processData(){
 	var file = $('#inventoryFile')[0].files[0];
+
+	if(!file)
+	{
+	    throwError("File is Empty");
+	    return;
+	}
+
 	readFileData(file, readFileDataCallback);
 }
 
 function readFileDataCallback(results){
+    console.log(results);
 	fileData = results.data;
+	var fields = results.meta.fields;
+	if(fields.length!=2)
+	{
+	    var row = {};
+	    row.error = "Incorrect number of headers";
+	    errorData.push(row);
+	    return;
+	}
+
+	if(fields[0]!='barcode' || fields[1]!='quantity')
+	{
+	    var row = {};
+        row.error = "Incorrect headers";
+        errorData.push(row);
+        return;
+	}
+
+
+
+    if(fileData.length===0)
+    {
+        throwError("Empty Tsv");
+        return;
+    }
+
+    if(fileData.length>5000)
+    {
+        throwError("File length cannot exceed 5000");
+        return;
+    }
+
+	console.log('ankur jain', fileData)
 	uploadRows();
 }
 
+
 function uploadRows(){
 	//Update progress
-	updateUploadDialog();
-	//If everything processed then return
-	if(processCount==fileData.length){
-		return;
-	}
+    	updateUploadDialog();
+    	//If everything processed then return
+    	if(processCount==fileData.length){
+    		return;
+    	}
 
-	//Process next row
-	var row = fileData[processCount];
-	processCount++;
+    	//Process next row
+    	var row = fileData[processCount];
+    	processCount++;
+
+    	if(row.__parsed_extra)
+    	{
+    	    row.error = "Extra fields";
+    	    errorData.push(row);
+    	    uploadRows();
+    	    return;
+    	}
 
 	var json = JSON.stringify(row);
 	var url = getInventoryUrl();
@@ -163,7 +212,7 @@ function displayInventoryList(data){
 		+ '<td>' + e.barcode + '</td>'
 		+ '<td>' + e.productName + '</td>'
 		+ '<td>'  + e.quantity + '</td>'
-		+ '<td>' + buttonHtml + '</td>'
+		+ `<td  ${isSupervisor() ? '' : 'hidden'}>` + buttonHtml + '</td>'
 		+ '</tr>';
         $tbody.append(row);
         count++;

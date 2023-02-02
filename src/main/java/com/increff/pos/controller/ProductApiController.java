@@ -33,7 +33,6 @@ public class ProductApiController {
 
     @ApiOperation(value = "Gets a product by ID")
     @RequestMapping(path = "/{id}", method = RequestMethod.GET)
-    // TODO: 29/01/23 use id instead of barcode
     public ProductData get(@PathVariable Integer id) throws ApiException {
         return (productDto.getProductById(id));
     }
@@ -41,6 +40,6 @@ public class ProductApiController {
     @ApiOperation(value = "Edit a Product")
     @RequestMapping(path = "/{id}", method = RequestMethod.PUT)
     public ProductData updateProduct(@PathVariable Integer id, @RequestBody ProductForm form) throws ApiException {
-        return productDto.update(id, form);
+            return productDto.update(id, form);
     }
 }

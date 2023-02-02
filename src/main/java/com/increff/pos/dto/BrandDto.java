@@ -25,7 +25,6 @@ public class BrandDto {
         return convertToBrandData(brandPojo);
     }
 
-    // FIXED: 29/01/23 why are you pojo to controller?
     public BrandData addBrand(BrandForm form) throws ApiException {
         validateBrandForm(form);
         BrandPojo brand = convertToBrandPojo(form);

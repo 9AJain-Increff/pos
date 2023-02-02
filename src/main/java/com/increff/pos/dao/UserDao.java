@@ -46,8 +46,5 @@ public class UserDao extends AbstractDao {
         return query.getResultList();
     }
 
-    public void update(UserPojo p) {
-    }
-
 
 }

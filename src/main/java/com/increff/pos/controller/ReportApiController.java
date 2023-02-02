@@ -6,6 +6,7 @@ import com.increff.pos.model.data.DailyData;
 import com.increff.pos.model.data.InventoryReportData;
 import com.increff.pos.model.data.SalesData;
 import com.increff.pos.model.form.BrandForm;
+import com.increff.pos.model.form.DailyReportForm;
 import com.increff.pos.model.form.SalesForm;
 import com.increff.pos.exception.ApiException;
 import io.swagger.annotations.Api;
@@ -17,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @Api
-// FIXED: 29/01/23 where is the scheduler to populate daily data?
 @RestController
 @RequestMapping(path = "/api/reports")
 public class ReportApiController {
@@ -45,16 +45,14 @@ public class ReportApiController {
     }
 
     @Scheduled(cron = "0 0 0 ? * *")
-//    @Scheduled(fixedDelay = 10000)
     public void updatePerDaySale() {
         reportDto.updatePerDaySale();
     }
 
     @ApiOperation(value = "Get day to day report")
-
-    @RequestMapping(path = "/daily", method = RequestMethod.GET)
-    public List<DailyData> getDailyReport() throws ApiException {
-        return reportDto.getDailyReport();
+    @RequestMapping(path = "/daily", method = RequestMethod.POST)
+    public List<DailyData> getDailyReport(@RequestBody DailyReportForm form) throws ApiException {
+        return reportDto.getDailyReport(form);
     }
 
 }

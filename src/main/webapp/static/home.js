@@ -23,8 +23,6 @@ function init() {
   $('#reports-card').click(() => redirectTo(UI_URLS.reportUrl));
   $('#admin-card').click(() => redirectTo(UI_URLS.adminUrl));
   $('#ui-nav').empty();
-  var element = document.getElementById("home-icon");
-  element.classList.add("thick");
 }
 
 $(document).ready(init);

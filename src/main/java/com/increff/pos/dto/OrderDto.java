@@ -83,7 +83,6 @@ public class OrderDto {
         return barcodes;
     }
 
-    // TODO: 29/01/23 can be placed inside inventory api and use ids
     public List<InventoryPojo> getInventoryPojo(List<String> barcodes) throws ApiException {
         List<InventoryPojo> inventoryPojoList = new ArrayList<>();
         for (String barcode : barcodes) {
@@ -103,7 +102,6 @@ public class OrderDto {
         return productPojoList;
     }
 
-    // TODO: 29/01/23 can be placed inside inventory api
     public void updateInventory(List<InventoryPojo> inventoryPojoList) throws ApiException {
         for (InventoryPojo inventoryPojo : inventoryPojoList) {
             inventoryService.update(inventoryPojo);
@@ -148,7 +146,6 @@ public class OrderDto {
     }
 
     private String getEncodedPdf(List<InvoiceData> invoiceDetails) throws RestClientException {
-        // TODO: 29/01/23 Create a sep class Constants and declare this there
         String INVOICE_API_URL = "http://localhost:8000/invoice/api/generate";
         RestTemplate restTemplate = new RestTemplate();
         String s = restTemplate.postForObject(INVOICE_API_URL, invoiceDetails, String.class);
@@ -183,7 +180,6 @@ public class OrderDto {
         List<String> barcodes = getBarcodes(updatedOrderItems);
 
         List<InventoryPojo> inventoryPojoList = getInventoryPojo(barcodes);
-        List<ProductPojo> productPojoList = getProductList(barcodes);
         validateInventory(inventoryPojoList, updatedOrderItems);
         updateInventory(inventoryPojoList);
         updateOrderItemList(updatedOrderItems, productIdToOrderItemMapping);
@@ -222,7 +218,7 @@ public class OrderDto {
     }
 
     @Transactional(rollbackOn = ApiException.class)
-    // TODO: 29/01/23 reduce db calls
+
     public OrderPojo updateOrder(Integer orderId, @NotNull List<OrderItemForm> orderItemForms) throws ApiException {
         if (orderItemForms.isEmpty()) {
             throw new ApiException("Add a Order Item");
@@ -241,14 +237,13 @@ public class OrderDto {
 
         List<OrderItemPojo> oldOrder = orderItemService.getOrderItemsById(orderId);
         Map<Integer, OrderItemPojo> productIdToOrderItemMapping = new HashMap<>();
-        // TODO: 29/01/23 rename variables properly
+
         for (OrderItemPojo orderItemPojo : updatedOrderList) {
             ProductPojo product = productService.checkProduct(orderItemPojo.getProductId());
             productIdToOrderItemMapping.put(product.getId(), orderItemPojo);
             mappingFormData.put(product.getId(), orderItemPojo);
         }
 
-        // TODO: 29/01/23 rename classes and variables properly
         OrderItemsUpdates getlist = new OrderItemsUpdates();
         getlist.updatesList(oldOrder, mappingFormData, orderId);
         List<OrderItemPojo> updatedOrderItems = getlist.getToUpdate();

@@ -33,7 +33,6 @@ public class ProductDto {
     private InventoryService inventoryService;
 
 
-    // TODO: 29/01/23 instead of this call brandApi from calling place only
     private List<Integer> getBrandIdList(List<ProductPojo> products) {
         List<Integer> brandIds = products.stream()
                 .map(ProductPojo::getBrandId)
@@ -70,18 +69,15 @@ public class ProductDto {
         inventoryPojo.setQuantity(0);
         inventoryService.addInventory(inventoryPojo);
         return convertToProductData(product, brand);
-        // FIXED: 29/01/23 what is use of sending productPojo? inventoryPojo has already productId
     }
 
 
-    //    FIXED can i throw the error from here AND what if the barcode changes from postman
     public ProductData update(Integer id, ProductForm form) throws ApiException {
         validateProductForm(form);
         BrandPojo brand = brandService.checkBrandExistByNameAndCategory(form.getBrandName(), form.getBrandCategory());
         productService.checkProductByIdAndBarcode(id, form.getBarcode());
         ProductPojo productPojo = convertToProductPojo(form, brand.getId());
         productPojo.setId(id);
-        // FIXED: 29/01/23 why passing brand? productPojo has brandId already irght?
         productService.update(productPojo);
         return convertToProductData(productPojo, brand);
 

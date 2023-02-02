@@ -22,7 +22,7 @@ public class OrderService {
     private String pdfUrl;
 
     @Transactional(rollbackOn = ApiException.class)
-    public OrderPojo addOrder(OrderPojo p) throws ApiException {
+    public OrderPojo addOrder(OrderPojo p) {
         return orderDao.insert(p);
     }
 

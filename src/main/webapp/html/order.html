@@ -131,6 +131,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Edit Order</h5>
+                    <h5 class="ml-3">Order Id:<span id="order-id-edit"></span></h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -190,7 +191,7 @@
                     <div class="row">
                         <!-- Table -->
                         <div class="col-12 table-wrapper-scroll-y my-custom-scrollbar">
-                            <table class="table table-striped table-scrollable" id="edit-order-table">
+                            <table class="table mt-0 table-striped table-scrollable" id="edit-order-table">
                                 <thead class="sticky-top">
                                 <tr>
                                     <th scope="col-2">S/No.</th>
@@ -221,6 +222,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Order Details</h5>
+                    <h5 class="ml-3">Order Id:<span id="order-id"></span></h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -233,15 +235,14 @@
                     <div class="row">
                         <!-- Table -->
                         <div class="col-12 table-wrapper-scroll-y my-custom-scrollbar">
-                            <table class="table table-striped table-scrollable" id="show-order-table">
+                            <table class="table mt-0
+                             table-striped table-scrollable" id="show-order-table">
                                 <thead class="sticky-top">
                                 <tr>
                                     <th scope="col-2">S/No.</th>
                                     <th scope="col-2">Barcode</th>
-                                    <!--                                    <th scope="col-2">Name</th>-->
                                     <th scope="col-2">Price</th>
                                     <th class="col-2">Quantity</th>
-                                    <!--                                    <th class="col-2">Action</th>-->
                                 </tr>
                                 </thead>
                                 <tbody></tbody>

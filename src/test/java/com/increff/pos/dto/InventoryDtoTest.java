@@ -52,6 +52,7 @@ public class InventoryDtoTest extends AbstractUnitTest {
     }
 
     @Test
+    @Rollback
     public void testGetInventoryItemByIdForInvalidBarcodeThrowsException() throws ApiException {
         exceptionRule.expect(ApiException.class);
         String barcode = "invalid_barcode_101";
@@ -61,6 +62,7 @@ public class InventoryDtoTest extends AbstractUnitTest {
     }
 
     @Test
+    @Rollback
     public void testGetInventoryItemByIdForValidBarcodeReturnsData() throws ApiException {
         String barcode = "a1001";
         InventoryData actual = inventoryDto.getInventoryByBarcode(barcode);
@@ -69,6 +71,7 @@ public class InventoryDtoTest extends AbstractUnitTest {
     }
 
     @Test
+    @Rollback
     public void testUpdateInventoryItem() throws ApiException {
         InventoryForm inventoryForm = new InventoryForm();
         inventoryForm.setQuantity(100);
@@ -86,6 +89,7 @@ public class InventoryDtoTest extends AbstractUnitTest {
     }
 
     @Test
+    @Rollback
     public void testUpdateInventoryItemWithNegativeQuantityThrowsException() throws ApiException {
         InventoryForm inventoryForm = new InventoryForm();
         inventoryForm.setQuantity(-1);
@@ -96,6 +100,7 @@ public class InventoryDtoTest extends AbstractUnitTest {
     }
 
     @Test
+    @Rollback
     public void testGetAllInventoryData() throws ApiException {
         List<InventoryData> expected = MockUtil.getMockInventoryData();
         List<InventoryData> actual = inventoryDto.getAllInventory();
@@ -103,6 +108,7 @@ public class InventoryDtoTest extends AbstractUnitTest {
     }
 
     @Test
+    @Rollback
     public void testGetInventoryById() throws ApiException {
         ProductPojo product = products
                 .stream()
@@ -114,6 +120,8 @@ public class InventoryDtoTest extends AbstractUnitTest {
         InventoryData expectedInventoryData =  convertToInventoryData(expected,product);
         AssertUtil.assertEqualInventoryData(expectedInventoryData, actual);
     }
+
+    //can be removed
 
 //    @Test
 //    @Rollback

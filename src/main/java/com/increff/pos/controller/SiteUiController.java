@@ -16,7 +16,7 @@ public class SiteUiController extends AbstractUiController {
     // WEBSITE PAGES
     @RequestMapping(value = "")
     public ModelAndView index() {
-        return mav("index.html");
+        return mav("redirect:/site/login");
     }
 
     private Boolean isValidate(){
@@ -32,12 +32,13 @@ public class SiteUiController extends AbstractUiController {
 
     @RequestMapping(value = "/site/signup")
     public ModelAndView signup() {
-        return mav("signUp.html");
+        String page = isValidate() ? "redirect:/ui/home":"signUp.html";
+        return mav(page);
     }
 
     @RequestMapping(value = "/site/logout")
     public ModelAndView logout() {
-        return mav("logout.html");
+        return mav("login.html");
     }
 
     @RequestMapping(value = "/site/pricing")

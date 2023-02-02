@@ -4,13 +4,15 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
+import static com.increff.pos.spring.SecurityConfig.isAuthenticated;
+
 @Controller
 public class AppUiController extends AbstractUiController {
 
     @RequestMapping(value = "/ui/home")
     public ModelAndView home() {
-
-        return mav("home.html");
+        String page = (isAuthenticated())?"home.html": "redirect:/site/login";
+        return mav(page);
     }
 
     @RequestMapping(value = "/ui/employee")

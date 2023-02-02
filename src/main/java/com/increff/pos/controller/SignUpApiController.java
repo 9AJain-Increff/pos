@@ -1,6 +1,7 @@
 package com.increff.pos.controller;
 
 import com.increff.pos.dto.SignUpDto;
+import com.increff.pos.model.data.InfoData;
 import com.increff.pos.model.form.UserForm;
 import com.increff.pos.pojo.UserPojo;
 import com.increff.pos.exception.ApiException;
@@ -31,10 +32,16 @@ public class SignUpApiController extends AbstractUiController {
 
     @Autowired
     private SignUpDto signUpDto;
-
+    @Autowired
+    private InfoData info;
     @ApiOperation(value = "Initializes application")
     @RequestMapping(path = "/site/signup", method = RequestMethod.POST)
     public ModelAndView signUp(HttpServletRequest req, UserForm form) throws ApiException {
+        UserPojo user = signUpDto.getUserByEmail(form);
+        if(user != null) {
+            info.setMessage("email already exist");
+            return new ModelAndView("redirect:/site/login");
+        }
         UserPojo p = signUpDto.addUser(form);
 
         // Create authentication object
@@ -46,7 +53,7 @@ public class SignUpApiController extends AbstractUiController {
         // Attach Authentication object to the Security Context
         SecurityUtil.setAuthentication(authentication);
 
-        return new ModelAndView("redirect:/ui/home");
+        return new ModelAndView("redirect:/site/login");
     }
 
     private static Authentication convert(UserPojo p) {

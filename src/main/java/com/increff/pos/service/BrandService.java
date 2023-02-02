@@ -55,7 +55,6 @@ public class BrandService {
     @Transactional(rollbackOn = ApiException.class)
     public BrandPojo update(BrandPojo p) throws ApiException {
         normalizeBrand(p);
-        // FIXED: 29/01/23 can use getAndCheckBrandById?
         BrandPojo exist = getAndCheckBrandById(p.getId());
         BrandPojo brand = getBrandByNameAndCategory(p.getName(), p.getCategory());
         if (brand != null && !brand.getId().equals(exist.getId())) {
@@ -78,7 +77,6 @@ public class BrandService {
         return brand;
     }
 
-    // FIXED: 29/01/23 remove throws
     public BrandPojo getBrandByNameAndCategory(String brandName, String brandCategory) {
         BrandPojo brand = dao.getBrandByNameAndCategory(brandName, brandCategory);
         return brand;

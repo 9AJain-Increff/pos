@@ -5,6 +5,7 @@ import com.increff.pos.util.SecurityUtil;
 import com.increff.pos.util.ValidationUtil;
 import org.apache.log4j.Logger;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -27,6 +28,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/**")//
                 .antMatchers("/ui/**")//
                 .and().authorizeRequests()//
+                .antMatchers("/api/orders/**").hasAnyAuthority("supervisor","operator")
+                .antMatchers("/api/reports/**").hasAnyAuthority("supervisor", "operator")
+                .antMatchers(HttpMethod.POST, "/api/inventory/barcode/**").hasAnyAuthority("supervisor", "operator")
+                .antMatchers(HttpMethod.POST, "/api/**").hasAuthority("supervisor")
+                .antMatchers(HttpMethod.PUT, "/api/**").hasAuthority("supervisor")
                 .antMatchers("/api/admin/**").hasAuthority("supervisor")//
                 .antMatchers("/api/**").hasAnyAuthority("supervisor", "operator")//
                 .antMatchers("/ui/admin/**").hasAuthority("supervisor")//

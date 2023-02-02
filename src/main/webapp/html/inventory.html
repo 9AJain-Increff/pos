@@ -51,7 +51,9 @@
                     <th scope="col">Barcode</th>
                     <th scope="col">Product Name</th>
                     <th scope="col">Quantity</th>
-                    <th scope="col">Actions</th>
+                    <th scope="col"
+                        th:if="${#strings.equalsIgnoreCase(info.getRole().name(), 'supervisor')}"
+                    >Actions</th>
                 </tr>
                 </thead>
                 <tbody>

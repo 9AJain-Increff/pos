@@ -371,6 +371,7 @@ const $tbody = $('#show-order-table').find('tbody');
 
 
 function getOrderData(id) {
+$('#order-id-edit').text(id)
      var url = getOrderUrl()+id;
       $.ajax({
         url: url,
@@ -487,11 +488,14 @@ function displayCreationModal() {
 
 function hideCreationModal() {
   $('#create-order-modal').modal('toggle');
+      throwSuccess("order placed");
   getOrderList();
 }
 function fetchOrderDetails(id) {
   $('#show-order-modal').modal({ backdrop: 'static', keyboard: false }, 'show');
-console.log('gcicb')
+  $('#order-id').text(id)
+//document.getElementById("order-id").innerHTML = "I have changed!";
+
   var url = getOrderUrl() + id;
   $.ajax({
     url: url,
@@ -650,7 +654,7 @@ function placeOrder(json, onSuccess) {
     headers: {
       'Content-Type': 'application/json',
     },
-    success: onSuccess,
+    success:onSuccess,
     error: handleAjaxError,
   });
 

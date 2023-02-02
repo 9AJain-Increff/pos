@@ -12,8 +12,8 @@
 >
     <div class="row" style="max-height: 80vh">
         <div
-                class="col-sm-4 col-6 p-2"
-                th:classappend="${#strings.equalsIgnoreCase(info.getRole().name(), 'supervisor')} ? col-lg-2 : col-lg-3"
+                class="col-sm-4 col-6 p-2 col-lg"
+                th:classappend="${#strings.equalsIgnoreCase(info.getRole().name(), 'supervisor')} "
         >
             <div class="card item-card p-2" id="brands-card">
                 <img class="card-img-top" th:src="@{/asset/brands-logo.png}" alt="Brands" />
@@ -22,8 +22,8 @@
         </div>
 
         <div
-                class="col-sm-4 col-6 p-2"
-                th:classappend="${#strings.equalsIgnoreCase(info.getRole().name(), 'supervisor')} ? col-lg-2 : col-lg-3"
+                class="col-sm-4 col-6 p-2 col-lg"
+                th:classappend="${#strings.equalsIgnoreCase(info.getRole().name(), 'supervisor')} "
         >
             <div class="card item-card p-2" id="products-card">
                 <img class="card-img-top" th:src="@{/asset/products-logo.png}" alt="Products" />
@@ -32,8 +32,8 @@
         </div>
 
         <div
-                class="col-sm-4 col-6 p-2"
-                th:classappend="${#strings.equalsIgnoreCase(info.getRole().name(), 'supervisor')} ? col-lg-2 : col-lg-3"
+                class="col-sm-4 col-6 p-2 col-lg"
+                th:classappend="${#strings.equalsIgnoreCase(info.getRole().name(), 'supervisor')} "
         >
             <div class="card item-card p-2" id="inventory-card">
                 <img class="card-img-top" th:src="@{/asset/inventory-logo.png}" alt="Inventory" />
@@ -42,8 +42,8 @@
         </div>
 
         <div
-                th:classappend="${#strings.equalsIgnoreCase(info.getRole().name(), 'supervisor')} ? col-lg-2 : col-lg-3"
-                class="col-sm-4 col-6 p-2"
+                th:classappend="${#strings.equalsIgnoreCase(info.getRole().name(), 'supervisor')} "
+                class="col-sm-4 col-6 p-2 col-lg"
         >
             <div class="card item-card p-2" id="orders-card">
                 <img class="card-img-top" th:src="@{/asset/orders-logo.png}" alt="Orders" />
@@ -52,8 +52,7 @@
         </div>
 
         <div
-                class="col-lg-2 col-sm-4 col-6 p-2"
-                th:if="${#strings.equalsIgnoreCase(info.getRole().name(), 'supervisor')}"
+                class="col-lg col-sm-4 col-6 p-2"
         >
             <div class="card item-card p-2" id="reports-card">
                 <img class="card-img-top" th:src="@{/asset/reports-logo.png}" alt="Reports" />
@@ -62,7 +61,7 @@
         </div>
 
         <div
-                class="col-lg-2 col-sm-4 col-6 p-2"
+                class="col-lg-2 col-sm-4 col-6 p-2 col-lg"
                 th:if="${#strings.equalsIgnoreCase(info.getRole().name(), 'supervisor')}"
         >
             <div class="card item-card p-2" id="admin-card">

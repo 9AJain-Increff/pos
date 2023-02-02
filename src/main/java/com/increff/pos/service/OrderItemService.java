@@ -27,7 +27,6 @@ public class OrderItemService {
             normalizeOrderItem(orderItemPojo);
         }
         for (OrderItemPojo orderItemPojo : p) {
-            // FIXED: 29/01/23 what is the use of this check? If yes, how are you checking?
             dao.insert(orderItemPojo);
         }
 
@@ -38,8 +37,6 @@ public class OrderItemService {
         dao.delete(orderItemId);
     }
 
-
-    // FIXED: 29/01/23 why apiException?
     public List<OrderItemPojo> getOrderItemsById(Integer id) {
         return dao.select(id);
     }
@@ -51,14 +48,12 @@ public class OrderItemService {
     @Transactional(rollbackOn = ApiException.class)
     public void updateOrderItem(OrderItemPojo p) {
 
-        // FIXED: 29/01/23 remove system.out.println
         OrderItemPojo ex = getOrderItem(p.getId());
         ex.setSellingPrice(p.getSellingPrice());
         ex.setQuantity(p.getQuantity());
 
     }
 
-    // FIXED: 29/01/23 why apiException?
     public OrderItemPojo getOrderItem(Integer id) {
         OrderItemPojo p = dao.getOrderItem(id);
 

@@ -21,7 +21,7 @@ function addBrand(event){
        	'Content-Type': 'application/json'
        },
 	   success: function(response) {
-	   $.notify('Brand Added successfully!', 'success');
+	   throwSuccess("Brand Added Sucessfully")
 	   	$('#add-brand-modal').modal('toggle');
 	   	getBrandList();
 	   },
@@ -49,7 +49,7 @@ function updateBrand(event){
        	'Content-Type': 'application/json'
        },
 	   success: function(response) {
-	   $.notify('Brand updated successfully!', 'success');
+	        throwSuccess("Brand Updated Successfully");
 	   		getBrandList();
 	   },
 	   error: handleAjaxError
@@ -110,7 +110,7 @@ function readFileDataCallback(results){
 	{
 	    var row = {};
 	    row.error = "Incorrect number of headers";
-	    errorData.add(row);
+	    errorData.push(row);
 	    return;
 	}
 
@@ -118,7 +118,7 @@ function readFileDataCallback(results){
 	{
 	    var row = {};
         row.error = "Incorrect headers";
-        errorData.add(row);
+        errorData.push(row);
         return;
 	}
 
@@ -127,6 +127,12 @@ function readFileDataCallback(results){
     if(fileData.length===0)
     {
         throwError("Empty Tsv");
+        return;
+    }
+
+    if(fileData.length>5000)
+    {
+        throwError("File length cannot exceed 5000");
         return;
     }
 
@@ -146,7 +152,13 @@ function uploadRows(){
 	var row = fileData[processCount];
 	processCount++;
 
-	console.log(row);
+	if(row.__parsed_extra)
+	{
+	    row.error = "Extra fields";
+	    errorData.push(row);
+	    uploadRows();
+	    return;
+	}
 
 	var json = JSON.stringify(row);
 	var url = getBrandUrl();
@@ -189,7 +201,8 @@ function displayBrandList(data){
 		+ '<td>' + count+ '</td>'
 		+ '<td>' + e.name + '</td>'
 		+ '<td>'  + e.category + '</td>'
-		+ '<td>' + buttonHtml + '</td>'
+        + `<td  ${isSupervisor() ? '' : 'hidden'}>` + buttonHtml + '</td>'
+
 		+ '</tr>';
         $tbody.append(row);
         count++;
@@ -231,7 +244,7 @@ function updateUploadDialog(){
 function updateFileName(){
 	var $file = $('#brandFile');
 	var fileName = $file.val();
-	$('#brandFileName').html(fileName);
+	$('#brandFileName').html(fileName.split("\\").pop());
 }
 
 function displayUploadData(){

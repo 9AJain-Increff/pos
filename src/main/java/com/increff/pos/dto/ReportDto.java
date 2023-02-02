@@ -8,6 +8,7 @@ import com.increff.pos.model.data.InventoryReportData;
 import com.increff.pos.model.data.SalesData;
 import com.increff.pos.model.form.BarcodeForm;
 import com.increff.pos.model.form.BrandForm;
+import com.increff.pos.model.form.DailyReportForm;
 import com.increff.pos.model.form.SalesForm;
 import com.increff.pos.pojo.*;
 import com.increff.pos.service.*;
@@ -16,8 +17,10 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.increff.pos.util.ConversionUtil.*;
 import static com.increff.pos.util.DateTimeUtil.formatEndDate;
@@ -68,10 +71,10 @@ public class ReportDto {
 
     public List<SalesData> getSalesReport(String brandName,
             String brandCategory,
-            LocalDateTime startTime,
-            LocalDateTime endTime) throws ApiException {
-        startTime = formatStartDate(startTime);
-        endTime = formatEndDate(endTime);
+            Date start,
+            Date end) throws ApiException {
+        LocalDateTime startTime = getStartTime(start);
+        LocalDateTime endTime = getEndTime(end);
         if(brandName == (null))brandName = "";
         if(brandCategory==(null))brandCategory = "";
         if(startTime.isAfter(endTime)){
@@ -190,10 +193,49 @@ public class ReportDto {
         return dailyReportPojoList;
     }
 
-    public List<DailyData> getDailyReport() throws ApiException {
+    public LocalDateTime convertToLocalDateTimeViaInstant(Date dateToConvert) {
+        return dateToConvert.toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime();
+    }
+    private LocalDateTime getStartTime(Date start){
+        LocalDateTime startTime = LocalDateTime.MIN;
+        if(start== null){
+            startTime = formatStartDate(startTime);
+        }
+        else {
+            startTime = (convertToLocalDateTimeViaInstant(start));
+            startTime = formatStartDate(startTime);
+        }
+        return startTime;
+    }
+
+    private LocalDateTime getEndTime(Date end){
+        LocalDateTime endTime = LocalDateTime.MAX;
+
+        if(end== null){
+            endTime= formatEndDate(endTime);
+        }
+        else {
+            endTime = (convertToLocalDateTimeViaInstant(end));
+            endTime = formatEndDate(endTime);
+        }
+        return endTime;
+    }
+
+    public List<DailyData> getDailyReport(DailyReportForm form) throws ApiException {
+        Date start = form.getStartTime(), end = form.getStartTime();
+        LocalDateTime startTime = getStartTime(start);
+        LocalDateTime endTime = getEndTime(end);
+        if(startTime.isAfter(endTime)){
+            throw new ApiException("start time should be before end time");
+        }
         List<DailyReportPojo> dailyReportPojo = dayToDayService.getDailyReport();
         List<DailyData> dailyDataList = new ArrayList<>();
         for (DailyReportPojo d : dailyReportPojo) {
+            LocalDateTime date = d.getDate().atStartOfDay();
+            if((date.isEqual(startTime) || date.isEqual(endTime)) ||
+                    (date.isAfter(startTime) && date.isBefore(endTime)))
             dailyDataList.add(convertToDailyData(d));
         }
         return dailyDataList;
@@ -211,12 +253,6 @@ public class ReportDto {
         for (OrderPojo order : orders) {
             // todo use getOrDefault
             dateToOrdersQuantity.put(order.getCreatedOn().toLocalDate(), dateToOrdersQuantity.getOrDefault(order.getCreatedOn().toLocalDate(), 0) + 1);
-
-//            if (dateToOrdersQuantity.containsKey(order.getCreatedOn().toLocalDate())) {
-//                dateToOrdersQuantity.put(order.getCreatedOn().toLocalDate(), dateToOrdersQuantity.get(order.getCreatedOn().toLocalDate()) + 1);
-//            } else {
-//                dateToOrdersQuantity.put(order.getCreatedOn().toLocalDate(), 1);
-//            }
 
             List<OrderItemPojo> orderItems = orderItemService.getOrderItemsById(order.getId());
             for (OrderItemPojo orderItem : orderItems) {

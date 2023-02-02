@@ -1,0 +1,7 @@
+barcode	quantity	error
+ap123	100	Extra fields
+ap124	85	Extra fields
+xy12345	50	Extra fields
+sa129	100	{"message":"Product with given barcode does not exist"}
+sa124		Extra fields
+ap125	15	Extra fields

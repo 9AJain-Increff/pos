@@ -1,0 +1,4 @@
+name	category	error
+wrogn	clothing	Extra fields
+vincent chase	eyewear	{"message":"Brand with given name and category already exist"}
+adidas		Extra fields

@@ -36,6 +36,10 @@ public class UserService {
         }
         return user;
     }
+    public UserPojo checkUserByEmail(String email)  {
+        UserPojo user = dao.selectByEmail(email);
+        return user;
+    }
 
     public UserPojo checkEmailAndPassword(String email, String password) throws ApiException {
         UserPojo user = getUserByEmail(email);

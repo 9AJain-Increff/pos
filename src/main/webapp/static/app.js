@@ -1,3 +1,8 @@
+function isSupervisor() {
+	var role = $("meta[name=role]").attr("content");
+	return role === 'SUPERVISOR';
+}
+
 
 //HELPER METHOD
 function toJson($form){
@@ -13,24 +18,22 @@ function toJson($form){
 }
 
 
-//function handleAjaxError(response){
-//console.log('failllllllllllll')
-//	var response = JSON.parse(response.responseText);
-//	$.notify.defaults( {clickToHide:true,autoHide:false} );
-//	$('.notifyjs-wrapper').trigger('notify-hide');
-//	$.notify(response.message, 'error');
-//}
 function handleAjaxError(response){
     var response = JSON.parse(response.responseText);
     $('.notifyjs-wrapper').trigger('notify-hide');
     $.notify.defaults( {clickToHide:true,autoHide:false} );
-    $.notify(response.message + " ❌", 'error');
+    $.notify(response.message + "❌", 'error');
 }
 
 function throwError(message){
     $('.notifyjs-wrapper').trigger('notify-hide');
     $.notify.defaults( {clickToHide:true,autoHide:false} );
-    $.notify(message + " :x:", 'error');
+    $.notify(message + "❌", 'error');
+}
+
+function throwSuccess(message){
+    $('.notifyjs-wrapper').trigger('notify-hide');
+    $.notify(message , 'success');
 }
 
 //prevent 'e' press in number field
@@ -132,11 +135,6 @@ function contains(list, item) {
     if (list[it] === item) return true;
   }
   return false;
-}
-function notifyError(errorMessage) {
-  $('.notifyjs-wrapper').trigger('notify-hide');
-  $.notify.defaults({ clickToHide: true, autoHide: false });
-  $.notify(errorMessage + ' :x:', 'error');
 }
 function appendOptions(selectElementId, options) {
   const $selectElement = $(selectElementId);

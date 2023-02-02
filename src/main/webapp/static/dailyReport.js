@@ -4,17 +4,42 @@ function getSalesReportUrl(){
 }
 
 function getDailyReport() {
-    var url = getSalesReportUrl();
-    console.log(url);
-    $.ajax({
-       url: url,
-       type: 'GET',
-       success: function(response) {
-            console.log(response);
-            displayInventoryReport(response);
-       },
-       error: handleAjaxError
-    });
+    var $form = $("#sales-form");
+    	var json = toJson($form);
+    	var url = getSalesReportUrl();
+
+    	$.ajax({
+    	   url: url,
+    	   type: 'POST',
+    	   data: json,
+    	   headers: {
+           	'Content-Type': 'application/json'
+           },
+    	   success: function(response) {
+    	   	$('#filter-modal').modal('toggle');
+    	   	displayInventoryReport(response);
+    	   },
+    	   error: handleAjaxError,
+    	});
+}
+
+function getDailyReportOnLoad() {
+    var $form = $("#sales-form");
+    	var json = toJson($form);
+    	var url = getSalesReportUrl();
+
+    	$.ajax({
+    	   url: url,
+    	   type: 'POST',
+    	   data: json,
+    	   headers: {
+           	'Content-Type': 'application/json'
+           },
+    	   success: function(response) {
+    	   	displayInventoryReport(response);
+    	   },
+    	   error: handleAjaxError,
+    	});
 }
 
 function displayInventoryReport(data) {
@@ -69,13 +94,20 @@ const sec = timeUTC.second;
   return dformat;
 }
 
+function openFilterModal(){
+    	$('#filter-modal').modal('toggle');
+
+}
+
 //INITIALIZATION CODE
 function init(){
         // todo: change to POST, pass date as JSON
    $('#filter-sales-report').click(getDailyReport);
-       var element = document.getElementById("report-icon");
+   $('#display-filter-btn').click(openFilterModal);
+
+    var element = document.getElementById("report-icon");
        element.classList.add("thick");
-       getDailyReport();
+       getDailyReportOnLoad();
 }
 
 $(document).ready(init);

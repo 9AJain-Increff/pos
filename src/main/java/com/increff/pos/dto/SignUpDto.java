@@ -34,7 +34,10 @@ public class SignUpDto {
         return set;
 
     }
+    public UserPojo getUserByEmail(UserForm form) throws ApiException {
 
+        return userService.getUserByEmail(form.getEmail());
+    }
     public UserPojo addUser(UserForm form) throws ApiException {
         isValidEmail(form.getEmail());
         UserPojo user = convertToUserPojo(form);

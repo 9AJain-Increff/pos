@@ -53,6 +53,33 @@ function filterSalesReport() {
     });
 }
 
+
+function filterSalesReportOnLoad() {
+    var $form = $("#sales-form");
+
+    let jsonString = toJson($form);
+
+      const json = JSON.parse(jsonString);
+
+      setupDate(json);
+      jsonString = JSON.stringify(json);
+
+      const url = getSalesReportUrl();
+
+    $.ajax({
+       url: url,
+       type: 'POST',
+       data: jsonString,
+       headers: {
+        'Content-Type': 'application/json'
+       },
+       success: function(response) {
+            console.log(response);
+            displaySalesReport(response);
+       },
+       error: handleAjaxError
+    });
+}
 function displaySalesReport(data) {
     var $tbody = $('#sales-table').find('tbody');
     console.log('my data',data)
@@ -106,6 +133,7 @@ function init(){
    });
    var element = document.getElementById("report-icon");
    element.classList.add("thick");
+   filterSalesReportOnLoad();
 }
 
 $(document).ready(init);

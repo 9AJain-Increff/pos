@@ -14,13 +14,9 @@ public class BrandDao extends AbstractDao {
     private static final String SELECT_ALL_BRANDS = "select p from BrandPojo p";
     private static final String SELECT_BRAND_BY_NAME_AND_CATEGORY = "select p from BrandPojo p where name=:name AND category=:category";
 
-    // FIXED: 29/01/23 remove unnecessary throwing of an Exception
     public void addBrand(BrandPojo p) {
         em().persist(p);
     }
-
-    // FIXED: 29/01/23 remove unnecessary methods
-
 
     public BrandPojo getBrandById(int id) {
         TypedQuery<BrandPojo> query = getQuery(SELECT_BRAND_BY_ID, BrandPojo.class);

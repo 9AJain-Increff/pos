@@ -23,7 +23,12 @@
                     id="upload-data"
                     th:if="${#strings.equalsIgnoreCase(info.getRole().name(), 'supervisor')}"
             >Upload</button>
-            <button type="button" class="btn btn-primary" id="create-new-product">Add</button>
+            <button
+                    type="button"
+                    class="btn btn-primary"
+                    id="create-new-product"
+                    th:if="${#strings.equalsIgnoreCase(info.getRole().name(), 'supervisor')}">
+                Add</button>
         </div>
     </div>
 
@@ -45,7 +50,9 @@
                     <th scope="col">Brand</th>
                     <th scope="col">Category</th>
                     <th scope="col">Price</th>
-                    <th scope="col">Action</th>
+                    <th scope="col"
+                        th:if="${#strings.equalsIgnoreCase(info.getRole().name(), 'supervisor')}">
+                        >Action</th>
                 </tr>
                 </thead>
                 <tbody>

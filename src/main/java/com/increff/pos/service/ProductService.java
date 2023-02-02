@@ -71,7 +71,6 @@ public class ProductService {
 
     public ProductPojo checkProductByIdAndBarcode(Integer id, String barcode) throws ApiException {
         normalize(barcode);
-        // FIXED: 29/01/23 cant we use getProductById?
         ProductPojo p = dao.getProductById(id);
         if (p == null) {
             throw new ApiException("Product with given id does not exit, id: " + id);
@@ -79,7 +78,6 @@ public class ProductService {
         if (p.getBarcode().equals(barcode)) {
             return p;
         }
-        // FIXED: 29/01/23 barcode can be changed but not to an existing one.....(?)
         checkBarcode(barcode);
         return p;
     }
@@ -90,8 +88,6 @@ public class ProductService {
         }
     }
 
-
-    // FIXED: 29/01/23 public is needed?
     private void checkBarcode(String barcode) throws ApiException {
         normalize(barcode);
         ProductPojo p = dao.getProductByBarcode(barcode);

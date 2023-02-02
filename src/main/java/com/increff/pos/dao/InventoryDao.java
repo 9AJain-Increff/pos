@@ -13,8 +13,6 @@ public class InventoryDao extends AbstractDao {
     private static final String SELECT_INVENTORY_BY_ID = "select p from InventoryPojo p where id=:id";
     private static final String SELECT_ALL_INVENTORY = "select p from InventoryPojo p";
 
-
-    // FIXED: 29/01/23 unnecessary throwing of an exception
     public void insert(InventoryPojo p) {
         em().persist(p);
     }

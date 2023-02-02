@@ -18,7 +18,6 @@ import java.util.List;
 
 @Api
 @RestController
-// TODO: 29/01/23 every add/edit method should return corresponding data....what to return in update order?
 @RequestMapping(path = "/api/orders")
 public class OrderApiController {
     @Autowired
@@ -32,7 +31,7 @@ public class OrderApiController {
     }
 
     @ApiOperation(value = "Get a Pdf Url")
-    // todo change path
+
     @RequestMapping(path = "/invoice/{id}", method = RequestMethod.GET)
     public void getPdf(@PathVariable Integer id, HttpServletResponse response) throws ApiException {
         String filePath = orderDto.getOrderById(id).getOrderURL();
@@ -62,14 +61,11 @@ public class OrderApiController {
     }
 
     @ApiOperation(value = "Edit a Order")
-    // FIXED: 29/01/23 move pdf gen to dto
     @RequestMapping(path = "/{id}", method = RequestMethod.PUT)
     public void updateOrder(@PathVariable int id, @RequestBody List<OrderItemForm> form) throws ApiException {
         orderDto.updateOrder(id, form);
 
     }
 
-
-    // FIXED: 29/01/23 replace system.out with logger
 
 }

@@ -31,7 +31,7 @@ function addProduct(event){
        	'Content-Type': 'application/json'
        },
 	   success: function(response) {
-	   $.notify('Product added successfully!', 'success');
+	   throwSuccess("Product Added Successfully");
 	   	$('#add-product-modal').modal('toggle');
 	   		getProductList();
 
@@ -51,6 +51,8 @@ function updateProduct(event){
 	//Set the values to update
 	var $form = $("#product-edit-form");
 	var json = toJson($form);
+	json = JSON.parse(json);
+	json.price = parseFloat(json.price).toFixed()
 	$.ajax({
 	   url: url,
 	   type: 'PUT',
@@ -59,7 +61,7 @@ function updateProduct(event){
        	'Content-Type': 'application/json'
        },
 	   success: function(response) {
-	   $.notify('Product updated successfully!', 'success');
+	   throwSuccess("Product Updated");
 	   		getProductList();
 	   },
 	   error: handleAjaxError
@@ -104,12 +106,51 @@ var processCount = 0;
 
 function processData(){
 	var file = $('#productFile')[0].files[0];
+
+	if(!file)
+	{
+	    throwError("File is Empty");
+	    return;
+	}
+
 	readFileData(file, readFileDataCallback);
 }
 
 function readFileDataCallback(results){
-	fileData = results.data;
-	uploadRows();
+		fileData = results.data;
+    	var fields = results.meta.fields;
+    	if(fields.length!=5)
+    	{
+    	    var row = {};
+    	    row.error = "Incorrect number of headers";
+    	    errorData.push(row);
+    	    return;
+    	}
+
+    	if(fields[0]!='name' || fields[1]!='brandName' || fields[2]!='brandCategory' || fields[3]!='barcode'|| fields[4]!='price' )
+    	{
+    	    var row = {};
+            row.error = "Incorrect headers";
+            errorData.push(row);
+            return;
+    	}
+
+
+
+        if(fileData.length===0)
+        {
+            throwError("Empty Tsv");
+            return;
+        }
+
+        if(fileData.length>5000)
+        {
+            throwError("File length cannot exceed 5000");
+            return;
+        }
+        console.log(processCount);
+
+    	uploadRows();
 }
 
 function uploadRows(){
@@ -123,6 +164,14 @@ function uploadRows(){
 	//Process next row
 	var row = fileData[processCount];
 	processCount++;
+
+	if(row.__parsed_extra)
+	{
+	    row.error = "Extra fields";
+	    errorData.push(row);
+	    uploadRows();
+	    return;
+	}
 
 	var json = JSON.stringify(row);
 	var url = getProductUrl();
@@ -172,7 +221,7 @@ console.log('ankur jinfo')
 		+ '<td>'  + e.brandName + '</td>'
 		+ '<td>' + e.brandCategory + '</td>'
 		+ '<td>' + e.price + '</td>'
-		+ '<td>' + buttonHtml + '</td>'
+        + `<td  ${isSupervisor() ? '' : 'hidden'}>` + buttonHtml + '</td>'
 		+ '</tr>';
         $tbody.append(row);
         count++;
