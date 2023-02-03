@@ -251,12 +251,12 @@ function updateUploadDialog(){
 	$('#errorCount').html("" + errorData.length);
 }
 
+
 function updateFileName(){
 	var $file = $('#inventoryFile');
 	var fileName = $file.val();
-	$('#inventoryFileName').html(fileName);
+	$('#inventoryFileName').html(fileName.split("\\").pop());
 }
-
 function displayUploadData(){
  	resetUploadDialog();
 	$('#upload-inventory-modal').modal('toggle');

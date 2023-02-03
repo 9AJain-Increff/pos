@@ -52,7 +52,8 @@ function updateProduct(event){
 	var $form = $("#product-edit-form");
 	var json = toJson($form);
 	json = JSON.parse(json);
-	json.price = parseFloat(json.price).toFixed()
+	json.price = formatPrice(json.price);
+	json = JSON.stringify(json);
 	$.ajax({
 	   url: url,
 	   type: 'PUT',
@@ -266,7 +267,7 @@ function updateUploadDialog(){
 function updateFileName(){
 	var $file = $('#productFile');
 	var fileName = $file.val();
-	$('#productFileName').html(fileName);
+	$('#productFileName').html(fileName.split("\\").pop());
 }
 
 function displayUploadData(){
@@ -324,7 +325,10 @@ function getBrandList(brands) {
     const brandCategory = brands.map((brandItem) => {
       return { brand: brandItem.name, category: brandItem.category };
     });
-    setupBrandCategoryDropdown(brandCategory, '#brand-name-selection', '#brand-category-selection');
+    defaults = { category: '', brand: '' };
+    setupBrandCategoryDropdown(brandCategory, '#brand-name-selection', '#brand-category-selection',
+        defaults
+    );
   };
 
 function getBrandListInEdit(data) {
@@ -336,7 +340,9 @@ $.ajax({
 	       const brandCategory = brands.map((brandItem) => {
              return { brand: brandItem.name, category: brandItem.category };
            });
-          await setupBrandCategoryDropdown(brandCategory, '#brand-name-edit', '#brand-category-edit');
+          await setupBrandCategoryDropdown(brandCategory, '#brand-name-edit', '#brand-category-edit',
+           { category: '', brand: '' }
+          );
           displayProduct(data);
 	   },
 	   error:

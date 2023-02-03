@@ -223,8 +223,12 @@ public class ReportDto {
         return endTime;
     }
 
+    private boolean isBetween(LocalDateTime date, LocalDateTime startDate, LocalDateTime endDate) {
+        if (date.isEqual(startDate) || date.isEqual(endDate)) return true;
+        return date.isBefore(endDate) && date.isAfter(startDate);
+    }
     public List<DailyData> getDailyReport(DailyReportForm form) throws ApiException {
-        Date start = form.getStartTime(), end = form.getStartTime();
+        Date start = form.getStartTime(), end = form.getEndTime();
         LocalDateTime startTime = getStartTime(start);
         LocalDateTime endTime = getEndTime(end);
         if(startTime.isAfter(endTime)){
@@ -234,9 +238,9 @@ public class ReportDto {
         List<DailyData> dailyDataList = new ArrayList<>();
         for (DailyReportPojo d : dailyReportPojo) {
             LocalDateTime date = d.getDate().atStartOfDay();
-            if((date.isEqual(startTime) || date.isEqual(endTime)) ||
-                    (date.isAfter(startTime) && date.isBefore(endTime)))
-            dailyDataList.add(convertToDailyData(d));
+            if(isBetween(date, startTime, endTime)){
+                dailyDataList.add(convertToDailyData(d));
+            }
         }
         return dailyDataList;
     }

@@ -134,7 +134,7 @@ public class OrderDto {
             InventoryPojo inventoryPojo = inventoryService.getAndCheckInventoryByProductId(product.getId());
             inventoryPojoList.add(inventoryPojo);
             orderItemPojoList.add(convertToOrderItemPojo(orderItem, newOrder.getId(), product.getId()));
-            productService.validateSellingPrice(orderItem.getSellingPrice(),product.getPrice());
+            productService.validateSellingPrice(orderItem.getSellingPrice(), product.getPrice());
         }
         validateInventory(inventoryPojoList, orderItemPojoList);
         updateInventory(inventoryPojoList);

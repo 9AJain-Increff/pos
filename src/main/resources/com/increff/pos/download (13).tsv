@@ -1,4 +1,0 @@
-name	brandName	brandCategory	barcode	mrp	error
-grey jeans	wrong	clothing	wr150	1299	{"message":"Invalid input: price can only be a positive number!"}
-red tshirt	wrong	clothing	wr151	699	{"message":"Invalid input: price can only be a positive number!"}
-jacket	wrong	clothing		1599	{"message":"Invalid input: price can only be a positive number!"}

@@ -181,3 +181,11 @@ function setupBrandCategoryFilters(brandCategories) {
     getCategories: getCategoriesForBrand,
   };
 }
+
+
+function formatPrice(price) {
+
+temp = price.split('.')
+if(temp.length == 1)return price;
+return temp[0] + '.' + temp[1].substring(0, 2);
+}

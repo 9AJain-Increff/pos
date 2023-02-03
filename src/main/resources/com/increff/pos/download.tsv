@@ -1,4 +1,0 @@
-name	category	error
-wrogn	clothing	{"message":"Brand with given name and category already exist"}
-vincent chase	eyewear	Extra fields
-adidas		{"message":"category cannot be empty"}

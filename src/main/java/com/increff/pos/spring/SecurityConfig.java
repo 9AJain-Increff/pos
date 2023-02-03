@@ -48,10 +48,5 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/swagger-ui.html", "/webjars/**");
     }
 
-    public static boolean isAuthenticated() {
-        UserPrincipal principal = SecurityUtil.getPrincipal();
-        if (principal == null) return false;
-        return !ValidationUtil.isBlank(principal.getEmail());
-    }
 
 }

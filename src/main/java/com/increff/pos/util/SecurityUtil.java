@@ -44,4 +44,9 @@ public class SecurityUtil {
         return isSupervisor ? UserRole.SUPERVISOR : UserRole.OPERATOR;
     }
 
+    public static boolean isAuthenticated() {
+        UserPrincipal principal = SecurityUtil.getPrincipal();
+        if (principal == null) return false;
+        return !ValidationUtil.isBlank(principal.getEmail());
+    }
 }

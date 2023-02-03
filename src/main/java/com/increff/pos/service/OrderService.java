@@ -68,7 +68,7 @@ public class OrderService {
         return getAllOrders().stream().filter(it -> {
                     LocalDateTime date = it.getCreatedOn();
                     return (date.isEqual(start) || date.isEqual(end)) ||
-                            date.isAfter(start) && date.isBefore(end);
+                            (date.isAfter(start) && date.isBefore(end));
                 }
         ).collect(Collectors.toList());
     }

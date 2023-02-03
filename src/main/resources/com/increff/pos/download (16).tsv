@@ -1,4 +1,0 @@
-name	brandName	brandCategory	barcode	price	error
-grey jeans	wrong	clothing	wr150	1299	Extra fields
-red tshirt	wrong	clothing	wr151	699	{"message":"Brand with given name and category does not exit "}
-jacket	wrong	clothing		1599	Extra fields
