@@ -27,7 +27,7 @@ public class SiteUiController extends AbstractUiController {
     }
     @RequestMapping(value = "/site/login")
     public ModelAndView login() {
-        String page = isValidate() ? "redirect:/ui/home":"login.html";
+        String page = "login.html";
         return mav(page);
     }
 

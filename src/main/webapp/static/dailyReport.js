@@ -5,7 +5,12 @@ function getSalesReportUrl(){
 
 function getDailyReport() {
     var $form = $("#sales-form");
-    	var json = toJson($form);
+    let jsonString = toJson($form);
+
+      const json = JSON.parse(jsonString);
+
+      setupDate(json);
+      jsonString = JSON.stringify(json);
     	var url = getSalesReportUrl();
 
     	$.ajax({
@@ -25,13 +30,18 @@ function getDailyReport() {
 
 function getDailyReportOnLoad() {
     var $form = $("#sales-form");
-    	var json = toJson($form);
+    let jsonString = toJson($form);
+
+      const json = JSON.parse(jsonString);
+
+      setupDate(json);
+      jsonString = JSON.stringify(json);
     	var url = getSalesReportUrl();
 
     	$.ajax({
     	   url: url,
     	   type: 'POST',
-    	   data: json,
+    	   data: jsonString,
     	   headers: {
            	'Content-Type': 'application/json'
            },

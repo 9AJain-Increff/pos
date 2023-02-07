@@ -32,7 +32,7 @@ function addBrand(event){
 }
 
 function updateBrand(event){
-	$('#edit-brand-modal').modal('toggle');
+
 	//Get the ID
 	var id = $("#brand-edit-form input[name=id]").val();
 	var url = getBrandUrl() + "/" + id;
@@ -49,6 +49,7 @@ function updateBrand(event){
        	'Content-Type': 'application/json'
        },
 	   success: function(response) {
+	   	$('#edit-brand-modal').modal('toggle');
 	        throwSuccess("Brand Updated Successfully");
 	   		getBrandList();
 	   },

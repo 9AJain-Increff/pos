@@ -44,7 +44,7 @@ public class MockUtil {
 
         perDaySale.setOrdersQuantity(1);
         perDaySale.setRevenue(100.0f);
-        perDaySale.setDate(LocalDate.from(currentDate.minusDays(3)));
+        perDaySale.setDate(LocalDateTime.from(currentDate.minusDays(3)));
         perDaySale.setOrderItemsQuantity(5);
         return perDaySale;
     }
@@ -70,11 +70,11 @@ public class MockUtil {
         return new ProductPojo(null, barcode, brandId, name, price);
     }
 
-    private static final int BRAND_APPLE_PHONE = 0;
-    private static final int BRAND_SAMSUNG_PHONE = 1;
-    private static final int BRAND_LENOVO_LAPTOP = 2;
-    private static final int BRAND_LENOVO_APPLE = 3;
-    private static final int BRAND_NIKE_SHOE = 4;
+    private static final Integer BRAND_APPLE_PHONE = 0;
+    private static final Integer BRAND_SAMSUNG_PHONE = 1;
+    private static final Integer BRAND_LENOVO_LAPTOP = 2;
+    private static final Integer BRAND_LENOVO_APPLE = 3;
+    private static final Integer BRAND_NIKE_SHOE = 4;
 
 
         public static UserForm getMockUserForm() {
@@ -260,7 +260,7 @@ public class MockUtil {
             updateInventory(inventoryService, item.getProductId(), item.getQuantity());
         });
 
-        orderItemService.addOrderItem(orderItems);
+        orderItemService.addOrderItems(orderItems);
         return new Pair<>(order, orderItems);
     }
 
@@ -292,7 +292,7 @@ public class MockUtil {
         return product;
     }
 
-    public static List<ProductPojo> getMockProducts(int size) {
+    public static List<ProductPojo> getMockProducts(Integer size) {
         List<ProductPojo> products = new ArrayList<>(size);
 
         for (int i = 0; i < size; i++) {

@@ -4,6 +4,23 @@ function isSupervisor() {
 }
 
 
+
+function getIsoDate(dateString) {
+  const date = new Date(dateString);
+  return date.toISOString();
+}
+
+function setupDate(json) {
+  if (json.startTime) {
+    json.startTime = getIsoDate(json.startTime);
+  }
+
+  if (json.endTime) {
+    json.endTime = getIsoDate(json.endTime);
+  }
+}
+
+
 //HELPER METHOD
 function toJson($form){
     var serialized = $form.serializeArray();

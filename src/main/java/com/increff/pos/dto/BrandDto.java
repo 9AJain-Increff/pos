@@ -20,7 +20,7 @@ public class BrandDto {
     @Autowired
     private BrandService brandService;
 
-    public BrandData getBrandById(int id) throws ApiException {
+    public BrandData getBrandById(Integer id) throws ApiException {
         BrandPojo brandPojo = brandService.getAndCheckBrandById(id);
         return convertToBrandData(brandPojo);
     }
@@ -32,7 +32,7 @@ public class BrandDto {
         return convertToBrandData(brand);
     }
 
-    public BrandData updateBrand(int id, BrandForm form) throws ApiException {
+    public BrandData updateBrand(Integer id, BrandForm form) throws ApiException {
         validateBrandForm(form);
         BrandPojo brandPojo = convertToBrandPojo(form);
         brandPojo.setId(id);

@@ -7,6 +7,7 @@ import javax.transaction.Transactional;
 import com.increff.pos.dao.InventoryDao;
 import com.increff.pos.exception.ApiException;
 import com.increff.pos.pojo.InventoryPojo;
+import com.increff.pos.pojo.OrderItemPojo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +23,11 @@ public class InventoryService {
         if (exist == null) {
             inventoryDao.insert(p);
         } else {
+            if(p.getQuantity()<0){
+                if(-1*p.getQuantity()>exist.getQuantity()){
+                    throw new ApiException("Total available quantity is "+ exist.getQuantity());
+                }
+            }
             p.setQuantity(p.getQuantity() + exist.getQuantity());
             update(p);
         }
@@ -51,5 +57,12 @@ public class InventoryService {
         ex.setQuantity((p.getQuantity()));
     }
 
+    public InventoryPojo validateInventory(Integer productId, Integer requiredQuantity) throws ApiException {
+        InventoryPojo inventory = getAndCheckInventoryByProductId(productId);
+        if(requiredQuantity>inventory.getQuantity()){
+            throw new ApiException("Only "+inventory.getQuantity()+" available in inventory");
+        }
+        return  inventory;
+    }
 
 }

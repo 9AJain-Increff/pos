@@ -1,12 +1,14 @@
 package com.increff.pos.util;
 
-import com.increff.pos.model.form.BrandForm;
-import com.increff.pos.model.form.InventoryForm;
-import com.increff.pos.model.form.OrderItemForm;
-import com.increff.pos.model.form.ProductForm;
+import com.increff.pos.model.form.*;
 import com.increff.pos.exception.ApiException;
 
-import static com.increff.pos.util.Normalization.normalize;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
+
+import static com.increff.pos.util.DateTimeUtil.formatEndDate;
+import static com.increff.pos.util.DateTimeUtil.formatStartDate;
 
 public class ValidationUtil {
     private static final String EMAIL_PATTERN = "[a-z\\d]+@[a-z]+\\.[a-z]{2,3}";
@@ -42,9 +44,6 @@ public class ValidationUtil {
             throw new ApiException("barcode cannot be empty");
         }
 
-        if (isNegative(form.getQuantity())) {
-            throw new ApiException("quantity cannot be negative");
-        }
 
     }
 
@@ -80,6 +79,36 @@ public class ValidationUtil {
         if (isBlank(form.getBarcode())) {
             throw new ApiException("barcode cannot be empty");
         }
+    }
+    public static LocalDateTime getStartTime(LocalDateTime start){
+        LocalDateTime startTime ;
+        if(start== null){
+            startTime = LocalDateTime.MIN;;
+        }
+        else {
+            startTime = formatStartDate(start);
+        }
+        return startTime;
+    }
+
+    public static LocalDateTime getEndTime(LocalDateTime end){
+        LocalDateTime endTime;
+        if(end== null){
+            endTime = LocalDateTime.MAX;;
+        }
+        else {
+            endTime = formatEndDate(end);
+        }
+        return endTime;
+    }
+
+
+
+    public static void validateSalesReport(SalesForm form){
+        isBlank(form.getBrandName());
+        isBlank(form.getBrandCategory());
+        form.setStartTime(getStartTime(form.getStartTime()));
+
     }
 
 }

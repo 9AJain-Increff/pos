@@ -10,20 +10,7 @@ function getBaseUrl() {
 function getBrandUrl() {
   return getBaseUrl() + '/api/brands';
 }
-function getIsoDate(dateString) {
-  const date = new Date(dateString);
-  return date.toISOString();
-}
 
-function setupDate(json) {
-  if (json.startDate) {
-    json.startDate = getIsoDate(json.startDate);
-  }
-
-  if (json.endDate) {
-    json.endDate = getIsoDate(json.endDate);
-  }
-}
 
 function filterSalesReport() {
     var $form = $("#sales-form");

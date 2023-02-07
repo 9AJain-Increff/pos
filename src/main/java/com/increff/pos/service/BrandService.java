@@ -22,14 +22,6 @@ public class BrandService {
     private BrandDao dao;
 
 
-    private BrandPojo isDuplicate(BrandPojo b) throws ApiException {
-        BrandPojo brand = dao.getBrandByNameAndCategory(b.getName(), b.getCategory());
-        if (brand != null) {
-            throw new ApiException("Brand with given name and category already exist");
-        } else {
-            return brand;
-        }
-    }
 
     @Transactional(rollbackOn = ApiException.class)
     public BrandPojo addBrand(BrandPojo brandPojo) throws ApiException {
@@ -40,7 +32,7 @@ public class BrandService {
     }
 
 
-    public BrandPojo getAndCheckBrandById(int id) throws ApiException {
+    public BrandPojo getAndCheckBrandById(Integer id) throws ApiException {
         BrandPojo brandPojo = dao.getBrandById(id);
         if (brandPojo == null) {
             throw new ApiException("Brand with given ID does not exist");
@@ -68,7 +60,6 @@ public class BrandService {
 
 
     public BrandPojo checkBrandExistByNameAndCategory(String brandName, String brandCategory) throws ApiException {
-        // TODO: 29/01/23 why not pass BrandPojo instead of passing both as sep variables?  ....in product form we have brand and category ... in order to get brandpojo , still we have tto pass name and category
         normalize(brandName);
         normalize(brandCategory);
         BrandPojo brand = dao.getBrandByNameAndCategory(brandName, brandCategory);
@@ -89,6 +80,15 @@ public class BrandService {
             brands.add((getAndCheckBrandById(brandId)));
         }
         return brands;
+    }
+
+    private BrandPojo isDuplicate(BrandPojo b) throws ApiException {
+        BrandPojo brand = dao.getBrandByNameAndCategory(b.getName(), b.getCategory());
+        if (brand != null) {
+            throw new ApiException("Brand with given name and category already exist");
+        } else {
+            return brand;
+        }
     }
 
 

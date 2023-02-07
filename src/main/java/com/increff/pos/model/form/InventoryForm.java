@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class InventoryForm {
 
-    private int quantity;
+    private Integer quantity;
     private String barcode;
 
 

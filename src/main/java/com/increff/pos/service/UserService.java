@@ -41,23 +41,13 @@ public class UserService {
         return user;
     }
 
-    public UserPojo checkEmailAndPassword(String email, String password) throws ApiException {
-        UserPojo user = getUserByEmail(email);
-        boolean authenticated = (user != null && Objects.equals(user.getPassword(), password));
-        if (!authenticated) {
-            throw  new ApiException("Invalid username or password");
-
-        }
-        return user;
-    }
-
     @Transactional
     public List<UserPojo> getAll() {
         return dao.selectAll();
     }
 
     @Transactional
-    public void delete(int id) {
+    public void delete(Integer id) {
 
         dao.delete(id);
     }

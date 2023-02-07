@@ -43,7 +43,7 @@ function addProduct(event){
 }
 
 function updateProduct(event){
-	$('#edit-product-modal').modal('toggle');
+
 	//Get the ID
 	var id = $("#product-edit-form input[name=id]").val();
 	var url = getProductUrl() + "/" + id;
@@ -62,6 +62,7 @@ function updateProduct(event){
        	'Content-Type': 'application/json'
        },
 	   success: function(response) {
+       $('#edit-product-modal').modal('toggle');
 	   throwSuccess("Product Updated");
 	   		getProductList();
 	   },

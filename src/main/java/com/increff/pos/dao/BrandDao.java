@@ -18,7 +18,7 @@ public class BrandDao extends AbstractDao {
         em().persist(p);
     }
 
-    public BrandPojo getBrandById(int id) {
+    public BrandPojo getBrandById(Integer id) {
         TypedQuery<BrandPojo> query = getQuery(SELECT_BRAND_BY_ID, BrandPojo.class);
         query.setParameter("id", id);
         return getSingle(query);

@@ -31,7 +31,7 @@ public class DailySaleserviceTest extends AbstractUnitTest{
 
         for (int i = 0; i < 5; i++) {
             DailyReportPojo perDaySale = MockUtil.getMockPerDaySale();
-            perDaySale.setDate(LocalDate.from(currentDate.plusDays(i)));
+            perDaySale.setDate(LocalDateTime.from(currentDate.plusDays(i)));
             dailyReportDao.insert(perDaySale);
             perDaySaleList.add(perDaySale);
         }

@@ -1,6 +1,7 @@
 package com.increff.pos.model.data;
 
 import com.increff.pos.model.form.BrandForm;
+import io.swagger.models.auth.In;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class BrandData extends BrandForm {
 
-    private int id;
+    private Integer id;
 
 
 }

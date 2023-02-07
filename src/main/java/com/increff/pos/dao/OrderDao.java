@@ -41,5 +41,12 @@ public class OrderDao extends AbstractDao {
         return query.getResultList();
     }
 
+    public List<OrderPojo> selectAllByDates(LocalDateTime start, LocalDateTime end) {
+        TypedQuery<OrderPojo> query = getQuery(GET_BETWEEN_DATE, OrderPojo.class);
+        query.setParameter("start", start);
+        query.setParameter("end", end);
+        return query.getResultList();
+    }
+
 
 }

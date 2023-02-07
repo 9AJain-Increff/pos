@@ -2,7 +2,6 @@ package com.increff.pos.dto;
 
 
 import com.increff.pos.exception.ApiException;
-import com.increff.pos.helper.OrderItemsUpdates;
 import com.increff.pos.model.data.InvoiceData;
 import com.increff.pos.model.data.OrderData;
 import com.increff.pos.model.data.OrderItemData;
@@ -55,95 +54,128 @@ public class OrderDto {
         return orderService.getOrderByOrderId(orderId);
     }
 
-    private void validateInventory(
-            List<InventoryPojo> inventoryPojoList,
-            List<OrderItemPojo> orderItemPojoList) throws ApiException {
-
-        for (int index = 0; index < inventoryPojoList.size(); index++) {
-            int inventoryQuantity = inventoryPojoList.get(index).getQuantity();
-            int requiredQuantity = orderItemPojoList.get(index).getQuantity();
-            Integer productId = orderItemPojoList.get(index).getProductId();
-            ProductPojo product = productService.checkProduct(productId);
-            if (requiredQuantity > inventoryQuantity) {
-                throw new ApiException("Only " + inventoryQuantity + " pieces of the product with barcode = " + product.getBarcode() + " exists");
-            } else {
-                inventoryPojoList.get(index).setQuantity(inventoryQuantity - requiredQuantity);
-            }
-        }
-    }
-
-
-    public List<String> getBarcodes(List<OrderItemPojo> orderItemPojos) throws ApiException {
-
-        List<String> barcodes = new ArrayList<>();
-        for (OrderItemPojo orderItem : orderItemPojos) {
-            ProductPojo product = productService.checkProduct(orderItem.getProductId());
-            barcodes.add(product.getBarcode());
-        }
-        return barcodes;
-    }
-
-    public List<InventoryPojo> getInventoryPojo(List<String> barcodes) throws ApiException {
-        List<InventoryPojo> inventoryPojoList = new ArrayList<>();
-        for (String barcode : barcodes) {
-            ProductPojo product = productService.getProductByBarcode(barcode);
-            InventoryPojo inventoryPojo = inventoryService.getAndCheckInventoryByProductId(product.getId());
-            inventoryPojoList.add(inventoryPojo);
-        }
-        return inventoryPojoList;
-    }
-
-    public List<ProductPojo> getProductList(List<String> barcode) throws ApiException {
-        List<ProductPojo> productPojoList = new ArrayList<>();
-        for (String orderItemBarcode : barcode) {
-            ProductPojo productPojo = productService.getProductByBarcode(orderItemBarcode);
-            productPojoList.add(productPojo);
-        }
-        return productPojoList;
-    }
-
-    public void updateInventory(List<InventoryPojo> inventoryPojoList) throws ApiException {
-        for (InventoryPojo inventoryPojo : inventoryPojoList) {
-            inventoryService.update(inventoryPojo);
-        }
-    }
-
-    public void addOrderItems(List<OrderItemPojo> addedOrderItems) throws ApiException {
-        for (OrderItemPojo orderItemPojo : addedOrderItems) {
-            ProductPojo product = productService.checkProduct(orderItemPojo.getProductId());
-            orderItemPojo.setProductId(product.getId());
-        }
-        orderItemService.addOrderItem(addedOrderItems);
-
-    }
-
     @Transactional(rollbackOn = Exception.class)
     public OrderData addOrder(List<OrderItemForm> orderItemForm) throws ApiException {
-        if (orderItemForm.size() == 0) {
-            throw new ApiException("Order must contain atleast 1 order item");
-        }
-        for (OrderItemForm orderItem : orderItemForm) {
-            validateOrderForm(orderItem);
-        }
-        LocalDateTime date = LocalDateTime.now(ZoneOffset.UTC);
-        OrderPojo newOrder = orderService.createNewOrder(convertToOrderPojo(date));
-        List<OrderItemPojo> orderItemPojoList = new ArrayList<>();
-        List<InventoryPojo> inventoryPojoList = new ArrayList<>();
+        validateFormAndSellingPrice(orderItemForm);
+        OrderPojo newOrder = createNewOrder();
         for (OrderItemForm orderItem : orderItemForm) {
             ProductPojo product = productService.getProductByBarcode(orderItem.getBarcode());
-            InventoryPojo inventoryPojo = inventoryService.getAndCheckInventoryByProductId(product.getId());
-            inventoryPojoList.add(inventoryPojo);
-            orderItemPojoList.add(convertToOrderItemPojo(orderItem, newOrder.getId(), product.getId()));
-            productService.validateSellingPrice(orderItem.getSellingPrice(), product.getPrice());
+            OrderItemPojo orderItemPojo = (convertToOrderItemPojo(orderItem, newOrder.getId(), product.getId()));
+            updateInventory(orderItemPojo);
+            orderItemService.addOrderItem(orderItemPojo);
         }
-        validateInventory(inventoryPojoList, orderItemPojoList);
-        updateInventory(inventoryPojoList);
-        addOrderItems(orderItemPojoList);
         List<InvoiceData> invoiceData = getInvoiceData(orderItemForm, newOrder);
         getEncodedPdf(invoiceData);
         addPdfURL(newOrder.getId());
         return convertToOrderData(newOrder);
     }
+
+    @Transactional(rollbackOn = ApiException.class)
+    public OrderPojo updateOrder(Integer orderId, @NotNull List<OrderItemForm> orderItemForms) throws ApiException {
+        validateFormAndSellingPrice(orderItemForms);
+        List<OrderItemPojo> updatedOrderItems = new ArrayList<>();
+        for (OrderItemForm orderItem : orderItemForms) {
+            ProductPojo product = productService.getProductByBarcode(orderItem.getBarcode());
+            updatedOrderItems.add(convertToOrderItemPojo(orderItem, orderId, product.getId()));
+        }
+        List<OrderItemPojo> previousOrderItems = orderItemService.getOrderItemsById(orderId);
+        Map<Integer, OrderItemPojo> updatedOrderItemsMapping = new HashMap<>();
+        Map<Integer, OrderItemPojo> previousOrderItemsMapping = new HashMap<>();
+        for (OrderItemPojo orderItem : previousOrderItems) {
+            previousOrderItemsMapping.put(orderItem.getProductId(), orderItem);
+        }
+        for (OrderItemPojo orderItem : updatedOrderItems) {
+            updatedOrderItemsMapping.put(orderItem.getProductId(), orderItem);
+        }
+        updateAddedOrders(updatedOrderItemsMapping,previousOrderItemsMapping);
+        updateUpdatedOrderItems(updatedOrderItemsMapping,previousOrderItemsMapping);
+        deleteOrderItems(updatedOrderItemsMapping,previousOrderItemsMapping);
+        OrderPojo order = orderService.getOrderByOrderId(orderId);
+        List<InvoiceData> invoiceData = getInvoiceData(orderItemForms, order);
+        getEncodedPdf(invoiceData);
+        addPdfURL(order.getId());
+        return orderService.getOrderByOrderId(orderId);
+    }
+
+    public List<OrderData> getAllOrders() {
+        List<OrderPojo> orders = orderService.getAllOrders();
+        List<OrderData> ordersData = new ArrayList<OrderData>();
+        for (OrderPojo p : orders) {
+            ordersData.add(convertToOrderData(p));
+        }
+        return ordersData;
+    }
+    public void addPdfURL(Integer id) {
+        orderService.addPdfURL(id);
+    }
+
+
+    public List<InvoiceData> getInvoiceData(List<OrderItemForm> form, OrderPojo order) throws ApiException {
+        List<InvoiceData> invoiceData = new ArrayList<>();
+        for (int i = 0; i < form.size(); i++) {
+            ProductPojo product = productService.getProductByBarcode(form.get(i).getBarcode());
+            InvoiceData data = convertToInvoiceData(
+                    form.get(i), product, order.getId()
+            );
+            invoiceData.add(data);
+        }
+        return invoiceData;
+    }
+    private void deleteOrderItems(Map<Integer, OrderItemPojo> updatedOrderItemsMapping,
+                                   Map<Integer, OrderItemPojo> previousOrderItemsMapping) throws ApiException {
+        Iterator<Map.Entry<Integer, OrderItemPojo>> iterator = previousOrderItemsMapping.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<Integer, OrderItemPojo> entry = iterator.next();
+            if (!updatedOrderItemsMapping.containsKey(entry.getKey())) {
+                OrderItemPojo orderItem = (entry.getValue());
+                orderItem.setQuantity(-1*orderItem.getQuantity());
+                updateInventory(orderItem);
+                orderItemService.delete(orderItem.getId());
+            }
+        }
+
+    }
+
+    private OrderPojo createNewOrder(){
+        LocalDateTime date = LocalDateTime.now(ZoneOffset.UTC);
+        return orderService.createNewOrder(convertToOrderPojo(date));
+    }
+
+    private void updateAddedOrders(Map<Integer, OrderItemPojo> updatedOrderItemsMapping,
+                                   Map<Integer, OrderItemPojo> previousOrderItemsMapping) throws ApiException {
+        Iterator<Map.Entry<Integer, OrderItemPojo>> iterator = updatedOrderItemsMapping.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<Integer, OrderItemPojo> entry = iterator.next();
+            if (!previousOrderItemsMapping.containsKey(entry.getKey())) {
+                OrderItemPojo orderItem = (entry.getValue());
+                updateInventory(orderItem);
+                orderItemService.addOrderItem(orderItem);
+            }
+        }
+    }
+    private void updateUpdatedOrderItems(Map<Integer, OrderItemPojo> updatedOrderItemsMapping,
+                                   Map<Integer, OrderItemPojo> previousOrderItemsMapping) throws ApiException {
+        Iterator<Map.Entry<Integer, OrderItemPojo>> iterator = updatedOrderItemsMapping.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<Integer, OrderItemPojo> entry = iterator.next();
+            if (previousOrderItemsMapping.containsKey(entry.getKey())) {
+                OrderItemPojo updatedOrderItem = entry.getValue();
+                OrderItemPojo previousOrderItem = (previousOrderItemsMapping.get(entry.getKey()));
+                updatedOrderItem.setQuantity(updatedOrderItem.getQuantity()-previousOrderItem.getQuantity());
+                updatedOrderItem.setId(previousOrderItem.getId());
+                updateInventory(updatedOrderItem);
+                updatedOrderItem.setQuantity(updatedOrderItem.getQuantity()+previousOrderItem.getQuantity());
+                orderItemService.updateOrderItem(updatedOrderItem);
+            }
+        }
+    }
+
+    private void updateInventory(OrderItemPojo orderItem) throws ApiException {
+            InventoryPojo inventory = inventoryService.validateInventory(orderItem.getProductId(),orderItem.getQuantity());
+            inventory.setQuantity(inventory.getQuantity()-orderItem.getQuantity());
+            inventoryService.update(inventory);
+    }
+
 
     private String getEncodedPdf(List<InvoiceData> invoiceDetails) throws RestClientException {
         String INVOICE_API_URL = "http://localhost:8000/invoice/api/generate";
@@ -166,122 +198,15 @@ public class OrderDto {
         }
     }
 
-    public void addNewlyUpdatedOrderItems(List<OrderItemPojo> addedOrderItems) throws ApiException {
-        List<String> barcodes = getBarcodes(addedOrderItems);
-
-        List<InventoryPojo> inventoryPojoList = getInventoryPojo(barcodes);
-        validateInventory(inventoryPojoList, addedOrderItems);
-        updateInventory(inventoryPojoList);
-        addOrderItems(addedOrderItems);
-    }
-
-    public void updateOrderItems(List<OrderItemPojo> updatedOrderItems,
-                                 Map<Integer, OrderItemPojo> productIdToOrderItemMapping) throws ApiException {
-        List<String> barcodes = getBarcodes(updatedOrderItems);
-
-        List<InventoryPojo> inventoryPojoList = getInventoryPojo(barcodes);
-        validateInventory(inventoryPojoList, updatedOrderItems);
-        updateInventory(inventoryPojoList);
-        updateOrderItemList(updatedOrderItems, productIdToOrderItemMapping);
-
-    }
-
-    public void updateOrderItemList(List<OrderItemPojo> updatedOrderItems,
-                                    Map<Integer, OrderItemPojo> barcodeToOrderItemMapping) throws ApiException {
-        for (OrderItemPojo orderItemPojo : updatedOrderItems) {
-            int newQuantity = barcodeToOrderItemMapping.get(orderItemPojo.getProductId()).getQuantity();
-            orderItemPojo.setQuantity(newQuantity);
-            orderItemService.updateOrderItem(orderItemPojo);
-        }
-    }
-
-    public void deleteUpdatedOrderItems(List<OrderItemPojo> deletedOrderItems) throws ApiException {
-        for (OrderItemPojo orderItemPojo : deletedOrderItems) {
-            orderItemService.delete(orderItemPojo.getId());
-        }
-    }
-
-
-    public void deleteOrderItems(List<OrderItemPojo> deletedOrderItems) throws ApiException {
-        List<String> barcodes = getBarcodes(deletedOrderItems);
-
-        List<InventoryPojo> inventoryPojoList = getInventoryPojo(barcodes);
-        validateInventory(inventoryPojoList, deletedOrderItems);
-        deleteInventory(inventoryPojoList);
-        deleteUpdatedOrderItems(deletedOrderItems);
-    }
-
-    public void deleteInventory(List<InventoryPojo> inventoryPojoList) throws ApiException {
-        for (InventoryPojo inventoryPojo : inventoryPojoList) {
-            inventoryService.update(inventoryPojo);
-        }
-    }
-
-    @Transactional(rollbackOn = ApiException.class)
-
-    public OrderPojo updateOrder(Integer orderId, @NotNull List<OrderItemForm> orderItemForms) throws ApiException {
+    private void validateFormAndSellingPrice(List<OrderItemForm> orderItemForms) throws ApiException {
         if (orderItemForms.isEmpty()) {
-            throw new ApiException("Add a Order Item");
+            throw new ApiException("Order List cannot be empty");
         }
-        List<OrderItemPojo> updatedOrderList = new ArrayList<>();
         for (OrderItemForm orderItem : orderItemForms) {
-
             validateOrderForm(orderItem);
             ProductPojo product = productService.getProductByBarcode(orderItem.getBarcode());
-            productService.validateSellingPrice(orderItem.getSellingPrice(), product.getPrice());
-            updatedOrderList.add(convertToOrderItemPojo(orderItem, orderId, product.getId()));
+            productService.validateSellingPrice(orderItem.getSellingPrice(),product.getPrice());
         }
-
-
-        Map<Integer, OrderItemPojo> mappingFormData = new HashMap<>();
-
-        List<OrderItemPojo> oldOrder = orderItemService.getOrderItemsById(orderId);
-        Map<Integer, OrderItemPojo> productIdToOrderItemMapping = new HashMap<>();
-
-        for (OrderItemPojo orderItemPojo : updatedOrderList) {
-            ProductPojo product = productService.checkProduct(orderItemPojo.getProductId());
-            productIdToOrderItemMapping.put(product.getId(), orderItemPojo);
-            mappingFormData.put(product.getId(), orderItemPojo);
-        }
-
-        OrderItemsUpdates getlist = new OrderItemsUpdates();
-        getlist.updatesList(oldOrder, mappingFormData, orderId);
-        List<OrderItemPojo> updatedOrderItems = getlist.getToUpdate();
-        List<OrderItemPojo> deletedOrderItems = getlist.getToDelete();
-        List<OrderItemPojo> addedOrderItems = getlist.getToAdd();
-
-        addNewlyUpdatedOrderItems(addedOrderItems);
-        updateOrderItems(updatedOrderItems, productIdToOrderItemMapping);
-        deleteOrderItems(deletedOrderItems);
-        OrderPojo updatedOrder = orderService.getOrderByOrderId(orderId);
-        List<InvoiceData> invoiceData = getInvoiceData(orderItemForms, updatedOrder);
-        getEncodedPdf(invoiceData);
-        addPdfURL(orderId);
-        return updatedOrder;
     }
 
-    public List<OrderData> getAllOrders() {
-        List<OrderPojo> orders = orderService.getAllOrders();
-        List<OrderData> ordersData = new ArrayList<OrderData>();
-        for (OrderPojo p : orders) {
-            ordersData.add(convertToOrderData(p));
-        }
-        return ordersData;
-    }
-
-    public List<InvoiceData> getInvoiceData(List<OrderItemForm> form, OrderPojo order) throws ApiException {
-        List<InvoiceData> invoiceData = new ArrayList<>();
-        for (int i = 0; i < form.size(); i++) {
-            ProductPojo product = productService.getProductByBarcode(form.get(i).getBarcode());
-            InvoiceData data = convertToInvoiceData(
-                    form.get(i), product, order.getId()
-            );
-            invoiceData.add(data);
-        }
-        return invoiceData;
-    }
-
-    public void addPdfURL(Integer id) {
-        orderService.addPdfURL(id);
-    }
 }

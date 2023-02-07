@@ -7,8 +7,6 @@ import java.time.LocalDateTime;
 @Data
 public class OrderData {
 
-    private int id;
+    private Integer id;
     private LocalDateTime createdOn;
-
-
 }

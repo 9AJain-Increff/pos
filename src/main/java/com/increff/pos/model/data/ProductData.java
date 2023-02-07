@@ -6,6 +6,6 @@ import lombok.Data;
 @Data
 public class ProductData extends ProductForm {
 
-    private int id;
+    private Integer id;
 
 }

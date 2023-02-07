@@ -6,7 +6,6 @@ import com.increff.pos.model.data.BrandData;
 import com.increff.pos.model.data.DailyData;
 import com.increff.pos.model.data.InventoryReportData;
 import com.increff.pos.model.data.SalesData;
-import com.increff.pos.model.form.BarcodeForm;
 import com.increff.pos.model.form.BrandForm;
 import com.increff.pos.model.form.DailyReportForm;
 import com.increff.pos.model.form.SalesForm;
@@ -17,15 +16,11 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static com.increff.pos.util.ConversionUtil.*;
-import static com.increff.pos.util.DateTimeUtil.formatEndDate;
-import static com.increff.pos.util.DateTimeUtil.formatStartDate;
-import static com.increff.pos.util.ValidationUtil.isBlank;
+import static com.increff.pos.util.ValidationUtil.*;
 
 @Component
 public class ReportDto {
@@ -57,22 +52,10 @@ public class ReportDto {
         } else return false;
     }
 
-    private List<OrderItemPojo> filterOrderItems(List<OrderItemPojo> orderItems, String brandName, String brandCategory) throws ApiException {
-        List<OrderItemPojo> filteredOrderItems = new ArrayList<>();
-        for (OrderItemPojo orderItem : orderItems) {
-            ProductPojo product = productService.checkProduct(orderItem.getProductId());
-            BrandPojo brand = brandService.getAndCheckBrandById(product.getBrandId());
-            if (checkValidity(brand, brandName, brandCategory)) {
-                filteredOrderItems.add(orderItem);
-            }
-        }
-        return filteredOrderItems;
-    }
-
     public List<SalesData> getSalesReport(String brandName,
             String brandCategory,
-            Date start,
-            Date end) throws ApiException {
+            LocalDateTime start,
+            LocalDateTime end) throws ApiException {
         LocalDateTime startTime = getStartTime(start);
         LocalDateTime endTime = getEndTime(end);
         if(brandName == (null))brandName = "";
@@ -108,6 +91,8 @@ public class ReportDto {
     return salesData;
     }
 
+
+
     public List<SalesData> getSalesReport(SalesForm form) throws ApiException {
 
         List<SalesData> salesReport = getSalesReport(form.getBrandName(), form.getBrandCategory(),
@@ -133,14 +118,99 @@ public class ReportDto {
             ProductPojo product = productIdToProductMapping.get(inventory.getProductId());
             BrandPojo brand = brandService.getAndCheckBrandById(product.getBrandId());
             brandIdToBrandMapping.put(brand.getId(), brand);
-            if (brandIdToQuantityMapping.containsKey(brand.getId()))
-                brandIdToQuantityMapping.put(brand.getId(), brandIdToQuantityMapping.get(brand.getId()) + inventory.getQuantity());
-            else
-                brandIdToQuantityMapping.put(brand.getId(), inventory.getQuantity());
+            brandIdToQuantityMapping.put(brand.getId(),brandIdToQuantityMapping.getOrDefault(brand.getId(),0)+inventory.getQuantity());
         }
         return getInventoryRportdata(brandIdToQuantityMapping, brandIdToBrandMapping,form);
     }
 
+
+
+    public List<BrandData> getBrandReport(BrandForm form) {
+        List<BrandPojo> brands = brandService.getAllBrand();
+        List<BrandData> brandsData = new ArrayList<>();
+        for(BrandPojo brand : brands){
+            if(checkValidity(brand, form.getName(), form.getCategory())){
+                brandsData.add(convertToBrandData(brand));
+            }
+        }
+        return brandsData;
+    }
+
+
+    public List<DailyData> getDailyReport(DailyReportForm form) throws ApiException {
+        LocalDateTime startTime = getStartTime(form.getStartTime());
+        LocalDateTime endTime = getEndTime(form.getEndTime());
+        if(startTime.isAfter(endTime)){
+            throw new ApiException("start time should be before end time");
+        }
+        List<DailyReportPojo> dailyReportPojo = dayToDayService.getDailyReport();
+        List<DailyData> dailyDataList = new ArrayList<>();
+        for (DailyReportPojo d : dailyReportPojo) {
+            LocalDateTime date = d.getDate();
+            if(timeIsBetween(date, startTime, endTime)){
+                dailyDataList.add(convertToDailyData(d));
+            }
+        }
+        return dailyDataList;
+    }
+
+    public void updatePerDaySale() {
+        LocalDateTime today = LocalDateTime.now(ZoneOffset.UTC);
+        LocalDateTime yesterday = today.minusDays(1);
+        List<OrderPojo> orders = orderService.getOrdersBetweenTime(yesterday, today);
+        Map<LocalDateTime, Integer> dateToOrdersQuantity = new HashMap<>();
+        Map<LocalDateTime, Integer> dateToOrderItemsQuantity = new HashMap<>();
+        Map<LocalDateTime, Float> dateToRevenue = new HashMap<>();
+        for (OrderPojo order : orders) {
+            LocalDateTime time = order.getCreatedOn();
+            dateToOrdersQuantity.put(time, dateToOrdersQuantity.getOrDefault(time, 0) + 1);
+            List<OrderItemPojo> orderItems = orderItemService.getOrderItemsById(order.getId());
+            for (OrderItemPojo orderItem : orderItems) {
+                dateToRevenue.put(time,dateToRevenue.getOrDefault(time,0.0f)+orderItem.getQuantity() * orderItem.getSellingPrice());
+                dateToOrderItemsQuantity.put(time,dateToOrderItemsQuantity.getOrDefault(time,0)+ orderItem.getQuantity());
+            }
+
+        }
+        List<DailyReportPojo> dailyReportPojo = updateDailyData(dateToOrdersQuantity, dateToOrderItemsQuantity, dateToRevenue);
+        dayToDayService.addDailyReport(dailyReportPojo);
+    }
+    private List<OrderItemPojo> filterOrderItems(List<OrderItemPojo> orderItems, String brandName, String brandCategory) throws ApiException {
+        List<OrderItemPojo> filteredOrderItems = new ArrayList<>();
+        for (OrderItemPojo orderItem : orderItems) {
+            ProductPojo product = productService.checkProduct(orderItem.getProductId());
+            BrandPojo brand = brandService.getAndCheckBrandById(product.getBrandId());
+            if (checkValidity(brand, brandName, brandCategory)) {
+                filteredOrderItems.add(orderItem);
+            }
+        }
+        return filteredOrderItems;
+    }
+
+    private boolean timeIsBetween(LocalDateTime date, LocalDateTime startDate, LocalDateTime endDate) {
+        if (date.isEqual(startDate) || date.isEqual(endDate)) return true;
+        return date.isBefore(endDate) && date.isAfter(startDate);
+    }
+
+
+    private List<DailyReportPojo> updateDailyData(
+            Map<LocalDateTime, Integer> dateToOrdersQuantity,
+            Map<LocalDateTime, Integer> dateToOrderItemsQuantity,
+            Map<LocalDateTime, Float> dateToRevenue) {
+        Iterator<Map.Entry<LocalDateTime, Integer>> itr = dateToOrdersQuantity.entrySet().iterator();
+        List<DailyReportPojo> dailyReportPojoList = new ArrayList<>();
+        while (itr.hasNext()) {
+            Map.Entry<LocalDateTime, Integer> entry = itr.next();
+            DailyReportPojo dailyReportPojo = new DailyReportPojo();
+            LocalDateTime time = entry.getKey();
+            int quantity = entry.getValue();
+            dailyReportPojo.setOrdersQuantity(quantity);
+            dailyReportPojo.setOrderItemsQuantity(dateToOrderItemsQuantity.get(time));
+            dailyReportPojo.setRevenue(dateToRevenue.get(time));
+            dailyReportPojo.setDate(time);
+            dailyReportPojoList.add(dailyReportPojo);
+        }
+        return dailyReportPojoList;
+    }
     private List<InventoryReportData> getInventoryRportdata(Map<Integer, Integer> brandIdToQuantityMapping,
                                                             Map<Integer, BrandPojo> brandIdToBrandMapping,
                                                             BrandForm form) {
@@ -158,121 +228,6 @@ public class ReportDto {
             }
         }
         return inventoriesReportData;
-    }
-
-    public List<BrandData> getBrandReport(BrandForm form) {
-        List<BrandPojo> brands = brandService.getAllBrand();
-        List<BrandData> brandsData = new ArrayList<>();
-        for(BrandPojo brand : brands){
-            if(checkValidity(brand, form.getName(), form.getCategory())){
-                brandsData.add(convertToBrandData(brand));
-            }
-        }
-        return brandsData;
-    }
-
-    private List<DailyReportPojo> updateDailyData(
-            Map<LocalDate, Integer> dateToOrdersQuantity,
-            Map<LocalDate, Integer> dateToOrderItemsQuantity,
-            Map<LocalDate, Float> dateToRevenue) {
-        Iterator<Map.Entry<LocalDate, Integer>> itr = dateToOrdersQuantity.entrySet().iterator();
-        List<DailyReportPojo> dailyReportPojoList = new ArrayList<>();
-        while (itr.hasNext()) {
-            Map.Entry<LocalDate, Integer> entry = itr.next();
-            DailyReportPojo dailyReportPojo = new DailyReportPojo();
-            LocalDate time = entry.getKey();
-            int quantity = entry.getValue();
-            dailyReportPojo.setOrdersQuantity(quantity);
-            dailyReportPojo.setOrderItemsQuantity(dateToOrderItemsQuantity.get(time));
-            dailyReportPojo.setRevenue(dateToRevenue.get(time));
-            dailyReportPojo.setDate(time);
-            dailyReportPojoList.add(dailyReportPojo);
-
-
-        }
-        return dailyReportPojoList;
-    }
-
-    public LocalDateTime convertToLocalDateTimeViaInstant(Date dateToConvert) {
-        return dateToConvert.toInstant()
-                .atZone(ZoneId.systemDefault())
-                .toLocalDateTime();
-    }
-    private LocalDateTime getStartTime(Date start){
-        LocalDateTime startTime = LocalDateTime.MIN;
-        if(start== null){
-            startTime = formatStartDate(startTime);
-        }
-        else {
-            startTime = (convertToLocalDateTimeViaInstant(start));
-            startTime = formatStartDate(startTime);
-        }
-        return startTime;
-    }
-
-    private LocalDateTime getEndTime(Date end){
-        LocalDateTime endTime = LocalDateTime.MAX;
-
-        if(end== null){
-            endTime= formatEndDate(endTime);
-        }
-        else {
-            endTime = (convertToLocalDateTimeViaInstant(end));
-            endTime = formatEndDate(endTime);
-        }
-        return endTime;
-    }
-
-    private boolean isBetween(LocalDateTime date, LocalDateTime startDate, LocalDateTime endDate) {
-        if (date.isEqual(startDate) || date.isEqual(endDate)) return true;
-        return date.isBefore(endDate) && date.isAfter(startDate);
-    }
-    public List<DailyData> getDailyReport(DailyReportForm form) throws ApiException {
-        Date start = form.getStartTime(), end = form.getEndTime();
-        LocalDateTime startTime = getStartTime(start);
-        LocalDateTime endTime = getEndTime(end);
-        if(startTime.isAfter(endTime)){
-            throw new ApiException("start time should be before end time");
-        }
-        List<DailyReportPojo> dailyReportPojo = dayToDayService.getDailyReport();
-        List<DailyData> dailyDataList = new ArrayList<>();
-        for (DailyReportPojo d : dailyReportPojo) {
-            LocalDateTime date = d.getDate().atStartOfDay();
-            if(isBetween(date, startTime, endTime)){
-                dailyDataList.add(convertToDailyData(d));
-            }
-        }
-        return dailyDataList;
-    }
-
-    public void updatePerDaySale() {
-        // TODO: 29/01/23 you can populate all 3 maps at a time
-        LocalDateTime today = LocalDateTime.now(ZoneOffset.UTC);
-        LocalDateTime yesterday = today.minusDays(1);
-        List<OrderPojo> orders = orderService.getOrdersBetweenTime(yesterday, today);
-        Map<LocalDate, Integer> dateToOrdersQuantity = new HashMap<>();
-        Map<LocalDate, Integer> dateToOrderItemsQuantity = new HashMap<>();
-        Map<LocalDate, Float> dateToRevenue = new HashMap<>();
-
-        for (OrderPojo order : orders) {
-            // todo use getOrDefault
-            dateToOrdersQuantity.put(order.getCreatedOn().toLocalDate(), dateToOrdersQuantity.getOrDefault(order.getCreatedOn().toLocalDate(), 0) + 1);
-
-            List<OrderItemPojo> orderItems = orderItemService.getOrderItemsById(order.getId());
-            for (OrderItemPojo orderItem : orderItems) {
-                if (dateToRevenue.containsKey(order.getCreatedOn().toLocalDate())) {
-                    dateToOrderItemsQuantity.put(order.getCreatedOn().toLocalDate(), dateToOrderItemsQuantity.get(order.getCreatedOn().toLocalDate()) + orderItem.getQuantity());
-                    dateToRevenue.put(order.getCreatedOn().toLocalDate(), dateToRevenue.get(order.getCreatedOn().toLocalDate()) + orderItem.getQuantity() * orderItem.getSellingPrice());
-                } else {
-                    dateToOrderItemsQuantity.put(order.getCreatedOn().toLocalDate(), orderItem.getQuantity());
-                    dateToRevenue.put(order.getCreatedOn().toLocalDate(), orderItem.getQuantity() * orderItem.getSellingPrice());
-                }
-            }
-
-        }
-        List<DailyReportPojo> dailyReportPojo = updateDailyData(dateToOrdersQuantity, dateToOrderItemsQuantity, dateToRevenue);
-        dayToDayService.addDailyReport(dailyReportPojo);
-
     }
 
 

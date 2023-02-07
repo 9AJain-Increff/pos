@@ -34,14 +34,14 @@ public class BrandApiController {
 
     @ApiOperation(value = "Gets a brand by ID")
     @RequestMapping(path = "{orderId}", method = RequestMethod.GET)
-    public BrandData get(@PathVariable int orderId) throws ApiException {
+    public BrandData get(@PathVariable Integer orderId) throws ApiException {
         BrandData p = dto.getBrandById(orderId);
         return (p);
     }
 
     @ApiOperation(value = "Edit a Brand")
     @RequestMapping(path = "{id}", method = RequestMethod.PUT)
-    public BrandData updateBrand(@PathVariable int id, @RequestBody BrandForm form) throws ApiException {
+    public BrandData updateBrand(@PathVariable Integer id, @RequestBody BrandForm form) throws ApiException {
         return dto.updateBrand(id, form);
     }
 

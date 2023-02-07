@@ -46,15 +46,6 @@ public class InventoryDto {
         return convertToInventoryData(p, product);
     }
 
-    public InventoryData updateInventory(InventoryForm form) throws ApiException {
-        form.setBarcode(normalize(form.getBarcode()));
-        validateInventoryForm(form);
-        ProductPojo product = productService.getProductByBarcode(form.getBarcode());
-        InventoryPojo p = convertToInventoryPojo(form, product.getId());
-        inventoryService.update(p);
-        return convertToInventoryData(p, product);
-    }
-
     public List<String> getBarcodes(List<InventoryPojo> inventoryPojoList) throws ApiException {
         List<String> barcodes = new ArrayList<>();
         for (InventoryPojo inventory : inventoryPojoList) {

@@ -36,7 +36,7 @@ public class AdminApiController {
 
     @ApiOperation(value = "Deletes a user")
     @RequestMapping(path = "/api/admin/user/{id}", method = RequestMethod.DELETE)
-    public void deleteUser(@PathVariable int id) {
+    public void deleteUser(@PathVariable Integer id) {
         userDto.delete(id);
     }
 

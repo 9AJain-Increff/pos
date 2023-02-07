@@ -25,9 +25,9 @@
                     type="button"
                     class="btn btn-primary"
                     id="upload-data"
-                    th:if="${#strings.equalsIgnoreCase(info.getRole().name(), 'supervisor')}"
-            >Upload</button>
-            <!--            <button type="button" class="btn btn-primary" id="refresh-data">Refresh</button>-->
+                    th:if="${#strings.equalsIgnoreCase(info.getRole().name(), 'supervisor')}">
+                   Upload
+            </button>
         </div>
         <!--        <div class="col-3">-->
         <!--            <button type="button" class="btn btn-primary" id="create-new-inventory">Add</button>-->
@@ -36,10 +36,6 @@
         <!--        </div>-->
     </div>
 
-    <!-- Blank Row -->
-    <div class="row">
-        &nbsp;
-    </div>
     <div class="row">
 
         <!-- Table -->
@@ -108,7 +104,8 @@
 
 
 
-    <!-- Inventory Edit Modal -->
+
+    <!-- Upload Inventory Modal -->
     <div class="modal" tabindex="-1" role="dialog" id="upload-inventory-modal">
         <div class="modal-dialog" role="document">
             <div class="modal-content">

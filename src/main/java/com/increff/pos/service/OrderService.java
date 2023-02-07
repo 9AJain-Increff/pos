@@ -65,12 +65,7 @@ public class OrderService {
 
 
     public List<OrderPojo> getOrdersBetweenTime(LocalDateTime start, LocalDateTime end) {
-        return getAllOrders().stream().filter(it -> {
-                    LocalDateTime date = it.getCreatedOn();
-                    return (date.isEqual(start) || date.isEqual(end)) ||
-                            (date.isAfter(start) && date.isBefore(end));
-                }
-        ).collect(Collectors.toList());
+        return orderDao.selectAllByDates(start,end);
     }
 
 

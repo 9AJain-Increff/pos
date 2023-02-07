@@ -3,16 +3,17 @@ package com.increff.pos.pojo;
 import com.increff.pos.model.auth.UserRole;
 import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(
+        uniqueConstraints = {@UniqueConstraint(columnNames = {"email" })},
+        indexes = {@Index(columnList = "email")}
+)
 public class UserPojo {
 
     @Id

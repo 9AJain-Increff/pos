@@ -18,5 +18,5 @@ public class InventoryPojo {
     // FIXED: 29/01/23 there is no need of sep id
     @Id
     private Integer productId;
-    private int quantity;
+    private Integer quantity;
 }

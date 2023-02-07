@@ -30,8 +30,6 @@ public class ProductService {
         return dao.add(product);
     }
 
-
-    // FIXED: 29/01/23 remove ApiException
     public List<ProductPojo> getAllProduct() {
         return dao.getAllProduct();
     }
@@ -45,22 +43,15 @@ public class ProductService {
         exist.setBrandId(product.getBrandId());
     }
 
-    private ProductPojo checkIfProductExist(ProductPojo p, String identity) throws ApiException {
-        if (p == null) {
-            throw new ApiException("Product with given " + identity + " does not exist");
-        }
-        return p;
-    }
+
 
     public ProductPojo getProductByBarcode(String barcode) throws ApiException {
         normalize(barcode);
         ProductPojo p = dao.getProductByBarcode(barcode);
-        /// FIXED: 29/01/23 below code can be combined with getProductById method
         return checkIfProductExist(p, "barcode");
     }
     public ProductPojo getProductById(Integer id) throws ApiException {
         ProductPojo p = dao.getProductById(id);
-        /// FIXED: 29/01/23 below code can be combined with getProductById method
         return checkIfProductExist(p, "barcode");
     }
 
@@ -88,14 +79,7 @@ public class ProductService {
         }
     }
 
-    private void checkBarcode(String barcode) throws ApiException {
-        normalize(barcode);
-        ProductPojo p = dao.getProductByBarcode(barcode);
-        if (p != null) {
-            throw new ApiException(("barcode already exist "));
-        }
 
-    }
 
     public List<ProductPojo> getProductsByIds(List<Integer> productIds) {
         List<ProductPojo> products = new ArrayList<>();
@@ -117,6 +101,20 @@ public class ProductService {
         }
         return products;
     }
+    private ProductPojo checkIfProductExist(ProductPojo p, String identity) throws ApiException {
+        if (p == null) {
+            throw new ApiException("Product with given " + identity + " does not exist");
+        }
+        return p;
+    }
 
+    private void checkBarcode(String barcode) throws ApiException {
+        normalize(barcode);
+        ProductPojo p = dao.getProductByBarcode(barcode);
+        if (p != null) {
+            throw new ApiException(("barcode already exist "));
+        }
+
+    }
 
 }

@@ -70,34 +70,34 @@ public class InventoryDtoTest extends AbstractUnitTest {
         AssertUtil.assertEqualInventoryData(expected, actual);
     }
 
-    @Test
-    @Rollback
-    public void testUpdateInventoryItem() throws ApiException {
-        InventoryForm inventoryForm = new InventoryForm();
-        inventoryForm.setQuantity(100);
-        inventoryForm.setBarcode("a1001");
-        inventoryDto.updateInventory(inventoryForm);
+//    @Test
+//    @Rollback
+//    public void testUpdateInventoryItem() throws ApiException {
+//        InventoryForm inventoryForm = new InventoryForm();
+//        inventoryForm.setQuantity(100);
+//        inventoryForm.setBarcode("a1001");
+//        inventoryDto.updateInventory(inventoryForm);
+//
+//        Integer productId = products
+//                .stream()
+//                .filter(it -> it.getBarcode().equals("a1001"))
+//                .collect(Collectors.toList()).get(0)
+//                .getId();
+//
+//        InventoryPojo inventory = inventoryService.getAndCheckInventoryByProductId(productId);
+//        Assert.assertEquals(100, inventory.getQuantity());
+//    }
 
-        Integer productId = products
-                .stream()
-                .filter(it -> it.getBarcode().equals("a1001"))
-                .collect(Collectors.toList()).get(0)
-                .getId();
-
-        InventoryPojo inventory = inventoryService.getAndCheckInventoryByProductId(productId);
-        Assert.assertEquals(100, inventory.getQuantity());
-    }
-
-    @Test
-    @Rollback
-    public void testUpdateInventoryItemWithNegativeQuantityThrowsException() throws ApiException {
-        InventoryForm inventoryForm = new InventoryForm();
-        inventoryForm.setQuantity(-1);
-        inventoryForm.setBarcode("a1001");
-        exceptionRule.expect(ApiException.class);
-        exceptionRule.expectMessage("quantity cannot be negative");
-        inventoryDto.updateInventory(inventoryForm);
-    }
+//    @Test
+//    @Rollback
+//    public void testUpdateInventoryItemWithNegativeQuantityThrowsException() throws ApiException {
+//        InventoryForm inventoryForm = new InventoryForm();
+//        inventoryForm.setQuantity(-1);
+//        inventoryForm.setBarcode("a1001");
+//        exceptionRule.expect(ApiException.class);
+//        exceptionRule.expectMessage("quantity cannot be negative");
+//        inventoryDto.updateInventory(inventoryForm);
+//    }
 
     @Test
     @Rollback

@@ -22,7 +22,7 @@ public class OrderItemService {
     private OrderItemDao dao;
 
     @Transactional(rollbackOn = ApiException.class)
-    public void addOrderItem(List<OrderItemPojo> p) {
+    public void addOrderItems(List<OrderItemPojo> p) {
         for (OrderItemPojo orderItemPojo : p) {
             normalizeOrderItem(orderItemPojo);
         }
@@ -30,6 +30,11 @@ public class OrderItemService {
             dao.insert(orderItemPojo);
         }
 
+    }
+    @Transactional(rollbackOn = ApiException.class)
+    public void addOrderItem(OrderItemPojo p) {
+        normalizeOrderItem(p);
+        dao.insert(p);
     }
 
     @Transactional(rollbackOn = ApiException.class)

@@ -44,15 +44,15 @@ public class ProductserviceTest extends AbstractUnitTest {
         productService.checkProductByIdAndBarcode(product.getId(),product.getBarcode());
     }
 
-    @Test
-    public void getByIdForValidIdReturnProductEntity() throws ApiException {
-        ProductPojo expected = MockUtil.getMockProduct();
-        productDao.add(expected);
-        ProductPojo actual = productService.checkProduct(expected.getId());
-        AssertUtil.assertEqualProducts(expected, actual);
-    }
+//    @Test
+//    public void getByIdForValidIdReturnProductEntity() throws ApiException {
+//        ProductPojo expected = MockUtil.getMockProduct();
+//        productDao.add(expected);
+//        ProductPojo actual = productService.checkProduct(expected.getId());
+//        AssertUtil.assertEqualProducts(expected, actual);
+//    }
 
-    private List<ProductPojo> insertMockProducts(int size) {
+    private List<ProductPojo> insertMockProducts(Integer size) {
         List<ProductPojo> mockProducts = MockUtil.getMockProducts(size);
         mockProducts.forEach(productDao::add);
         return mockProducts;

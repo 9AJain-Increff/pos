@@ -10,9 +10,10 @@ import java.time.LocalDateTime;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(
+        uniqueConstraints = {@UniqueConstraint(columnNames = {"orderURL"})}
+)
 public class OrderPojo {
-
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;

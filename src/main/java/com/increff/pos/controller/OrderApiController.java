@@ -32,7 +32,7 @@ public class OrderApiController {
 
     @ApiOperation(value = "Get a Pdf Url")
 
-    @RequestMapping(path = "/invoice/{id}", method = RequestMethod.GET)
+    @RequestMapping(path = "/{id}/invoice", method = RequestMethod.GET)
     public void getPdf(@PathVariable Integer id, HttpServletResponse response) throws ApiException {
         String filePath = orderDto.getOrderById(id).getOrderURL();
         response.setContentType("application/pdf");
@@ -51,18 +51,18 @@ public class OrderApiController {
     @ApiOperation(value = "Gets list of all orders")
     @RequestMapping(path = "", method = RequestMethod.GET)
     public List<OrderData> getAllOrder() {
-        return orderDto.getAllOrders();
+            return orderDto.getAllOrders();
     }
 
     @ApiOperation(value = "Gets a order by ID")
     @RequestMapping(path = "/{id}", method = RequestMethod.GET)
-    public List<OrderItemData> get(@PathVariable int id) throws ApiException {
+    public List<OrderItemData> get(@PathVariable Integer id) throws ApiException {
         return orderDto.getOrderItemsById(id);
     }
 
     @ApiOperation(value = "Edit a Order")
     @RequestMapping(path = "/{id}", method = RequestMethod.PUT)
-    public void updateOrder(@PathVariable int id, @RequestBody List<OrderItemForm> form) throws ApiException {
+    public void updateOrder(@PathVariable Integer id, @RequestBody List<OrderItemForm> form) throws ApiException {
         orderDto.updateOrder(id, form);
 
     }

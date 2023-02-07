@@ -208,12 +208,15 @@ function resetModal() {
   displayCreateOrderItems(orderItems);
 }
 function getFormattedDate(timeUTC) {
-  const year = timeUTC.year;
-  const month = timeUTC.monthValue;
-  const day = timeUTC.dayOfMonth;
-   const hour = timeUTC.hour;
-    const min = timeUTC.minute;
-const sec = timeUTC.second;
+while(timeUTC.length <6 ){
+timeUTC.push(0);
+}
+  const year = timeUTC[0];
+  const month = timeUTC[1];
+  const day = timeUTC[2];
+   const hour = timeUTC[3];
+    const min = timeUTC[4];
+const sec = timeUTC[5];
 
   const ist = new Date(`${month}/${day}/${year} ${hour}:${min}:${sec} UTC`);
 
@@ -233,7 +236,7 @@ const sec = timeUTC.second;
 }
 
 function callPdfGenerator(id){
-const url = getOrderUrl() +'invoice/'+ id;
+const url = getOrderUrl() +id+'/invoice';
   $.ajax({
     url: url,
     type: 'GET',
