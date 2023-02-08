@@ -165,6 +165,7 @@ function uploadRows(){
 
 	//Process next row
 	var row = fileData[processCount];
+
 	processCount++;
 
 	if(row.__parsed_extra)

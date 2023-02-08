@@ -37,6 +37,10 @@ public class SignUpApiController extends AbstractUiController {
     @ApiOperation(value = "Initializes application")
     @RequestMapping(path = "/site/signup", method = RequestMethod.POST)
     public ModelAndView signUp(HttpServletRequest req, UserForm form) throws ApiException {
+        if(!(form.getPassword().equals(form.getConfirmPassword()))){
+            info.setMessage("password doesn't match");
+            return new ModelAndView("redirect:/site/signup");
+        }
         UserPojo user = signUpDto.getUserByEmail(form);
         if(user != null) {
             info.setMessage("email already exist");

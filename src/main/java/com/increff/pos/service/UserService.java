@@ -29,6 +29,7 @@ public class UserService {
         return dao.insert(p);
     }
 
+
     public UserPojo getUserByEmail(String email) throws ApiException {
         UserPojo user = dao.selectByEmail(email);
         if (user == null) {
@@ -38,6 +39,7 @@ public class UserService {
     }
     public UserPojo checkUserByEmail(String email)  {
         UserPojo user = dao.selectByEmail(email);
+
         return user;
     }
 

@@ -110,7 +110,7 @@ function readFileDataCallback(results){
 	if(fields.length!=2)
 	{
 	    var row = {};
-	    row.error = "Incorrect number of headers";
+	    row.result = "Incorrect number of headers";
 	    errorData.push(row);
 	    return;
 	}
@@ -118,7 +118,7 @@ function readFileDataCallback(results){
 	if(fields[0]!='name' || fields[1]!='category')
 	{
 	    var row = {};
-        row.error = "Incorrect headers";
+        row.result = "Incorrect headers";
         errorData.push(row);
         return;
 	}
@@ -151,11 +151,17 @@ function uploadRows(){
 
 	//Process next row
 	var row = fileData[processCount];
+	row.S_No = processCount+1;
+	row = preferredOrder(row, [
+        "S_No",
+        "name",
+        "category",
+    ]);
 	processCount++;
 
 	if(row.__parsed_extra)
 	{
-	    row.error = "Extra fields";
+	    row.result = "Extra fields";
 	    errorData.push(row);
 	    uploadRows();
 	    return;
@@ -173,15 +179,26 @@ function uploadRows(){
        	'Content-Type': 'application/json'
        },
 	   success: function(response) {
+	   	    row.result = "Extra fields";
+       	    errorData.push(row);
 	   		uploadRows();
 	   },
 	   error: function(response){
-	   		row.error=response.responseText
+	   		row.result=response.responseText
 	   		errorData.push(row);
 	   		uploadRows();
 	   }
 	});
 
+}
+function preferredOrder(obj, order) {
+    var newObject = {};
+    for(var i = 0; i < order.length; i++) {
+        if(obj.hasOwnProperty(order[i])) {
+            newObject[order[i]] = obj[order[i]];
+        }
+    }
+    return newObject;
 }
 
 function downloadErrors(){

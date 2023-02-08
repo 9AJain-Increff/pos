@@ -2,11 +2,13 @@ package com.increff.pos.dto;
 
 import com.increff.pos.exception.ApiException;
 import com.increff.pos.model.auth.UserRole;
+import com.increff.pos.model.form.LoginForm;
 import com.increff.pos.model.form.UserForm;
 import com.increff.pos.pojo.UserPojo;
 import com.increff.pos.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.util.List;
 @Component
@@ -28,8 +30,9 @@ public class UserDto {
         userService.addUser(p);
     }
 
-    public UserPojo checkUserExist(String email)  {
-        return userService.checkUserByEmail(email);
+    public UserPojo checkUserExist(LoginForm form)  {
+
+        return userService.checkUserByEmail(form.getEmail());
     }
 
     private static UserPojo convert(UserForm f) {
